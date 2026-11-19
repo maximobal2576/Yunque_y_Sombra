@@ -4,12 +4,17 @@
 extends Node
 
 const POOL_SIZE: int = 12
+const BACKGROUND_MUSIC_PATH: String = "res://assets/audio/music/musica_fondo_tranquila.wav"
+const DEFAULT_MUSIC_VOLUME_DB: float = -13.5
 
 var audio_streams: Dictionary = {}
 var players_pool: Array[AudioStreamPlayer] = []
 var pool_index: int = 0
 var steam_player: AudioStreamPlayer = null
 var forge_ambient_player: AudioStreamPlayer = null
+var music_player: AudioStreamPlayer = null
+var _music_active: bool = false
+var _music_volume_db: float = DEFAULT_MUSIC_VOLUME_DB
 var _forge_ambient_active: bool = false
 var _forge_ambient_timer: float = 0.0
 var _steam_tween: Tween = null
@@ -32,7 +37,8 @@ const PRELOADED_SOUNDS: Dictionary = {
 	"pickaxe_hit": preload("res://assets/audio/sfx/pickaxe_hit.wav"),
 	"rock_shatter": preload("res://assets/audio/sfx/rock_shatter.wav"),
 	"torch_light": preload("res://assets/audio/sfx/torch_light.wav"),
-	"step_complete": preload("res://assets/audio/sfx/step_complete.wav")
+	"step_complete": preload("res://assets/audio/sfx/step_complete.wav"),
+	"bg_music": preload("res://assets/audio/music/musica_fondo_tranquila.wav")
 }
 
 const SOUND_PATHS: Dictionary = {
@@ -52,7 +58,8 @@ const SOUND_PATHS: Dictionary = {
 	"pickaxe_hit": "res://assets/audio/sfx/pickaxe_hit.wav",
 	"rock_shatter": "res://assets/audio/sfx/rock_shatter.wav",
 	"torch_light": "res://assets/audio/sfx/torch_light.wav",
-	"step_complete": "res://assets/audio/sfx/step_complete.wav"
+	"step_complete": "res://assets/audio/sfx/step_complete.wav",
+	"bg_music": BACKGROUND_MUSIC_PATH
 }
 
 func _ready() -> void:
@@ -83,13 +90,24 @@ func _ready() -> void:
 	if audio_streams.has("fire"):
 		forge_ambient_player.stream = audio_streams["fire"] as AudioStream
 	add_child(forge_ambient_player)
-	set_process(false)
+	
+	# Reproductor dedicado para música tranquila medieval/artesanal de fondo
+	music_player = AudioStreamPlayer.new()
+	music_player.name = "ReproductorMusicaFondo"
+	music_player.bus = &"Music" if AudioServer.get_bus_index(&"Music") != -1 else &"Master"
+	music_player.volume_db = _music_volume_db
+	var music_stream: AudioStream = _prepare_background_music_stream()
+	if music_stream != null:
+		music_player.stream = music_stream
+	add_child(music_player)
+	start_background_music()
 
 func _exit_tree() -> void:
 	if _steam_tween != null and _steam_tween.is_valid():
 		_steam_tween.kill()
 	if _bellows_tween != null and _bellows_tween.is_valid():
 		_bellows_tween.kill()
+	stop_background_music()
 	stop_all_sfx()
 	players_pool.clear()
 
@@ -104,17 +122,99 @@ func stop_all_sfx() -> void:
 	if is_instance_valid(forge_ambient_player):
 		forge_ambient_player.stop()
 		forge_ambient_player.stream = null
+	if is_instance_valid(music_player):
+		_music_active = false
+		music_player.stop()
+		music_player.stream = null
 
 func _process(delta: float) -> void:
-	if not _forge_ambient_active or not is_instance_valid(forge_ambient_player):
+	if not _forge_ambient_active and not _music_active:
 		set_process(false)
 		return
-	_forge_ambient_timer -= delta
-	if not forge_ambient_player.playing and _forge_ambient_timer <= 0.0:
-		forge_ambient_player.pitch_scale = randf_range(0.92, 1.06)
-		forge_ambient_player.volume_db = randf_range(-12.5, -9.5)
-		forge_ambient_player.play()
-		_forge_ambient_timer = randf_range(0.15, 0.45)
+		
+	if _music_active and is_instance_valid(music_player):
+		if music_player.stream != null and not music_player.playing:
+			music_player.play()
+			
+	if _forge_ambient_active and is_instance_valid(forge_ambient_player):
+		_forge_ambient_timer -= delta
+		if not forge_ambient_player.playing and _forge_ambient_timer <= 0.0:
+			forge_ambient_player.pitch_scale = randf_range(0.92, 1.06)
+			forge_ambient_player.volume_db = randf_range(-12.5, -9.5)
+			forge_ambient_player.play()
+			_forge_ambient_timer = randf_range(0.15, 0.45)
+
+func _prepare_background_music_stream() -> AudioStream:
+	var stream: AudioStream = null
+	if audio_streams.has("bg_music") and audio_streams["bg_music"] is AudioStream:
+		stream = audio_streams["bg_music"] as AudioStream
+	else:
+		stream = _load_wav_resilient(BACKGROUND_MUSIC_PATH)
+	if stream == null:
+		stream = _generate_procedural_music_fallback()
+	if stream is AudioStreamWAV:
+		var wav_stream: AudioStreamWAV = stream as AudioStreamWAV
+		wav_stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav_stream.loop_begin = 0
+		var bytes_per_sample: int = 2 if wav_stream.format == AudioStreamWAV.FORMAT_16_BITS else 1
+		if wav_stream.stereo:
+			bytes_per_sample *= 2
+		if bytes_per_sample > 0 and wav_stream.data.size() > 0:
+			wav_stream.loop_end = int(wav_stream.data.size() / bytes_per_sample)
+	audio_streams["bg_music"] = stream
+	return stream
+
+func _generate_procedural_music_fallback() -> AudioStreamWAV:
+	# Fallback procedural en memoria por si aún no se importó el WAV en modo headless
+	var mix_rate: int = 22050
+	var duration_sec: float = 8.0
+	var total_samples: int = int(mix_rate * duration_sec)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+	var chord_freqs: Array[float] = [146.83, 220.00, 293.66, 349.23] # Re menor cálido
+	for i: int in range(total_samples):
+		var t: float = float(i) / float(mix_rate)
+		var env: float = 0.5 - 0.5 * cos(TAU * t / duration_sec)
+		var val: float = (
+			0.45 * sin(TAU * chord_freqs[0] * t)
+			+ 0.30 * sin(TAU * chord_freqs[1] * t)
+			+ 0.15 * sin(TAU * chord_freqs[2] * t)
+			+ 0.10 * sin(TAU * chord_freqs[3] * t)
+		) * env * 0.25
+		var sample_int: int = clampi(int(round(val * 32767.0)), -32767, 32767)
+		data.encode_s16(i * 2, sample_int)
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wav.loop_begin = 0
+	wav.loop_end = total_samples
+	return wav
+
+func start_background_music() -> void:
+	if not is_instance_valid(music_player):
+		return
+	if music_player.stream == null:
+		music_player.stream = _prepare_background_music_stream()
+	_music_active = true
+	music_player.volume_db = _music_volume_db
+	if not music_player.playing and music_player.stream != null:
+		music_player.play()
+	set_process(true)
+
+func stop_background_music() -> void:
+	_music_active = false
+	if is_instance_valid(music_player) and music_player.playing:
+		music_player.stop()
+	if not _forge_ambient_active:
+		set_process(false)
+
+func set_music_volume_db(vol: float) -> void:
+	_music_volume_db = clampf(vol, -60.0, 6.0)
+	if is_instance_valid(music_player):
+		music_player.volume_db = _music_volume_db
 
 func _load_all_samples() -> void:
 	for key: String in SOUND_PATHS.keys():
@@ -224,7 +324,8 @@ func start_forge_ambience() -> void:
 
 func stop_forge_ambience() -> void:
 	_forge_ambient_active = false
-	set_process(false)
+	if not _music_active:
+		set_process(false)
 	if is_instance_valid(forge_ambient_player) and forge_ambient_player.playing:
 		forge_ambient_player.stop()
 
