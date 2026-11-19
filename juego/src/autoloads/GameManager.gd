@@ -39,6 +39,23 @@ func _ready() -> void:
 	emit_signal("coins_changed", coins)
 	emit_signal("state_changed", current_state)
 
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F12:
+			_capture_live_viewport()
+
+func _capture_live_viewport() -> void:
+	var vp := get_viewport()
+	if not vp:
+		return
+	var img := vp.get_texture().get_image()
+	if img:
+		DirAccess.make_dir_absolute("res://screenshots")
+		var target := ProjectSettings.globalize_path("res://screenshots/live_eye_capture.png")
+		img.save_png(target)
+		print("📸 [OJOS ACTIVADOS] Captura de viewport guardada en: ", target)
+		post_notification("📸 Captura visual registrada para el Asistente")
+
 func change_state(new_state: State) -> void:
 	if current_state == new_state:
 		return
