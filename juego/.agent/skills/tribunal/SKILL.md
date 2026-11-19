@@ -1,51 +1,43 @@
 ---
 name: tribunal
 description: >-
-  Tribunal de Inspección Multi-Agente y Multi-Modelo. Despliega varios subagentes en paralelo para
-  inspeccionar todo el proyecto (orden de carpetas, archivos residuales, calidad de código, documentación
-  y cumplimiento de reglas) y cruza los hallazgos con una segunda opinión de modelos externos gratuitos
-  como DeepSeek (vía OpenRouter, API DeepSeek u Ollama local).
-  Activa esta skill cuando el usuario pida una inspección total, auditoría de orden/limpieza o revisión
-  cruzada con varios agentes y modelos externos (`/tribunal`).
+  Tribunal Supremo de Auditoría Técnica, Orden y Calidad Multi-Agente y Multi-Modelo (absorbe /revision).
+  Despliega subagentes en paralelo para auditar arquitectura GDScript 4 (SOLID, tipado ':=', cero nodos
+  huérfanos), orden de carpetas, fidelidad a docs/idea.txt con nodos en español, UI/UX (60-30-10, AAA)
+  y cruza el resultado con una segunda opinión externa gratuita vía OpenRouter (consultar_externo.py).
+  Activa esta skill cuando se solicite una auditoría profunda, revisión de fase o inspección general.
 ---
 
-# ⚖️ Tribunal Multi-Agente y Multi-Modelo (`/tribunal`)
+# ⚖️ Tribunal de Auditoría Multi-Agente y Multi-Modelo (`/tribunal`)
 
-Eres el **Presidente del Tribunal de Inspección**. Tu misión es evaluar de forma exhaustiva e imparcial el estado completo del proyecto combinando **subagentes internos paralelos** y **modelos externos gratuitos** (como DeepSeek) para evitar sesgos de un solo modelo.
+Eres el **Presidente del Tribunal de Auditoría** (unificando la revisión normativa de `/revision` y la inspección multi-modelo de `/tribunal`). Tu misión es evaluar bajo demanda el estado del proyecto sin inflar las respuestas cotidianas, combinando **subagentes internos en paralelo** y **segunda opinión externa vía OpenRouter**.
 
-## 📋 Protocolo de Ejecución
+---
 
-### Paso 1: Despliegue de Subagentes Internos en Paralelo
-Divide el workspace o proyecto en frentes independientes y lanza un subagente (`invoke_subagent` con `TypeName: "research"`, `Model: "flash"` o `"inherit"`) por cada frente:
-1. **Inspector de Orden y Estructura:** Verifica árbol de carpetas, archivos sueltos en la raíz, logs/temporales fuera de lugar, `.gitignore` y duplicados.
-2. **Inspector de Código y Arquitectura:** Revisa scripts principales, convenciones, tipado, deuda técnica, errores evidentes y código muerto.
-3. **Inspector de Documentación, Reglas y Skills:** Verifica coherencia entre `README.md`, `AGENTS.md` / `GEMINI.md`, guías y skills instaladas.
-4. **Inspector de Tests, Assets y Configuración:** Revisa que las pruebas, recursos y archivos de configuración estén ordenados y sin referencias rotas.
+## 📋 Protocolo de Ejecución en 3 Pasos
 
-> Espera a recibir los reportes de todos los subagentes antes de pasar al veredicto final.
+### Paso 1: Despliegue de Subagentes Internos por Frentes
+Invoca subagentes `research` en paralelo (`invoke_subagent`) según el alcance de la auditoría:
+1. **Frente 1 — Orden, Estructura y Limpieza:**
+   - Verifica que la raíz esté limpia (sin `.log`, `.bat` ni temporales sueltos), que `.gitignore` proteja claves/logs y que no existan carpetas de skills duplicadas.
+2. **Frente 2 — Arquitectura GDScript 4 y Fidelidad al GDD (`docs/idea.txt`):**
+   - Audita tipado estático estricto (`:=` y tipos explícitos), ausencia de sintaxis Godot 3, corrutinas seguras tras `await`, desacoplamiento por señales y **nombres de nodos 100% en español** en cada `.tscn`.
+3. **Frente 3 — Diseño de Juego, Retroalimentación y Dirección de Arte:**
+   - Verifica que las acciones tengan feedback multi-canal por señales (sin deriva de `scale` ni `Engine.time_scale` trabado), layout con `Containers`/`Anchors`, contraste WCAG AAA (> 7:1) y audio con *pitch jitter*.
 
-### Paso 2: Consulta a Modelo Externo Gratuito (Segunda Opinión)
-Para obtener una evaluación independiente con **DeepSeek** (u otro modelo gratuito configurado), ejecuta el script incluido en esta skill:
+### Paso 2: Segunda Opinión en Modelo Externo Gratuito (OpenRouter)
+Ejecuta el script de consulta externa sobre el resumen o los archivos críticos auditados:
 
 ```powershell
-python "C:\Users\curso\.gemini\antigravity\skills\tribunal\scripts\consultar_externo.py" --archivo "<ruta_al_resumen_o_archivo>" --rol "auditor"
+python "C:\Users\curso\.gemini\antigravity\skills\tribunal\scripts\consultar_externo.py" --archivo "<ruta_archivo>" --rol "auditor"
 ```
+*(El script carga automáticamente `OPENROUTER_API_KEY` del entorno o del `.env` local de la skill y consulta `openrouter/free` con fallback automático).*
 
-También puedes pasar texto directo por `--prompt "..."` o por stdin. El script detecta automáticamente el proveedor disponible según las variables de entorno configuradas:
-1. `OPENROUTER_API_KEY` → Usa modelos gratuitos de OpenRouter (por defecto `deepseek/deepseek-r1:free`, fallback `deepseek/deepseek-chat-v3-0324:free`).
-2. `DEEPSEEK_API_KEY` → Usa la API directa de DeepSeek (`deepseek-chat`).
-3. `GROQ_API_KEY` → Usa Groq (`llama-3.3-70b-versatile`).
-4. **Ollama local** (`http://localhost:11434`) → Usa `deepseek-r1` local sin necesidad de API key ni internet.
-
-*Si no hay ningún proveedor externo configurado o disponible*, infórmalo claramente en el reporte indicando exactamente qué variable o servicio falta, pero **no bloquees** el veredicto del Tribunal basado en los subagentes internos.
-
-### Paso 3: Veredicto Consolidado del Tribunal
-Presenta un dictamen estructurado con:
-- **Estado General:** `APROBADO` | `APROBADO CON OBSERVACIONES` | `REQUIERE ORDENAMIENTO`
-- **Hallazgos por Frente** (Estructura/Orden, Código, Documentación/Reglas, Tests/Config).
-- **Segunda Opinión Externa (DeepSeek):** Puntos donde el modelo externo coincide o agrega observaciones distintas.
-- **Lista de Acciones Priorizadas:**
-  - 🔴 **Crítico / Bloqueante**
-  - 🟡 **Orden y Limpieza**
-  - 🟢 **Mejora recomendada**
-- Al finalizar los subagentes, límpialos con `manage_subagents` (`kill_all`) si ya quedaron inactivos.
+### Paso 3: Veredicto Consolidado
+Presenta un fallo directo y accionable:
+- **Dictamen:** `APROBADO` | `APROBADO CON OBSERVACIONES` | `RECHAZADO`
+- **Coincidencias y Hallazgos (Internos + Segunda Opinión Externa):**
+  - 🔴 **Crítico / Bloqueante** (errores de compilación, soft-locks, violación de `docs/idea.txt`).
+  - 🟡 **Orden y Arquitectura** (deuda técnica, nodos en inglés, falta de tipado).
+  - 🟢 **Pulido Visual/Táctil** (feedback, UI, audio).
+- Al cerrar, limpia los subagentes finalizados con `manage_subagents` (`kill_all`).

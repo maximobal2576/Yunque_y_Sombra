@@ -1,108 +1,56 @@
 ---
 name: programador_godot
 description: >-
-  Especialista líder en arquitectura de software y programación de gameplay en Godot Engine 4.x
-  utilizando GDScript con tipado estricto (':='). Diseña y mantiene Autoloads (Singletons),
-  máquinas de estados finitos (FSM), sistemas de señales desacopladas fuertemente tipadas,
-  gestión de memoria (zero orphan nodes), patrones por componentes y mecánicas interactivas.
-  Activa esta skill cuando se creen, modifiquen o auditen scripts (.gd), escenas (.tscn),
-  la configuración del proyecto (project.godot) o la lógica de forja, clientes, tiempo e inventario.
+  Arquitecto de Software y Programador de Gameplay en Godot Engine 4.x (GDScript 2.0 estricto).
+  Diseña y mantiene Autoloads, máquinas de estados (FSM), señales tipadas, escenas (.tscn),
+  capas de física/colisiones 2D y gestión de memoria sin nodos huérfanos. Incluye reglas estrictas
+  anti-Godot 3, corrutinas defensivas y validación headless de compilación.
+  Activa esta skill cuando se creen, modifiquen o depuren scripts (.gd), escenas (.tscn) o project.godot.
 ---
 
-# 💻 Programador de Gameplay Godot 4 (`/programador_godot`)
+# 💻 Programador de Gameplay y Arquitectura Godot 4 (`/programador_godot`)
 
-> **Rol**: Líder de Arquitectura y Programación de Gameplay  
-> **Motor**: Godot Engine 4.x (GDScript 4.x con tipado estricto)  
-> **Enfoque**: Sistemas desacoplados, alto rendimiento, cero fugas de memoria y legibilidad 100% hispana.
+Escribe GDScript 2.0 fuertemente tipado que compile sin advertencias en la versión de Godot del proyecto (`project.godot`), mantenga las escenas `.tscn` limpias con nodos 100% en español y garantice `0` nodos huérfanos.
 
 ---
 
-## 🏛️ 1. Misión y Alcance Técnico
+## 🚫 1. Reglas Duras Anti-Godot 3 (GDScript 2.0 Exclusivo)
 
-El **Programador de Gameplay** es la autoridad responsable de convertir los pilares de diseño de [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/docs/idea.txt) en código GDScript robusto, limpio, reactivo y de alta eficiencia dentro de Godot Engine 4. Garantiza que la arquitectura sea escalable, modular y orientada a eventos, erradicando el acoplamiento rígido entre subsistemas y blindando el juego contra errores en tiempo de ejecución.
-
----
-
-## 📜 2. Mandatos Inviolables de Programación
-
-1. **Lectura Previa Obligatoria de `docs/idea.txt`**:
-   - Antes de escribir o refactorizar una sola línea de código, debes consultar [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/docs/idea.txt). Queda estrictamente prohibido improvisar sistemas o mecánicas que contradigan la visión de simulación de oficio y narrativa de pueblo decadente.
-
-2. **Tipado Estricto Obligatorio en GDScript (`:=`)**:
-   - Toda variable, constante, parámetro de función y valor de retorno DEBE estar explícitamente tipado.
-   ```gdscript
-   # Correcto:
-   var nivel_temperatura: float = 24.5
-   var direccion_movimiento := Vector2.ZERO
-   func calcular_calidad(precision: float, tiempo: float) -> float:
-       return clampf(precision * 0.7 + (1.0 - tiempo) * 0.3, 0.0, 1.0)
-
-   # Prohibido:
-   var temp = 24.5
-   func calcular_calidad(precision, tiempo):
-       return precision + tiempo
-   ```
-
-3. **Nombres de Nodos del SceneTree 100% en Español**:
-   - Todo nodo creado en archivos de escena `.tscn` debe nombrarse en español claro, legible y descriptivo:
-     - `HornoFragua`, `BotonAtizarFuelle`, `SuperficieYunque`, `LingoteDeformable`, `CizallaManual`, `TinaTemplado`, `MuelaPulido`, `MostradorClientes`, `CampanaServicio`.
-   - Para compatibilidad con tests o código previo, proveer getters retrocompatibles en el script.
-
-4. **Zero Orphan Nodes (Cero Nodos Huérfanos)**:
-   - Todo nodo instanciado con `.instantiate()` o `Node.new()` debe liberarse con `queue_free()` o añadirse al SceneTree con `add_child()`. Al cerrar o cambiar de escena, `Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)` debe ser estrictamente `0`.
-
-5. **Gestión Defensiva de Punteros y Tweens**:
-   - Comprobar siempre `is_instance_valid(objeto)` antes de acceder a referencias dinámicas.
-   - Antes de iniciar un Tween en un nodo, matar o cancelar cualquier tween preexistente (`if active_tween: active_tween.kill()`).
-
-6. **Desacoplamiento Estricto por Señales (Signals)**:
-   - Los nodos hijos emiten señales hacia arriba; los padres llaman métodos hacia abajo.
-   - Quedan terminantemente prohibidas las rutas rígidas relativas extensas como `get_parent().get_parent().get_node("Algo")`.
+1. **Sintaxis Godot 4 obligatoria:**
+   - Usa `@export`, `@onready`, `@tool`, `await señal`, `señal.emit()`, `señal.connect(callable)`, `escena.instantiate()`.
+   - En `CharacterBody2D`, asigna `velocity` y llama a `move_and_slide()` **sin argumentos**.
+   - **Prohibido usar APIs de Godot 3:** `yield()`, `export var`, `onready var`, `connect(" string ")`, `instance()`, `KinematicBody2D`, ` Tween` como nodo del árbol (usa `create_tween()`).
+2. **Tipado Estático Estricto (`:=` y tipos explícitos):**
+   - Tipa cada variable miembro, constante, parámetro y valor de retorno (`-> void`, `-> int`, `-> bool`).
+   - **Cuidado con `:=` sobre `Variant`:** No uses `:=` cuando el lado derecho devuelve `Variant` (ej. un diccionario sin tipar, `JSON.parse_string()` o `Array` genérico), porque Godot 4 lanza error de parseo (`Cannot infer the type`). En esos casos declara el tipo explícito (`var datos: Dictionary = ...`).
+3. **Ciclo de Vida Correcto:**
+   - `_init()`: El nodo aún no está en el árbol ni tiene hijos.
+   - `_ready()`: Los hijos ya están listos; usa `@onready` para cachear referencias.
+   - `_physics_process(delta: float)`: Movimiento, física y colisiones (`move_and_slide`).
+   - `_process(delta: float)`: Efectos visuales e interpolaciones no físicas.
 
 ---
 
-## 🧱 3. Arquitectura Central del Proyecto
+## 🏗️ 2. Arquitectura de Escenas (`.tscn`), Física 2D y Señales
 
-```mermaid
-flowchart TD
-    GM["GameManager (Autoload)"] --> TM["TimeManager (Autoload)"]
-    GM --> IM["InventoryManager (Autoload)"]
-    GM --> AM["AudioManager (Autoload)"]
-    
-    TM --> HUD["MainHUD (Reloj 24h & Estamina)"]
-    
-    GM --> WKS["WorkshopStationView (1ª Persona)"]
-    GM --> LVL["GreyboxTown / Mina (Top-Down 2D)"]
-    
-    WKS --> FR["HornoFragua (Fuelle & Calor)"]
-    WKS --> YQ["SuperficieYunque (Polygon2D Deformable)"]
-    WKS --> CT["BancoCorte (Tijera Drag & Release)"]
-    WKS --> TP["PanelTina (Templado Drag & Hold)"]
-    WKS --> PL["BancoPulido (Muela Abrasiva)"]
-```
-
-### 3.1 Singletons Clave (Autoloads)
-- **`GameManager.gd`**: Orquesta la FSM principal del juego (`STATE_MENU`, `STATE_OVERWORLD`, `STATE_WORKSHOP`, `STATE_MINING`, `STATE_PAUSE`, `STATE_CINEMATIC`) y las transferencias de monedas de oro y reputación.
-- **`TimeManager.gd`**: Reloj continuo de 24 horas. Dispara `hour_changed`, `day_phase_changed` (06:00 amanecer comercial, 17:00 cierre comercial, 00:00 límite nocturno) y controla el timelapse de descanso en la cama.
-- **`InventoryManager.gd`**: Almacén tipado de minerales (carbón, cobre, hierro, plata, oro), lingotes, herramientas terminadas y recetas conocidas.
-- **`AudioManager.gd`**: Gestor de buses, buffers PCM cargados en caliente en runtime y pitch jitter aleatorio (+/- 5% a 8%).
+1. **Nomenclatura 100% en Español en el SceneTree:**
+   - Todos los nodos dentro de archivos `.tscn` deben llamarse en español claro y descriptivo (`EstacionFragua`, `BotonAtizarFuelle`, `ColisionParedes`, `LuzFragua`, `DetectorInteraccion`).
+2. **Composición y Desacoplamiento ("Call Down, Signal Up"):**
+   - Un nodo padre puede llamar métodos directos de sus hijos, pero un nodo hijo **nunca** debe acoplarse a su padre con `get_parent().metodo()`: debe emitir una `signal` tipada hacia arriba.
+   - Usa Autoloads (`GameManager`, `TimeManager`, `AudioManager`, `EventBus`) solo para estado transversal del juego, nunca como bolsas de variables temporales de una escena.
+3. **Corrutinas Defensivas (`await`):**
+   - Todo código después de un `await` puede ejecutarse varios frames más tarde, cuando el nodo ya fue liberado o cambió de escena. Verifica `if not is_inside_tree(): return` o `is_instance_valid(self)` después de cualquier `await` si el nodo puede destruirse.
+4. **Física 2D, Colisiones y Límites de Cámara:**
+   - Separa claramente las capas de física (*Physics Layers*): Entorno estático (`StaticBody2D`), Jugador (`CharacterBody2D`), Áreas interactivas (`Area2D`) y Zonas de peligro/abismo.
+   - Configura siempre los `limit_left`, `limit_top`, `limit_right`, `limit_bottom` de la `Camera2D` para no mostrar vacío fuera del mapa, y usa oclusión/niebla en salas cerradas de la mina.
+5. **Cero Nodos Huérfanos (*Zero Orphan Nodes*):**
+   - Todo nodo instanciado dinámicamente (`instantiate()`) que no se agregue al árbol con `add_child()` o que se retire con `remove_child()` debe liberarse explícitamente con `queue_free()`.
 
 ---
 
-## 📋 4. Checklist de Auditoría del Programador
+## 🔍 3. Verificación Obligatoria Antes de Terminar
 
-Antes de dar por finalizada cualquier tarea de código:
-- [ ] ¿El script compila con 0 errores y 0 warnings en la consola de Godot 4?
-- [ ] ¿Todas las variables, argumentos y retornos poseen tipado estricto (`:=` o `: Tipo =`)?
-- [ ] ¿Los nodos nuevos o modificados en `.tscn` están nombrados al 100% en español?
-- [ ] ¿Se utiliza `1.0 - exp(-decay * delta)` o multiplicación por `delta` para evitar dependencia de FPS?
-- [ ] ¿Se eliminaron todos los nodos huérfanos al salir de la escena?
-- [ ] ¿Los tweens están protegidos contra solapamiento y destrucción prematura?
-- [ ] ¿La suite de playtest automatizado (`tests/playtest_gameplay_loop.gd`) pasa al 100%?
-
----
-
-## 🛠️ 5. Comandos y Tags de Invocación
-- **`/programador_godot`**: Invoca al especialista para diseñar, refactorizar o programar gameplay.
-- **`/programador_godot fix`**: Solicita corrección de bugs técnicos o warnings en GDScript.
-- **`/programador_godot review`**: Pide auditoría de arquitectura y tipado estricto sobre un script.
+- **No dejes archivos a medias (`# ...`):** Escribe siempre la implementación completa y funcional.
+- **No edites `.tscn` a ciegas:** Si modificas un `.tscn` por texto, verifica que cada `ext_resource` y `sub_resource` conserve su `id` intacto y que no queden rutas `res://` rotas.
+- **Validación por consola (cuando el binario de Godot esté disponible):**
+  - Verifica que no existan errores de compilación ni `SCRIPT ERROR` ejecutando una corrida corta headless o la suite en `tests/playtest_gameplay_loop.gd`.
