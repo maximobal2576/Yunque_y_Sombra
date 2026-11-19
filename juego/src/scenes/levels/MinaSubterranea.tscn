@@ -735,10 +735,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -255.0
-offset_right = 360.0
-offset_bottom = 255.0
+offset_left = -340.0
+offset_top = -210.0
+offset_right = 340.0
+offset_bottom = 210.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pergamino_hito")
@@ -763,13 +763,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 30.0
-offset_top = 24.0
-offset_right = -30.0
-offset_bottom = -24.0
+offset_left = 28.0
+offset_top = 22.0
+offset_right = -28.0
+offset_bottom = -22.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="EtiquetaTituloHito" type="Label" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical"]
 layout_mode = 2
@@ -783,17 +783,17 @@ custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
 
 [node name="ResplandorFondoVeta" type="Polygon2D" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/IlustracionVetaReluciente"]
-position = Vector2(330, 42)
+position = Vector2(312, 42)
 color = Color(0.71, 0.6, 0.42, 0.35)
 polygon = PackedVector2Array(-95, -28, 0, -42, 95, -28, 110, 18, 0, 38, -110, 18)
 
 [node name="RocaFracturadaZoom" type="Polygon2D" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/IlustracionVetaReluciente"]
-position = Vector2(330, 44)
+position = Vector2(312, 44)
 color = Color(0.26, 0.22, 0.2, 1)
 polygon = PackedVector2Array(-65, 22, -48, -22, -8, -30, 45, -24, 68, 20, 18, 28, -22, 28)
 
 [node name="NucleoHierroReluciente" type="Polygon2D" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/IlustracionVetaReluciente"]
-position = Vector2(330, 42)
+position = Vector2(312, 42)
 color = Color(0.84, 0.89, 0.96, 1)
 polygon = PackedVector2Array(-28, 8, -16, -18, 8, -22, 28, -4, 18, 16, -10, 18)
 
@@ -804,7 +804,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 14
-text = "La roca cede ante tu pico y revela una veta reluciente de Hierro Puro. Entre la fisura recién abierta cae una hoja grabada del Diario Perdido de tu tío Rodrik:"
+text = "La roca cede y revela Hierro Puro junto a una nota oculta de tu tío Rodrik:"
 autowrap_mode = 2
 
 [node name="EtiquetaNotaDiarioTio" type="Label" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical"]
@@ -812,9 +812,8 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
 theme_override_constants/line_spacing = 4
-theme_override_font_sizes/font_size = 13
-text = "«Fragmento del Diario de Rodrik — Las Vetas Ocultas:
-Si estás leyendo esto, has descendido al túnel secreto tras mi taller. Los Señores Feudales aseguraban que esta colina era estéril para obligarnos a comprar su chatarra a precios de usura. Mentían. Bajo nuestros pies descansa el hierro más noble de la comarca. Usa las antorchas, forja con sabiduría y no permitas que sus emisarios escuchen el eco de tu pico...»"
+theme_override_font_sizes/font_size = 14
+text = "«Los Señores Feudales mintieron: esta colina no es estéril, oculta el hierro más puro de la comarca. Forja en secreto y que sus emisarios no oigan tu pico.» — Tío Rodrik"
 autowrap_mode = 2
 
 [node name="BotonCerrarCinematica" type="Button" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical"]
@@ -828,4 +827,4 @@ theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_hito_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hito_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_hito_hover")
-text = "Guardar Hierro Puro y Archivar Nota del Tío"
+text = "[E] Guardar nota en el diario"

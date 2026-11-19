@@ -1,17 +1,27 @@
 # AudioManager.gd
 # Gestor central de audio y Foley táctil para 'Yunque & Sombra' (/sonidista)
-# Implementa precarga nativa compatible con Web/HTML5 (PCK) y fallback resiliente de muestras WAV.
+# Implementa precarga nativa compatible con Web/HTML5 (PCK), síntesis procedural cálida y control de volumen por canal.
 extends Node
 
 const POOL_SIZE: int = 12
 const BACKGROUND_MUSIC_PATH: String = "res://assets/audio/music/musica_fondo_tranquila.wav"
 const DEFAULT_MUSIC_VOLUME_DB: float = -13.5
+const DEFAULT_FORGE_AMBIENT_DB: float = -24.0
+const MUTED_VOLUME_DB: float = -80.0
+
+var master_volume: float = 1.0
+var music_volume: float = 0.85
+var sfx_volume: float = 0.90
+var ambience_volume: float = 0.45
 
 var audio_streams: Dictionary = {}
 var players_pool: Array[AudioStreamPlayer] = []
+var _pool_base_volumes: Array[float] = []
 var pool_index: int = 0
 var steam_player: AudioStreamPlayer = null
+var _steam_base_volume_db: float = 1.5
 var forge_ambient_player: AudioStreamPlayer = null
+var _forge_base_volume_db: float = DEFAULT_FORGE_AMBIENT_DB
 var music_player: AudioStreamPlayer = null
 var _music_active: bool = false
 var _music_volume_db: float = DEFAULT_MUSIC_VOLUME_DB
@@ -65,6 +75,8 @@ const SOUND_PATHS: Dictionary = {
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_load_all_samples()
+	audio_streams["warm_hearth"] = _generate_warm_hearth_ambience()
+	audio_streams["voice_blip"] = _generate_voice_blip_stream()
 	
 	# Instanciar pool fijo de reproductores para SFX one-shot (cero nodos huérfanos)
 	for i: int in range(POOL_SIZE):
@@ -73,6 +85,7 @@ func _ready() -> void:
 		p.bus = &"Master"
 		add_child(p)
 		players_pool.append(p)
+		_pool_base_volumes.append(0.0)
 		
 	# Reproductor dedicado para loop de vapor en la tina
 	steam_player = AudioStreamPlayer.new()
@@ -82,24 +95,28 @@ func _ready() -> void:
 		steam_player.stream = audio_streams["quench"] as AudioStream
 	add_child(steam_player)
 
-	# Reproductor dedicado para ambiente de brasas de la fragua
+	# Reproductor dedicado para ambiente cálido y suave de brasas de la fragua
 	forge_ambient_player = AudioStreamPlayer.new()
 	forge_ambient_player.name = "ReproductorAmbienteFragua"
 	forge_ambient_player.bus = &"Master"
-	forge_ambient_player.volume_db = -11.0
-	if audio_streams.has("fire"):
-		forge_ambient_player.stream = audio_streams["fire"] as AudioStream
+	_forge_base_volume_db = DEFAULT_FORGE_AMBIENT_DB
+	forge_ambient_player.stream = audio_streams["warm_hearth"] as AudioStream
+	forge_ambient_player.volume_db = _compute_ambience_db(_forge_base_volume_db)
 	add_child(forge_ambient_player)
 	
 	# Reproductor dedicado para música tranquila medieval/artesanal de fondo
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "ReproductorMusicaFondo"
 	music_player.bus = &"Music" if AudioServer.get_bus_index(&"Music") != -1 else &"Master"
-	music_player.volume_db = _music_volume_db
 	var music_stream: AudioStream = _prepare_background_music_stream()
 	if music_stream != null:
 		music_player.stream = music_stream
 	add_child(music_player)
+	
+	set_master_volume(master_volume)
+	set_music_volume(music_volume)
+	set_sfx_volume(sfx_volume)
+	set_ambience_volume(ambience_volume)
 	start_background_music()
 
 func _exit_tree() -> void:
@@ -110,6 +127,7 @@ func _exit_tree() -> void:
 	stop_background_music()
 	stop_all_sfx()
 	players_pool.clear()
+	_pool_base_volumes.clear()
 
 func stop_all_sfx() -> void:
 	for p: AudioStreamPlayer in players_pool:
@@ -133,16 +151,155 @@ func _process(delta: float) -> void:
 		return
 		
 	if _music_active and is_instance_valid(music_player):
-		if music_player.stream != null and not music_player.playing:
+		if music_player.stream != null and not music_player.playing and music_volume > 0.01:
 			music_player.play()
 			
 	if _forge_ambient_active and is_instance_valid(forge_ambient_player):
 		_forge_ambient_timer -= delta
 		if not forge_ambient_player.playing and _forge_ambient_timer <= 0.0:
-			forge_ambient_player.pitch_scale = randf_range(0.92, 1.06)
-			forge_ambient_player.volume_db = randf_range(-12.5, -9.5)
-			forge_ambient_player.play()
-			_forge_ambient_timer = randf_range(0.15, 0.45)
+			if forge_ambient_player.stream == null and audio_streams.has("warm_hearth"):
+				forge_ambient_player.stream = audio_streams["warm_hearth"] as AudioStream
+			forge_ambient_player.pitch_scale = randf_range(0.94, 1.05)
+			_forge_base_volume_db = randf_range(-25.5, -22.5)
+			forge_ambient_player.volume_db = _compute_ambience_db(_forge_base_volume_db)
+			if ambience_volume > 0.01:
+				forge_ambient_player.play()
+			_forge_ambient_timer = randf_range(0.85, 1.55)
+
+func set_master_volume(value: float) -> void:
+	master_volume = clampf(value, 0.0, 1.0)
+	var master_idx: int = AudioServer.get_bus_index(&"Master")
+	if master_idx != -1:
+		if master_volume <= 0.01:
+			AudioServer.set_bus_mute(master_idx, true)
+			AudioServer.set_bus_volume_db(master_idx, MUTED_VOLUME_DB)
+		else:
+			AudioServer.set_bus_mute(master_idx, false)
+			AudioServer.set_bus_volume_db(master_idx, linear_to_db(maxf(master_volume, 0.0001)))
+
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value, 0.0, 1.0)
+	_apply_music_volume()
+
+func _apply_music_volume() -> void:
+	if not is_instance_valid(music_player):
+		return
+	if music_volume <= 0.01:
+		music_player.volume_db = MUTED_VOLUME_DB
+	else:
+		var offset_db: float = linear_to_db(maxf(music_volume, 0.0001))
+		music_player.volume_db = clampf(_music_volume_db + offset_db, MUTED_VOLUME_DB, 6.0)
+
+func _compute_sfx_db(base_db: float) -> float:
+	if sfx_volume <= 0.01:
+		return MUTED_VOLUME_DB
+	var offset_db: float = linear_to_db(maxf(sfx_volume, 0.0001))
+	return clampf(base_db + offset_db, MUTED_VOLUME_DB, 6.0)
+
+func set_sfx_volume(value: float) -> void:
+	sfx_volume = clampf(value, 0.0, 1.0)
+	for i: int in range(players_pool.size()):
+		var p: AudioStreamPlayer = players_pool[i]
+		if is_instance_valid(p):
+			var base_db: float = _pool_base_volumes[i] if i < _pool_base_volumes.size() else 0.0
+			p.volume_db = _compute_sfx_db(base_db)
+	if is_instance_valid(steam_player):
+		steam_player.volume_db = _compute_sfx_db(_steam_base_volume_db)
+
+func _compute_ambience_db(base_db: float) -> float:
+	if ambience_volume <= 0.01:
+		return MUTED_VOLUME_DB
+	var offset_db: float = linear_to_db(maxf(ambience_volume, 0.0001))
+	return clampf(base_db + offset_db, MUTED_VOLUME_DB, 6.0)
+
+func set_ambience_volume(value: float) -> void:
+	ambience_volume = clampf(value, 0.0, 1.0)
+	if is_instance_valid(forge_ambient_player):
+		forge_ambient_player.volume_db = _compute_ambience_db(_forge_base_volume_db)
+		if ambience_volume <= 0.01 and forge_ambient_player.playing:
+			forge_ambient_player.stop()
+
+func _generate_warm_hearth_ambience() -> AudioStreamWAV:
+	# Sintetiza un murmullo grave, suave y cálido de brasas de carbón (90-180 Hz, cero ruido blanco agresivo)
+	var mix_rate: int = 22050
+	var duration_sec: float = 1.35
+	var total_samples: int = int(mix_rate * duration_sec)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+	for i: int in range(total_samples):
+		var t: float = float(i) / float(mix_rate)
+		var norm_t: float = t / duration_sec
+		# Envolvente Hann suave de entrada y salida sin clics
+		var window_env: float = 0.5 - 0.5 * cos(TAU * norm_t)
+		# Modulación lenta de respiración térmica
+		var slow_mod: float = 0.72 + 0.28 * sin(TAU * 1.15 * t + 0.4)
+		# Ondas sinusoidales graves de carbón incandescente (90-180 Hz)
+		var low_hearth: float = (
+			0.50 * sin(TAU * 96.0 * t + 0.15 * sin(TAU * 2.2 * t))
+			+ 0.34 * sin(TAU * 134.0 * t)
+			+ 0.16 * sin(TAU * 172.0 * t)
+		)
+		# Micro-pulsos suaves filtrados de brasa (envolventes gaussianas suaves sobre tono cálido)
+		var pulse_1: float = exp(-pow((t - 0.42) / 0.075, 2.0)) * sin(TAU * 156.0 * t) * 0.22
+		var pulse_2: float = exp(-pow((t - 0.94) / 0.085, 2.0)) * sin(TAU * 124.0 * t) * 0.18
+		var val: float = (low_hearth * slow_mod + pulse_1 + pulse_2) * window_env * 0.42
+		var sample_int: int = clampi(int(round(val * 32767.0)), -32767, 32767)
+		data.encode_s16(i * 2, sample_int)
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	wav.loop_mode = AudioStreamWAV.LOOP_DISABLED
+	return wav
+
+func _generate_voice_blip_stream() -> AudioStreamWAV:
+	# Sintetiza un balbuceo de voz corto y cálido (~45 ms, frecuencia base ~220 Hz, envolvente suave sin clics)
+	var mix_rate: int = 22050
+	var duration_sec: float = 0.045
+	var total_samples: int = int(mix_rate * duration_sec)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+	var phase: float = 0.0
+	for i: int in range(total_samples):
+		var t: float = float(i) / float(mix_rate)
+		var norm_t: float = t / duration_sec
+		# Envolvente redondeada sin clics al inicio ni al final
+		var env: float = sin(PI * norm_t)
+		env = env * env
+		# Ligera inflexión vocal cálida alrededor de 220 Hz
+		var inst_freq: float = 214.0 + 14.0 * sin(PI * norm_t)
+		phase += TAU * inst_freq / float(mix_rate)
+		var val: float = (
+			0.62 * sin(phase)
+			+ 0.27 * sin(phase * 2.0)
+			+ 0.11 * sin(phase * 3.0)
+		) * env * 0.48
+		var sample_int: int = clampi(int(round(val * 32767.0)), -32767, 32767)
+		data.encode_s16(i * 2, sample_int)
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = mix_rate
+	wav.stereo = false
+	wav.data = data
+	wav.loop_mode = AudioStreamWAV.LOOP_DISABLED
+	return wav
+
+func play_voice_blip(pitch_base: float = 1.0) -> void:
+	if not audio_streams.has("voice_blip"):
+		audio_streams["voice_blip"] = _generate_voice_blip_stream()
+	var player: AudioStreamPlayer = _get_available_sfx_player()
+	if player == null:
+		return
+	var idx: int = players_pool.find(player)
+	var base_db: float = -11.0
+	if idx != -1 and idx < _pool_base_volumes.size():
+		_pool_base_volumes[idx] = base_db
+	player.stream = audio_streams["voice_blip"] as AudioStream
+	player.volume_db = _compute_sfx_db(base_db)
+	player.pitch_scale = clampf(pitch_base * randf_range(0.93, 1.07), 0.6, 1.6)
+	if sfx_volume > 0.01:
+		player.play()
 
 func _prepare_background_music_stream() -> AudioStream:
 	var stream: AudioStream = null
@@ -199,8 +356,8 @@ func start_background_music() -> void:
 	if music_player.stream == null:
 		music_player.stream = _prepare_background_music_stream()
 	_music_active = true
-	music_player.volume_db = _music_volume_db
-	if not music_player.playing and music_player.stream != null:
+	_apply_music_volume()
+	if not music_player.playing and music_player.stream != null and music_volume > 0.01:
 		music_player.play()
 	set_process(true)
 
@@ -213,8 +370,7 @@ func stop_background_music() -> void:
 
 func set_music_volume_db(vol: float) -> void:
 	_music_volume_db = clampf(vol, -60.0, 6.0)
-	if is_instance_valid(music_player):
-		music_player.volume_db = _music_volume_db
+	_apply_music_volume()
 
 func _load_all_samples() -> void:
 	for key: String in SOUND_PATHS.keys():
@@ -278,15 +434,20 @@ func play_sfx(key: String, volume_db: float = 0.0, pitch_jitter: float = 0.0) ->
 	var player: AudioStreamPlayer = _get_available_sfx_player()
 	if player == null:
 		return
+	var idx: int = players_pool.find(player)
+	var base_db: float = clampf(volume_db, -40.0, 6.0)
+	if idx != -1 and idx < _pool_base_volumes.size():
+		_pool_base_volumes[idx] = base_db
 		
 	player.stream = audio_streams[key] as AudioStream
-	player.volume_db = clampf(volume_db, -40.0, 6.0)
+	player.volume_db = _compute_sfx_db(base_db)
 	var safe_jitter: float = clampf(pitch_jitter, 0.0, 0.35)
 	if safe_jitter > 0.0:
 		player.pitch_scale = randf_range(1.0 - safe_jitter, 1.0 + safe_jitter)
 	else:
 		player.pitch_scale = 1.0
-	player.play()
+	if sfx_volume > 0.01:
+		player.play()
 
 func play_bell() -> void:
 	play_sfx("bell", 1.0, 0.05)
@@ -310,12 +471,17 @@ func play_anvil(temperatura: float = 1050.0) -> void:
 	var player: AudioStreamPlayer = _get_available_sfx_player()
 	if player == null:
 		return
+	var idx: int = players_pool.find(player)
+	var base_db: float = 2.0 + randf_range(-0.8, 0.8)
+	if idx != -1 and idx < _pool_base_volumes.size():
+		_pool_base_volumes[idx] = base_db
 	player.stream = audio_streams[chosen] as AudioStream
 	# Metal caliente: golpe grave y sordo; metal frío: campaneo más agudo y seco
 	var base_pitch: float = 1.0 if temperatura >= 800.0 else (1.08 if temperatura >= 650.0 else 1.16)
 	player.pitch_scale = base_pitch * randf_range(0.94, 1.06)
-	player.volume_db = 2.0 + randf_range(-0.8, 0.8)
-	player.play()
+	player.volume_db = _compute_sfx_db(base_db)
+	if sfx_volume > 0.01:
+		player.play()
 
 func start_forge_ambience() -> void:
 	_forge_ambient_active = true
@@ -365,9 +531,10 @@ func start_quench_steam() -> void:
 			_steam_tween.kill()
 		if steam_player.stream == null and audio_streams.has("quench"):
 			steam_player.stream = audio_streams["quench"] as AudioStream
-		steam_player.volume_db = 1.5
+		_steam_base_volume_db = 1.5
+		steam_player.volume_db = _compute_sfx_db(_steam_base_volume_db)
 		steam_player.pitch_scale = randf_range(0.94, 1.06)
-		if not steam_player.playing:
+		if not steam_player.playing and sfx_volume > 0.01:
 			steam_player.play()
 
 func stop_quench_steam() -> void:

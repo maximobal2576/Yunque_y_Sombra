@@ -189,6 +189,13 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "Precisión de Cizalla: 100%"
 
+[node name="EtiquetaLargoTrazo" type="Label" parent="BarraSuperior"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.847059, 0.772549, 0.647059, 1)
+theme_override_font_sizes/font_size = 14
+text = "Largo de corte: 0 / 220 px"
+
 [node name="BancoCorte" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
@@ -236,7 +243,7 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.847059, 0.772549, 0.647059, 0.9)
 theme_override_font_sizes/font_size = 12
-text = "TAJADERA DE YUNQUE Y CIZALLA — TRAZA POR DONDE QUIERAS CORTAR EL METAL"
+text = "TAJADERA DE YUNQUE Y CIZALLA — DIBUJA BIEN LA FORMA DE CORTE (LARGO MÁX: 220 PX)"
 horizontal_alignment = 1
 
 [node name="RebabaSuperior" type="Polygon2D" parent="BancoCorte"]
