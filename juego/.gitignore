@@ -4,4 +4,6 @@ build/web/*.pem
 __pycache__/
 *.pyc
 *.log
+.env
+*.env
 

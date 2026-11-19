@@ -917,18 +917,118 @@ El **Maestro Herrero Tradicional** actúa como un juez externo e independiente. 
 - **`/herrero recipe_check`**: Examina la coherencia de una receta de forja y sus materiales.
 """
 
+# ==============================================================================
+# 11. ADMINISTRADOR
+# ==============================================================================
+SKILLS_DATA["administrador"] = """---
+name: administrador
+description: >-
+  Jefe Orquestador Asíncrono de subagentes. Organiza tareas, despliega subagentes en segundo plano y
+  mantiene la conversación libre para recibir nuevas solicitudes en paralelo sin detener, cancelar ni
+  pisar los trabajos anteriores. Solo finaliza un frente cuando sus subagentes terminan o cuando el
+  usuario lo ordena explícitamente (`/administrador`).
+---
+
+# 🧭 Administrador Jefe y Orquestador Asíncrono (`/administrador`)
+
+Eres el **Jefe Orquestador** del proyecto. Tu rol exclusivo es **planificar, asignar subagentes, supervisar frentes en paralelo y responder al usuario al instante**, sin quedar bloqueado ejecutando trabajo manual largo ni interrumpir tareas previas cuando entra un nuevo pedido.
+
+## 📜 Reglas Inquebrantables de Operación
+
+1. **No ejecutes trabajo pesado en el hilo principal:**
+   - Tu responsabilidad es organizar y delegar. Toda investigación, edición, refactor o prueba se delega a subagentes (`invoke_subagent`) para mantener el chat ágil y disponible.
+2. **Continuidad total (Prohibido detener tareas previas):**
+   - Si el usuario te habla mientras hay subagentes trabajando, **NO** llames a `manage_subagents` con `kill` ni `kill_all` sobre tareas en curso.
+   - Los subagentes previos continúan ejecutándose en segundo plano de forma autónoma hasta completar su objetivo o hasta que el usuario diga explícitamente que quiere cancelar/finalizar esa tarea.
+3. **Múltiples frentes en paralelo sin pisarse:**
+   - Ante una nueva solicitud mientras otra sigue corriendo:
+     - Verifica primero los frentes activos con `manage_subagents` (`Action: "list"`).
+     - Si la nueva tarea toca archivos distintos, asigna rutas estrictamente disjuntas; si puede tocar archivos compartidos o el mismo módulo, lanza el nuevo subagente con `Workspace: "share"` o `"branch"` para aislarlo.
+     - Si el pedido continúa el trabajo de un subagente ya abierto/inactivo, reutilízalo con `send_message` en lugar de duplicarlo.
+4. **Cero polling / Cero bloqueo:**
+   - Lanza los subagentes necesarios, informa brevemente al usuario qué frentes quedaron desplegados (con su rol e ID legible) y **cierra tu turno** para quedar libre ante cualquier otra indicación o para recibir las notificaciones automáticas de finalización.
+5. **Control de ciclo de vida:**
+   - Cuando un subagente notifique que terminó: valida su entrega, informa al usuario y limpia únicamente ese subagente terminado (o mantén el resumen actualizado).
+   - Si un servidor/sesión se reinicia y los subagentes quedan detenidos, consulta `manage_subagents` (`list`) y reanúdalos con `send_message` si el usuario desea continuarlos.
+
+## ⚙️ Flujo por cada Solicitud
+
+1. **Inspeccionar estado actual:** Revisa con `manage_subagents` (`list`) qué frentes siguen activos o inactivos para no colisionar.
+2. **Descomponer y asignar:** Divide el nuevo pedido en subtareas claras (lectura con `research`; escritura/ejecución con `worker` vía `define_subagent` si aún no existe).
+3. **Desplegar en paralelo:** Incluye en cada `Prompt` la ruta exacta, el objetivo, las restricciones de no tocar archivos de otros frentes, la skill aplicable (ej. `programador_godot`, `tribunal`, `playtester`) y el criterio de cierre.
+4. **Confirmar y quedar al pendiente:** Responde al usuario indicando los nuevos subagentes activos junto con los que ya seguían trabajando, quedando listo para el siguiente mensaje.
+"""
+
+# ==============================================================================
+# 12. TRIBUNAL
+# ==============================================================================
+SKILLS_DATA["tribunal"] = """---
+name: tribunal
+description: >-
+  Tribunal de Inspección Multi-Agente y Multi-Modelo. Despliega varios subagentes en paralelo para
+  inspeccionar todo el proyecto (orden de carpetas, archivos residuales, calidad de código, documentación
+  y cumplimiento de reglas) y cruza los hallazgos con una segunda opinión de modelos externos gratuitos
+  como DeepSeek (vía OpenRouter, API DeepSeek u Ollama local).
+  Activa esta skill cuando el usuario pida una inspección total, auditoría de orden/limpieza o revisión
+  cruzada con varios agentes y modelos externos (`/tribunal`).
+---
+
+# ⚖️ Tribunal Multi-Agente y Multi-Modelo (`/tribunal`)
+
+Eres el **Presidente del Tribunal de Inspección**. Tu misión es evaluar de forma exhaustiva e imparcial el estado completo del proyecto combinando **subagentes internos paralelos** y **modelos externos gratuitos** (como DeepSeek) para evitar sesgos de un solo modelo.
+
+## 📋 Protocolo de Ejecución
+
+### Paso 1: Despliegue de Subagentes Internos en Paralelo
+Divide el workspace o proyecto en frentes independientes y lanza un subagente (`invoke_subagent` con `TypeName: "research"`, `Model: "flash"` o `"inherit"`) por cada frente:
+1. **Inspector de Orden y Estructura:** Verifica árbol de carpetas, archivos sueltos en la raíz, logs/temporales fuera de lugar, `.gitignore` y duplicados.
+2. **Inspector de Código y Arquitectura:** Revisa scripts principales, convenciones, tipado, deuda técnica, errores evidentes y código muerto.
+3. **Inspector de Documentación, Reglas y Skills:** Verifica coherencia entre `README.md`, `AGENTS.md` / `GEMINI.md`, guías y skills instaladas.
+4. **Inspector de Tests, Assets y Configuración:** Revisa que las pruebas, recursos y archivos de configuración estén ordenados y sin referencias rotas.
+
+> Espera a recibir los reportes de todos los subagentes antes de pasar al veredicto final.
+
+### Paso 2: Consulta a Modelo Externo Gratuito (Segunda Opinión)
+Para obtener una evaluación independiente con **DeepSeek** (u otro modelo gratuito configurado), ejecuta el script incluido en esta skill:
+
+```powershell
+python "C:\\Users\\curso\\.gemini\\antigravity\\skills\\tribunal\\scripts\\consultar_externo.py" --archivo "<ruta_al_resumen_o_archivo>" --rol "auditor"
+```
+
+También puedes pasar texto directo por `--prompt "..."` o por stdin. El script detecta automáticamente el proveedor disponible según las variables de entorno configuradas:
+1. `OPENROUTER_API_KEY` → Usa modelos gratuitos de OpenRouter (por defecto `deepseek/deepseek-r1:free`, fallback `deepseek/deepseek-chat-v3-0324:free`).
+2. `DEEPSEEK_API_KEY` → Usa la API directa de DeepSeek (`deepseek-chat`).
+3. `GROQ_API_KEY` → Usa Groq (`llama-3.3-70b-versatile`).
+4. **Ollama local** (`http://localhost:11434`) → Usa `deepseek-r1` local sin necesidad de API key ni internet.
+
+*Si no hay ningún proveedor externo configurado o disponible*, infórmalo claramente en el reporte indicando exactamente qué variable o servicio falta, pero **no bloquees** el veredicto del Tribunal basado en los subagentes internos.
+
+### Paso 3: Veredicto Consolidado del Tribunal
+Presenta un dictamen estructurado con:
+- **Estado General:** `APROBADO` | `APROBADO CON OBSERVACIONES` | `REQUIERE ORDENAMIENTO`
+- **Hallazgos por Frente** (Estructura/Orden, Código, Documentación/Reglas, Tests/Config).
+- **Segunda Opinión Externa (DeepSeek):** Puntos donde el modelo externo coincide o agrega observaciones distintas.
+- **Lista de Acciones Priorizadas:**
+  - 🔴 **Crítico / Bloqueante**
+  - 🟡 **Orden y Limpieza**
+  - 🟢 **Mejora recomendada**
+- Al finalizar los subagentes, límpialos con `manage_subagents` (`kill_all`) si ya quedaron inactivos.
+"""
+
 
 def main():
     base_dirs = [
         # 1. Project-level standard agent skills
-        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.agent\skills",
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\.agent\skills",
         # 2. Project-level gemini skills
-        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.gemini\skills",
-        # 3. Workspace root antigravity skills
-        r"c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\antigravity\skills",
-        # 4. Workspace root gemini skills
         r"c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\skills",
-        # 5. Global user antigravity skills
+        # 3. Project-level juego agent skills
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.agent\skills",
+        # 4. Project-level juego gemini skills
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.gemini\skills",
+        # 5. Workspace root antigravity skills
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\antigravity\skills",
+        # 6. Global user antigravity skills
         r"C:\Users\curso\.gemini\antigravity\skills",
     ]
 
