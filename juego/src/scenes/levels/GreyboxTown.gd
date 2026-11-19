@@ -145,16 +145,16 @@ func _ready() -> void:
 	area_puerta_casa.interacted.connect(_enter_house_from_exterior)
 
 	# Conectar detectores de zona para oclusion estanca
-	detector_zona_exterior.body_entered.connect(func(body: Node2D): if body == jugador: set_active_zone(Zone.EXTERIOR))
-	detector_zona_pasillo.body_entered.connect(func(body: Node2D): if body == jugador: set_active_zone(Zone.PASILLO))
-	detector_zona_dormitorio.body_entered.connect(func(body: Node2D): if body == jugador: set_active_zone(Zone.DORMITORIO))
-	detector_zona_mina.body_entered.connect(func(body: Node2D): if body == jugador: set_active_zone(Zone.MINA))
+	detector_zona_exterior.body_entered.connect(func(body: Node2D) -> void: if body == jugador: set_active_zone(Zone.EXTERIOR))
+	detector_zona_pasillo.body_entered.connect(func(body: Node2D) -> void: if body == jugador: set_active_zone(Zone.PASILLO))
+	detector_zona_dormitorio.body_entered.connect(func(body: Node2D) -> void: if body == jugador: set_active_zone(Zone.DORMITORIO))
+	detector_zona_mina.body_entered.connect(func(body: Node2D) -> void: if body == jugador: set_active_zone(Zone.MINA))
 
 	if OS.get_environment("GODOT_PLAYTEST") == "1":
 		print("[GREYBOX] Activando PlaytestDriver por variable de entorno GODOT_PLAYTEST=1...")
-		var driver_script = load("res://src/scenes/tests/PlaytestDriver.gd")
+		var driver_script: Script = load("res://src/scenes/tests/PlaytestDriver.gd") as Script
 		if driver_script:
-			var driver = CanvasLayer.new()
+			var driver := CanvasLayer.new()
 			driver.name = "ConductorPlaytest"
 			driver.set_script(driver_script)
 			add_child(driver)
@@ -178,7 +178,7 @@ func _ready() -> void:
 
 	# Mensaje de bienvenida inicial si ya no estamos en prologo
 	if GameManager.current_state != GameManager.State.PROLOGUE:
-		GameManager.post_notification("Centro del Pueblo: Sigue el camino hacia la casa de tu tio al norte.")
+		GameManager.post_notification("Centro del Pueblo: Sigue el camino hacia la casa de tu tío al norte.")
 
 func _notificar_tutorial(evento_id: String) -> void:
 	if is_instance_valid(guia_tutorial) and guia_tutorial.has_method("notificar_evento"):
@@ -190,27 +190,27 @@ func _conectar_eventos_taller_a_tutorial() -> void:
 	if "vista_mostrador" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.vista_mostrador):
 		var mostrador: Node = vista_estaciones_taller.vista_mostrador
 		if "boton_campana" in mostrador and is_instance_valid(mostrador.boton_campana):
-			mostrador.boton_campana.pressed.connect(func(): _notificar_tutorial("campana_tocada"))
+			mostrador.boton_campana.pressed.connect(func() -> void: _notificar_tutorial("campana_tocada"))
 		if mostrador.has_signal("order_accepted"):
-			mostrador.order_accepted.connect(func(_info): _notificar_tutorial("comanda_aceptada"))
+			mostrador.order_accepted.connect(func(_info: Variant) -> void: _notificar_tutorial("comanda_aceptada"))
 		if mostrador.has_signal("go_to_workbench_requested"):
-			mostrador.go_to_workbench_requested.connect(func(): _notificar_tutorial("estacion_fragua"))
+			mostrador.go_to_workbench_requested.connect(func() -> void: _notificar_tutorial("estacion_fragua"))
 		if mostrador.has_signal("item_delivered"):
-			mostrador.item_delivered.connect(func(_cal, _rec): _notificar_tutorial("pedido_entregado"))
+			mostrador.item_delivered.connect(func(_cal: Variant, _rec: Variant) -> void: _notificar_tutorial("pedido_entregado"))
 	if "btn_llevar_al_yunque" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.btn_llevar_al_yunque):
-		vista_estaciones_taller.btn_llevar_al_yunque.pressed.connect(func(): _notificar_tutorial("estacion_yunque"))
+		vista_estaciones_taller.btn_llevar_al_yunque.pressed.connect(func() -> void: _notificar_tutorial("estacion_yunque"))
 	if "estacion_yunque" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.estacion_yunque):
 		if vista_estaciones_taller.estacion_yunque.has_signal("anvil_shaping_completed"):
-			vista_estaciones_taller.estacion_yunque.anvil_shaping_completed.connect(func(_s, _p): _notificar_tutorial("estacion_corte"))
+			vista_estaciones_taller.estacion_yunque.anvil_shaping_completed.connect(func(_s: Variant, _p: Variant) -> void: _notificar_tutorial("estacion_corte"))
 	if "estacion_corte" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.estacion_corte):
 		if vista_estaciones_taller.estacion_corte.has_signal("cutting_completed"):
-			vista_estaciones_taller.estacion_corte.cutting_completed.connect(func(_s, _p): _notificar_tutorial("estacion_tina"))
+			vista_estaciones_taller.estacion_corte.cutting_completed.connect(func(_s: Variant, _p: Variant) -> void: _notificar_tutorial("estacion_tina"))
 	if "estacion_tina" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.estacion_tina):
 		if vista_estaciones_taller.estacion_tina.has_signal("quenching_completed"):
-			vista_estaciones_taller.estacion_tina.quenching_completed.connect(func(_s, _c): _notificar_tutorial("estacion_pulido"))
+			vista_estaciones_taller.estacion_tina.quenching_completed.connect(func(_s: Variant, _c: Variant) -> void: _notificar_tutorial("estacion_pulido"))
 	if "estacion_pulido" in vista_estaciones_taller and is_instance_valid(vista_estaciones_taller.estacion_pulido):
 		if vista_estaciones_taller.estacion_pulido.has_signal("polishing_completed"):
-			vista_estaciones_taller.estacion_pulido.polishing_completed.connect(func(_s): _notificar_tutorial("ticket_mostrado"))
+			vista_estaciones_taller.estacion_pulido.polishing_completed.connect(func(_s: Variant) -> void: _notificar_tutorial("ticket_mostrado"))
 
 func set_active_zone(new_zone: Zone, immediate: bool = false) -> void:
 	current_zone = new_zone
@@ -280,14 +280,14 @@ func _enter_house_from_exterior() -> void:
 	_teleport_player(SPAWN_HOUSE_HALLWAY)
 	set_active_zone(Zone.PASILLO)
 	_notificar_tutorial("pasillo_entrado")
-	GameManager.post_notification("Entras a la casa de tu tio. Oeste: Taller | Norte: Mina | Este: Dormitorio.")
+	GameManager.post_notification("Entras a la casa de tu tío. Oeste: Taller | Norte: Mina | Este: Dormitorio.")
 
 func _teleport_player(target_pos: Vector2) -> void:
 	_is_transitioning = true
 	jugador.velocity = Vector2.ZERO
 	jugador.global_position = target_pos
 	_reset_camera()
-	get_tree().create_timer(0.25).timeout.connect(func(): _is_transitioning = false)
+	get_tree().create_timer(0.25).timeout.connect(func() -> void: _is_transitioning = false)
 
 # ==============================================================================
 # INTERACCIONES NARRATIVAS Y OBJETOS
@@ -297,13 +297,13 @@ func _on_bed_interacted() -> void:
 	TimeManager.sleep_voluntarily()
 
 func _on_wardrobe_interacted() -> void:
-	GameManager.post_notification("Armario de roble carcomido: Ropas raidas de trabajo y delantales con olor a hollin de tu tio.")
+	GameManager.post_notification("Armario de roble carcomido: Ropas raídas de trabajo y delantales con olor a hollín de tu tío.")
 
 func _on_counter_interacted() -> void:
 	if TimeManager.hour >= 6 and TimeManager.hour < 17:
-		GameManager.post_notification("Mostrador comercial: El porton esta abierto esperando pedidos de los aldeanos.")
+		GameManager.post_notification("Mostrador comercial: El portón está abierto esperando pedidos de los aldeanos.")
 	else:
-		GameManager.post_notification("Mostrador comercial: Porton cerrado por la noche. Los clientes volveran a las 06:00 AM.")
+		GameManager.post_notification("Mostrador comercial: Portón cerrado por la noche. Los clientes volverán al amanecer.")
 
 func _on_mine_interacted() -> void:
 	var target_spawn: Vector2 = Vector2(2200, 800)
@@ -315,7 +315,7 @@ func _on_mine_interacted() -> void:
 		jugador.set_camera_bounds(1780, 280, 2620, 920)
 	AudioManager.play_place_item()
 	_notificar_tutorial("mina_explorada")
-	GameManager.post_notification("Desciendes a la Mina Subterránea: Enciende las antorchas [E] y pica las vetas de mineral.")
+	GameManager.post_notification("Desciendes a la Mina Subterránea: Enciende las antorchas y pica las vetas de mineral.")
 
 func _on_mine_exit_requested() -> void:
 	_teleport_player(SPAWN_MINE_ACCESS_RETURN)
@@ -324,10 +324,10 @@ func _on_mine_exit_requested() -> void:
 	GameManager.post_notification("Regresas al Acceso a la Mina en la parte trasera de la casa.")
 
 func _on_mine_tools_interacted() -> void:
-	GameManager.post_notification("Estanteria minera: Picos gastados, cuerdas resecas y restos de carbon antiguo.")
+	GameManager.post_notification("Estantería minera: Picos gastados, cuerdas resecas y restos de carbón antiguo.")
 
 func _on_lamp_interacted() -> void:
-	GameManager.post_notification("Farol publico oxidado: Apagado y sin combustible. Desde que tu tio desaparecio, nadie cuida la luz del pueblo.")
+	GameManager.post_notification("Farol público oxidado: Apagado y sin combustible. Desde que tu tío desapareció, nadie cuida la luz del pueblo.")
 
 func _on_signpost_interacted() -> void:
-	GameManager.post_notification("Cartel de madera desgastado: [Norte: Herreria y Taller de Rodrik] (Cubierto de hiedra y telaranas)")
+	GameManager.post_notification("Cartel de madera desgastado: Norte - Herrería y Taller de Rodrik (cubierto de hiedra y telarañas).")

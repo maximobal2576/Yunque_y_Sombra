@@ -143,6 +143,7 @@ var has_finished_piece: bool = false
 var finished_piece_quality: float = 0.0
 var _arrastrando_pieza_entrega: bool = false
 var _tiempo_anim_cliente: float = 0.0
+var _convocando_cliente: bool = false
 
 func _ready() -> void:
 	bell_button.pressed.connect(_on_bell_clicked)
@@ -160,8 +161,18 @@ func _ready() -> void:
 	if indicador_entrega_cliente:
 		indicador_entrega_cliente.visible = false
 
-	bell_label.text = "🛎️ Toca la campana"
+	bell_label.text = "Toca la campana"
 	_actualizar_busto_cliente("sargento")
+
+func reset_if_stuck() -> void:
+	if _convocando_cliente:
+		return
+	if not order_sheet.visible and not delivery_tray.visible:
+		has_active_order = false
+		has_finished_piece = false
+		bell_label.text = "Toca la campana"
+	elif order_sheet.visible and btn_accept_order.disabled and not delivery_tray.visible:
+		btn_to_forge.visible = true
 
 func _process(delta: float) -> void:
 	if not visible or not is_visible_in_tree():
@@ -270,10 +281,17 @@ func _on_bell_clicked() -> void:
 	fx_tween.tween_property(bell_ring_fx, "modulate:a", 0.0, 0.45)
 	fx_tween.chain().tween_callback(func(): bell_ring_fx.visible = false)
 
-	if not has_active_order and not has_finished_piece:
+	if _convocando_cliente:
+		return
+	if (not has_active_order and not has_finished_piece) or (not order_sheet.visible and not delivery_tray.visible):
+		has_active_order = false
+		has_finished_piece = false
 		_summon_customer()
 
 func _summon_customer() -> void:
+	if _convocando_cliente:
+		return
+	_convocando_cliente = true
 	var customer: Dictionary = customers[current_customer_index]
 	active_order = customer
 
@@ -299,24 +317,25 @@ func _summon_customer() -> void:
 	order_sheet.modulate.a = 0.0
 	order_sheet.pivot_offset = order_sheet.size * 0.5
 	order_sheet.scale = Vector2(0.86, 1.12)
-	order_title_label.text = "📜 COMANDA: %s" % customer["item_name"]
+	order_title_label.text = "COMANDA: %s" % customer["item_name"]
 	order_desc_label.text = customer["description"]
 	order_specs_label.text = customer["specs"]
-	order_reward_label.text = "💰 Paga ofrecida: %d Monedas de Oro" % customer["base_reward"]
+	order_reward_label.text = "Paga ofrecida: %d Monedas de Oro" % customer["base_reward"]
 	btn_accept_order.disabled = false
-	btn_accept_order.text = "✅ Aceptar Encargo y Forjar"
+	btn_accept_order.text = "Aceptar Encargo y Forjar"
 
 	var order_tween: Tween = create_tween().set_parallel(true)
 	order_tween.tween_property(order_sheet, "modulate:a", 1.0, 0.25)
 	order_tween.tween_property(order_sheet, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 	bell_label.text = "Cliente en ventanilla: Revisa la comanda y acéptala"
+	_convocando_cliente = false
 
 func _on_accept_order_pressed() -> void:
 	has_active_order = true
 	AudioManager.play_sfx("place_item", 0.5, 0.05)
 	btn_accept_order.disabled = true
-	btn_accept_order.text = "⚙️ Encargo en Proceso"
+	btn_accept_order.text = "Encargo en Proceso"
 	btn_to_forge.visible = true
 	if order_sheet:
 		order_sheet.pivot_offset = order_sheet.size * 0.5
@@ -355,13 +374,13 @@ func set_piece_ready_for_delivery(quality: float, crafted_shape: PackedVector2Ar
 		quality * 100.0
 	]
 	btn_deliver_item.disabled = false
-	btn_deliver_item.text = "⬆️ Entregar Pieza (o arrastra al cliente)"
+	btn_deliver_item.text = "Entregar Pieza (o arrastra al cliente)"
 
 	var tray_tween: Tween = create_tween().set_parallel(true)
 	tray_tween.tween_property(delivery_tray, "modulate:a", 1.0, 0.28)
 	tray_tween.tween_property(delivery_tray, "scale", Vector2.ONE, 0.32).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
-	bell_label.text = "⬆️ Arrastra al cliente"
+	bell_label.text = "Arrastra al cliente"
 
 func _configurar_geometria_pieza_mesada(crafted_shape: PackedVector2Array, color_acero: Color) -> void:
 	var poly: PackedVector2Array = crafted_shape
@@ -436,5 +455,6 @@ func _on_deliver_item_pressed() -> void:
 	delivery_tray.visible = false
 	has_active_order = false
 	has_finished_piece = false
+	_convocando_cliente = false
 	current_customer_index = (current_customer_index + 1) % customers.size()
-	bell_label.text = "🛎️ Toca la campana"
+	bell_label.text = "Toca la campana"

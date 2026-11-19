@@ -184,13 +184,13 @@ alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 14
-text = "🔨 Golpes: 0"
+text = "Golpes: 0"
 
 [node name="EtiquetaTemperaturaPieza" type="Label" parent="BarraSuperior"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
 theme_override_font_sizes/font_size = 14
-text = "🌡️ Pieza: 1085°C (Naranja-amarillo de forja)"
+text = "Pieza: 1085°C (Naranja-amarillo de forja)"
 
 [node name="EtiquetaPrecision" type="Label" parent="BarraSuperior"]
 layout_mode = 2
@@ -317,7 +317,7 @@ offset_right = 95.0
 offset_bottom = 38.0
 theme_override_colors/font_color = Color(0.95, 0.86, 0.55, 0.95)
 theme_override_font_sizes/font_size = 11
-text = "🔨 [Arrastra el Martillo]"
+text = "[Arrastra el Martillo]"
 horizontal_alignment = 1
 
 [node name="AreaImpacto" type="Control" parent="SuperficieYunque"]
@@ -369,7 +369,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-text = "🔥 Volver a la Fragua (Recalentar)"
+text = "Volver a la Fragua (Recalentar)"
 
 [node name="BotonPasarACorte" type="Button" parent="."]
 layout_mode = 1
@@ -390,4 +390,4 @@ theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 disabled = true
-text = "➡️ Pasar a Estación de Corte"
+text = "Pasar a Estación de Corte"

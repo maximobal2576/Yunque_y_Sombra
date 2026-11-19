@@ -1,6 +1,6 @@
 # MainHUD.gd
 # HUD inferior persistente estilo barra de tareas (GDD 3.0)
-# Nomenclatura de nodos 100% en español conforme a docs/idea.txt §8.2
+# Nomenclatura de nodos 100% en español y tipado estricto (:=) conforme a docs/idea.txt §8.2
 extends CanvasLayer
 
 @onready var etiqueta_reloj: Label = $BarraInferior/ContenedorFila/EtiquetaReloj
@@ -42,20 +42,20 @@ func _ready() -> void:
 	TimeManager.emit_current_time()
 
 func _on_time_updated(_hour: int, _minute: int, day: int, phase_name: String) -> void:
-	etiqueta_reloj.text = "📅 DÍA %d  |  ⏰ %s  |  [%s]" % [day, TimeManager.get_formatted_time(), phase_name]
+	etiqueta_reloj.text = "DÍA %d  |  %s  |  %s" % [day, TimeManager.get_formatted_time(), phase_name]
 
 func _on_stamina_changed(current: float, maximum: float) -> void:
 	barra_estamina.max_value = maximum
 	barra_estamina.value = current
-	etiqueta_estamina.text = "⚡ %.0f / %.0f" % [current, maximum]
+	etiqueta_estamina.text = "Vigor: %.0f / %.0f" % [current, maximum]
 
 func _on_coins_changed(coins: int) -> void:
-	etiqueta_monedas.text = "🪙 %d Oro" % coins
+	etiqueta_monedas.text = "Oro: %d" % coins
 
 func _on_notification_posted(msg: String) -> void:
 	banner_toast.text = msg
 	banner_toast.visible = true
-	var tween: Tween = create_tween()
+	var tween := create_tween()
 	banner_toast.modulate.a = 1.0
 	tween.tween_interval(3.2)
 	tween.tween_property(banner_toast, "modulate:a", 0.0, 0.6)
@@ -65,4 +65,4 @@ func set_prompt(text: String) -> void:
 	if text == "":
 		etiqueta_interaccion.text = ""
 	else:
-		etiqueta_interaccion.text = "👉 [E] %s" % text
+		etiqueta_interaccion.text = "[E] %s" % text

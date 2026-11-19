@@ -36,7 +36,7 @@ const TEMP_OPTIMAL_MAX: float = EscalaTermica.TEMP_FORJA_OPTIMA_MAX # 1150.0°C
 const TEMP_QUEMADO: float = EscalaTermica.TEMP_QUEMADO # 1250.0°C
 const TEMP_MANOMETRO_MAX: float = EscalaTermica.TEMP_MANOMETRO_MAX # 1400.0°C
 const AUMENTO_POR_FUELLE: float = 95.0 # 11 bombeos desde 20°C alcanzan ~1065°C con inercia realista
-const DECAIMIENTO_FRAGUA_POR_SEGUNDO: float = 28.0 # Inercia térmica del lecho de carbón (/herrero)
+const DECAIMIENTO_FRAGUA_POR_SEGUNDO: float = 14.0 # Inercia térmica pausada del lecho de carbón (/herrero)
 
 const CATALOGO_METALES: Dictionary = {
 	"hierro_dulce": {
@@ -365,10 +365,12 @@ func reset_recipe() -> void:
 	_resaltar_barril_activo("")
 
 	btn_llevar_al_yunque.disabled = false
-	etiqueta_estado_fragua.text = "1° Arrastra un lingote de los 3 barriles hacia el interior del horno. 2° Atiza el fuelle hasta 1000°C - 1150°C."
+	etiqueta_estado_fragua.text = "Coloca un lingote de los barriles en las brasas y acciona el fuelle hasta alcanzar entre 1000°C y 1150°C."
 	etiqueta_estado_fragua.modulate = Color(0.95, 0.9, 0.8)
 	_update_forge_ui()
 
+	if vista_mostrador and vista_mostrador.has_method("reset_if_stuck"):
+		vista_mostrador.reset_if_stuck()
 	estacion_yunque.reset_station()
 	estacion_corte.reset_station()
 	estacion_tina.reset_station()
@@ -378,6 +380,8 @@ func reset_recipe() -> void:
 
 func _switch_tab(tab: StationTab) -> void:
 	current_station = tab
+	if tab == StationTab.COUNTER and vista_mostrador and vista_mostrador.has_method("reset_if_stuck"):
+		vista_mostrador.reset_if_stuck()
 	vista_mostrador.visible = (tab == StationTab.COUNTER)
 	estacion_fragua.visible = (tab == StationTab.FORGE)
 	estacion_yunque.visible = (tab == StationTab.ANVIL)
@@ -432,6 +436,7 @@ func _update_forge_ui() -> void:
 
 	if ahora_en_optima and not _estaba_en_zona_optima:
 		AudioManager.play_sfx("temp_ready", 1.5, 0.03)
+		AudioManager.play_sfx("step_complete", 2.0, 0.02)
 		if btn_llevar_al_yunque:
 			btn_llevar_al_yunque.pivot_offset = btn_llevar_al_yunque.size * 0.5
 			var tw_ready: Tween = create_tween()
@@ -585,28 +590,28 @@ func _calculate_and_display_ticket() -> void:
 	final_quality = (score_forge * 0.20) + (score_anvil * 0.25) + (score_cut * 0.20) + (score_quench * 0.20) + (score_polish * 0.15)
 	reward_coins = 10 + int(15.0 * final_quality)
 
-	ticket_score_forge.text = "🔥 1. Temperatura Fragua: %.0f%%" % (score_forge * 100.0)
-	ticket_score_anvil.text = "🔨 2. Moldeado Yunque Cenital: %.0f%%" % (score_anvil * 100.0)
-	ticket_score_cut.text = "✂️ 3. Corte Manual de Rebabas: %.0f%%" % (score_cut * 100.0)
-	ticket_score_quench.text = "🌊 4. Inmersión en Tina Fría: %.0f%%" % (score_quench * 100.0)
-	ticket_score_polish.text = "✨ 5. Pulido & Desbaste: %.0f%%" % (score_polish * 100.0)
+	ticket_score_forge.text = "Temperatura de Fragua: %.0f%%" % (score_forge * 100.0)
+	ticket_score_anvil.text = "Moldeado en Yunque: %.0f%%" % (score_anvil * 100.0)
+	ticket_score_cut.text = "Corte con Cizalla: %.0f%%" % (score_cut * 100.0)
+	ticket_score_quench.text = "Temple en Agua: %.0f%%" % (score_quench * 100.0)
+	ticket_score_polish.text = "Pulido en Arenisca: %.0f%%" % (score_polish * 100.0)
 
 	ticket_score_total.text = "CALIDAD GENERAL: %.0f%%" % (final_quality * 100.0)
 
 	if final_quality >= 0.90:
-		ticket_rank_label.text = "⭐⭐⭐ ¡OBRA MAESTRA DEL ARTESANO! ⭐⭐⭐"
+		ticket_rank_label.text = "¡OBRA MAESTRA DEL ARTESANO!"
 		ticket_rank_label.modulate = Color(0.96, 0.78, 0.2)
 	elif final_quality >= 0.75:
-		ticket_rank_label.text = "⭐⭐ HERRERO COMPETENTE ⭐⭐"
+		ticket_rank_label.text = "HERRERO COMPETENTE"
 		ticket_rank_label.modulate = Color(0.85, 0.77, 0.65)
 	elif final_quality >= 0.50:
-		ticket_rank_label.text = "⭐ TRABAJO RÚSTICO DE APRENDIZ ⭐"
+		ticket_rank_label.text = "TRABAJO RÚSTICO DE APRENDIZ"
 		ticket_rank_label.modulate = Color(0.7, 0.5, 0.4)
 	else:
 		ticket_rank_label.text = "PIEZA DEFECTUOSA / RECHAZO"
 		ticket_rank_label.modulate = Color(0.85, 0.3, 0.3)
 
-	ticket_reward_label.text = "💰 Paga Estimada: +%d Monedas de Oro" % reward_coins
+	ticket_reward_label.text = "Paga Estimada: +%d Monedas de Oro" % reward_coins
 
 	capa_ticket_final.visible = true
 	capa_ticket_final.modulate.a = 0.0

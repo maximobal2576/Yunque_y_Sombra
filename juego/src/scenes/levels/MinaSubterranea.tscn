@@ -172,7 +172,12 @@ color = Color(0.24, 0.2, 0.18, 1)
 polygon = PackedVector2Array(-22, -12, -10, -24, 12, -24, 24, -10, 22, 14, 8, 24, -12, 24, -24, 10)
 
 [node name="EscaleraSalidaTaller" type="Node2D" parent="."]
+z_index = 1
 position = Vector2(2200, 845)
+
+[node name="HaloLuzEntrada" type="Polygon2D" parent="EscaleraSalidaTaller"]
+color = Color(0.95, 0.78, 0.45, 0.18)
+polygon = PackedVector2Array(-65, -45, 65, -45, 80, 35, -80, 35)
 
 [node name="SombraEscalera" type="Polygon2D" parent="EscaleraSalidaTaller"]
 position = Vector2(0, 4)
@@ -188,10 +193,6 @@ points = PackedVector2Array(-24, -10, 24, -10, 24, 0, -24, 0, -24, 10, 24, 10)
 width = 3.0
 default_color = Color(0.68, 0.52, 0.34, 1)
 
-[node name="HaloLuzEntrada" type="Polygon2D" parent="EscaleraSalidaTaller"]
-color = Color(0.95, 0.78, 0.45, 0.18)
-polygon = PackedVector2Array(-65, -45, 65, -45, 80, 35, -80, 35)
-
 [node name="EtiquetaSalida" type="Label" parent="EscaleraSalidaTaller"]
 offset_left = -80.0
 offset_top = -42.0
@@ -199,7 +200,7 @@ offset_right = 80.0
 offset_bottom = -20.0
 theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 11
-text = "▲ Salida al Taller [E]"
+text = "Salida al Taller"
 horizontal_alignment = 1
 
 [node name="CuerpoEscalera" type="StaticBody2D" parent="EscaleraSalidaTaller"]
@@ -211,12 +212,13 @@ shape = SubResource("RectangleShape2D_cuerpo_escalera")
 
 [node name="AreaInteractiva" type="Area2D" parent="EscaleraSalidaTaller"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Subir Escalera hacia el Taller"
+prompt_text = "Subir Escalera hacia el Taller"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="EscaleraSalidaTaller/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_escalera")
 
 [node name="ContenedorAntorchas" type="Node2D" parent="."]
+z_index = 1
 
 [node name="SoporteAntorcha1" type="Node2D" parent="ContenedorAntorchas"]
 position = Vector2(2040, 720)
@@ -261,7 +263,7 @@ color = Color(1, 0.65, 0.18, 0.9)
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorAntorchas/SoporteAntorcha1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Encender Antorcha de Pared"
+prompt_text = "Encender Antorcha de Pared"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorAntorchas/SoporteAntorcha1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_antorcha")
@@ -309,7 +311,7 @@ color = Color(1, 0.65, 0.18, 0.9)
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorAntorchas/SoporteAntorcha2"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Encender Antorcha de Pared"
+prompt_text = "Encender Antorcha de Pared"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorAntorchas/SoporteAntorcha2/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_antorcha")
@@ -357,12 +359,13 @@ color = Color(1, 0.68, 0.22, 0.92)
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorAntorchas/SoporteAntorcha3"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Encender Antorcha de Pared"
+prompt_text = "Encender Antorcha de Pared"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorAntorchas/SoporteAntorcha3/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_antorcha")
 
 [node name="ContenedorVetas" type="Node2D" parent="."]
+z_index = 2
 
 [node name="VetaCarbon1" type="Node2D" parent="ContenedorVetas"]
 position = Vector2(1940, 740)
@@ -414,7 +417,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaCarbon1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Carbón Mineral"
+prompt_text = "Picar Veta de Carbón Mineral"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaCarbon1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -469,7 +472,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaHierro1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Hierro Puro"
+prompt_text = "Picar Veta de Hierro Puro"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaHierro1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -524,7 +527,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaHierro2"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Hierro Puro"
+prompt_text = "Picar Veta de Hierro Puro"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaHierro2/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -579,7 +582,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaCobre1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Cobre Nativo"
+prompt_text = "Picar Veta de Cobre Nativo"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaCobre1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -634,7 +637,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaPlata1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Plata de Veta Profunda"
+prompt_text = "Picar Veta de Plata de Veta Profunda"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaPlata1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -689,7 +692,7 @@ shape = SubResource("CircleShape2D_cuerpo_veta")
 
 [node name="AreaInteractiva" type="Area2D" parent="ContenedorVetas/VetaOro1"]
 script = ExtResource("2_interact_script")
-prompt_text = "[E] Picar Veta de Oro Antiguo"
+prompt_text = "Picar Veta de Oro Antiguo"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="ContenedorVetas/VetaOro1/AreaInteractiva"]
 shape = SubResource("RectangleShape2D_area_veta")
@@ -772,7 +775,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
 theme_override_font_sizes/font_size = 20
-text = "⛏️ ¡HITO METALÚRGICO: VETA DE HIERRO PURO!"
+text = "HITO METALÚRGICO: VETA DE HIERRO PURO"
 horizontal_alignment = 1
 
 [node name="IlustracionVetaReluciente" type="Control" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical"]
@@ -801,7 +804,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 14
-text = "¡HITO METALÚRGICO! La roca cede ante tu pico y revela una veta reluciente de Hierro Puro. Entre la fisura recién abierta cae una hoja grabada del Diario Perdido de tu tío Rodrik:"
+text = "La roca cede ante tu pico y revela una veta reluciente de Hierro Puro. Entre la fisura recién abierta cae una hoja grabada del Diario Perdido de tu tío Rodrik:"
 autowrap_mode = 2
 
 [node name="EtiquetaNotaDiarioTio" type="Label" parent="CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical"]
@@ -810,7 +813,7 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
 theme_override_constants/line_spacing = 4
 theme_override_font_sizes/font_size = 13
-text = "«Fragmento de Diario #1 — Las Vetas Ocultas:
+text = "«Fragmento del Diario de Rodrik — Las Vetas Ocultas:
 Si estás leyendo esto, has descendido al túnel secreto tras mi taller. Los Señores Feudales aseguraban que esta colina era estéril para obligarnos a comprar su chatarra a precios de usura. Mentían. Bajo nuestros pies descansa el hierro más noble de la comarca. Usa las antorchas, forja con sabiduría y no permitas que sus emisarios escuchen el eco de tu pico...»"
 autowrap_mode = 2
 
@@ -825,4 +828,4 @@ theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_hito_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hito_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_hito_hover")
-text = "Guardar Hierro Puro y Archivar Nota del Tío  [ E / ESPACIO ]"
+text = "Guardar Hierro Puro y Archivar Nota del Tío"

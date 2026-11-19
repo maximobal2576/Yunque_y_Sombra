@@ -143,84 +143,8 @@ points = PackedVector2Array(-150, -70, -70, -115, 70, -115, 150, -70, 165, 20, 1
 width = 4.0
 default_color = Color(0.42, 0.35, 0.27, 0.75)
 
-[node name="PozoAntiguo" type="Node2D" parent="PuebloExterior"]
-position = Vector2(495, 905)
-
-[node name="SombraPozo" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
-position = Vector2(4, 6)
-color = Color(0.06, 0.04, 0.03, 0.55)
-polygon = PackedVector2Array(-32, -16, 0, -28, 32, -16, 36, 12, 0, 26, -36, 12)
-
-[node name="BrocalPiedra" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
-color = Color(0.36, 0.33, 0.3, 1)
-polygon = PackedVector2Array(-30, -15, 0, -26, 30, -15, 34, 10, 0, 24, -34, 10)
-
-[node name="AguaOscura" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
-color = Color(0.09, 0.16, 0.22, 1)
-polygon = PackedVector2Array(-20, -10, 0, -17, 20, -10, 22, 6, 0, 15, -22, 6)
-
-[node name="VigaTechoPozo" type="ColorRect" parent="PuebloExterior/PozoAntiguo"]
-offset_left = -32.0
-offset_top = -34.0
-offset_right = 32.0
-offset_bottom = -24.0
-color = Color(0.32, 0.21, 0.13, 1)
-
-[node name="ArbolesSecos" type="Node2D" parent="PuebloExterior"]
-
-[node name="ArbolOeste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
-position = Vector2(360, 770)
-
-[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
-color = Color(0.05, 0.04, 0.03, 0.45)
-polygon = PackedVector2Array(-34, 8, 0, -6, 36, 8, 24, 24, -24, 24)
-
-[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
-color = Color(0.25, 0.17, 0.12, 1)
-polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
-
-[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
-color = Color(0.46, 0.22, 0.14, 0.92)
-polygon = PackedVector2Array(-36, -18, -18, -44, 18, -46, 38, -20, 22, 2, -22, 4)
-
-[node name="ArbolEste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
-position = Vector2(905, 795)
-
-[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
-color = Color(0.25, 0.17, 0.12, 1)
-polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
-
-[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
-color = Color(0.55, 0.34, 0.16, 0.92)
-polygon = PackedVector2Array(-34, -16, -14, -42, 20, -42, 36, -16, 18, 4, -20, 4)
-
-[node name="FlechasGuiaTaller" type="Node2D" parent="PuebloExterior"]
-
-[node name="Flecha1" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
-position = Vector2(640, 865)
-color = Color(0.88, 0.72, 0.32, 0.75)
-polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
-
-[node name="Flecha2" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
-position = Vector2(640, 790)
-color = Color(0.88, 0.72, 0.32, 0.82)
-polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
-
-[node name="Flecha3" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
-position = Vector2(640, 715)
-color = Color(0.95, 0.8, 0.38, 0.9)
-polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
-
-[node name="TituloZona" type="Label" parent="PuebloExterior" unique_id=1358266334]
-offset_left = 180.0
-offset_top = 635.0
-offset_right = 500.0
-offset_bottom = 660.0
-theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1)
-theme_override_font_sizes/font_size = 14
-text = "🍂 CENTRO DEL PUEBLO (DECROVEIL)"
-
 [node name="SenderoPiedras" type="Node2D" parent="PuebloExterior" unique_id=1144104141]
+z_index = 1
 
 [node name="Piedra1" type="ColorRect" parent="PuebloExterior/SenderoPiedras" unique_id=986400002]
 offset_left = 618.0
@@ -264,6 +188,93 @@ offset_right = 668.0
 offset_bottom = 705.0
 color = Color(0.196078, 0.14902, 0.121569, 1)
 
+[node name="FlechasGuiaTaller" type="Node2D" parent="PuebloExterior"]
+z_index = 2
+
+[node name="Flecha1" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+position = Vector2(640, 865)
+color = Color(0.95, 0.79, 0.36, 0.92)
+polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
+
+[node name="Flecha2" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+position = Vector2(640, 790)
+color = Color(0.98, 0.83, 0.4, 0.96)
+polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
+
+[node name="Flecha3" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+position = Vector2(640, 715)
+color = Color(1, 0.88, 0.46, 1)
+polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
+
+[node name="PozoAntiguo" type="Node2D" parent="PuebloExterior"]
+z_index = 2
+position = Vector2(495, 905)
+
+[node name="SombraPozo" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+position = Vector2(4, 6)
+color = Color(0.06, 0.04, 0.03, 0.55)
+polygon = PackedVector2Array(-32, -16, 0, -28, 32, -16, 36, 12, 0, 26, -36, 12)
+
+[node name="BrocalPiedra" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+color = Color(0.36, 0.33, 0.3, 1)
+polygon = PackedVector2Array(-30, -15, 0, -26, 30, -15, 34, 10, 0, 24, -34, 10)
+
+[node name="AguaOscura" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+color = Color(0.09, 0.16, 0.22, 1)
+polygon = PackedVector2Array(-20, -10, 0, -17, 20, -10, 22, 6, 0, 15, -22, 6)
+
+[node name="VigaTechoPozo" type="ColorRect" parent="PuebloExterior/PozoAntiguo"]
+offset_left = -32.0
+offset_top = -34.0
+offset_right = 32.0
+offset_bottom = -24.0
+color = Color(0.32, 0.21, 0.13, 1)
+
+[node name="ArbolesSecos" type="Node2D" parent="PuebloExterior"]
+z_index = 2
+
+[node name="ArbolOeste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
+position = Vector2(360, 770)
+
+[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+color = Color(0.05, 0.04, 0.03, 0.45)
+polygon = PackedVector2Array(-34, 8, 0, -6, 36, 8, 24, 24, -24, 24)
+
+[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+color = Color(0.25, 0.17, 0.12, 1)
+polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
+
+[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+color = Color(0.46, 0.22, 0.14, 0.92)
+polygon = PackedVector2Array(-36, -18, -18, -44, 18, -46, 38, -20, 22, 2, -22, 4)
+
+[node name="ArbolEste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
+position = Vector2(905, 795)
+
+[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+color = Color(0.05, 0.04, 0.03, 0.45)
+polygon = PackedVector2Array(-34, 8, 0, -6, 36, 8, 24, 24, -24, 24)
+
+[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+color = Color(0.25, 0.17, 0.12, 1)
+polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
+
+[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+color = Color(0.55, 0.34, 0.16, 0.92)
+polygon = PackedVector2Array(-34, -16, -14, -42, 20, -42, 36, -16, 18, 4, -20, 4)
+
+[node name="TituloZona" type="Label" parent="PuebloExterior" unique_id=1358266334]
+z_index = 3
+offset_left = 180.0
+offset_top = 635.0
+offset_right = 500.0
+offset_bottom = 660.0
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 14
+text = "CENTRO DEL PUEBLO (DECROVEIL)"
+
 [node name="MurosPerimetrales" type="StaticBody2D" parent="PuebloExterior" unique_id=1932848238]
 collision_mask = 0
 
@@ -288,6 +299,7 @@ position = Vector2(975, 640)
 shape = SubResource("RectangleShape2D_ext_north_wing")
 
 [node name="CasasEnRuinas" type="Node2D" parent="PuebloExterior" unique_id=1083366537]
+z_index = 2
 
 [node name="CasaOeste1" type="ColorRect" parent="PuebloExterior/CasasEnRuinas" unique_id=607910623]
 offset_left = 160.0
@@ -309,7 +321,7 @@ offset_left = 10.0
 offset_top = 30.0
 offset_right = 110.0
 offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.5, 0.42, 0.35, 1)
+theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
 theme_override_font_sizes/font_size = 10
 text = "Casa derruida
 (Vigas podridas)"
@@ -334,7 +346,7 @@ offset_left = 10.0
 offset_top = 30.0
 offset_right = 110.0
 offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.5, 0.42, 0.35, 1)
+theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
 theme_override_font_sizes/font_size = 10
 text = "Almacén viejo
 (Techo hundido)"
@@ -359,7 +371,7 @@ offset_left = 10.0
 offset_top = 30.0
 offset_right = 110.0
 offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.5, 0.42, 0.35, 1)
+theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
 theme_override_font_sizes/font_size = 10
 text = "Taller en ruinas
 (Tablas quemadas)"
@@ -384,12 +396,13 @@ offset_left = 10.0
 offset_top = 30.0
 offset_right = 110.0
 offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.5, 0.42, 0.35, 1)
+theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
 theme_override_font_sizes/font_size = 10
 text = "Choza solitaria
 (Ventanas tapiadas)"
 
 [node name="FarolCentral" type="StaticBody2D" parent="PuebloExterior" unique_id=380809503]
+z_index = 2
 position = Vector2(580, 840)
 collision_mask = 0
 
@@ -441,6 +454,7 @@ prompt_text = "Inspeccionar Farol Público Apagado"
 shape = SubResource("RectangleShape2D_lamp_area")
 
 [node name="CartelGuia" type="StaticBody2D" parent="PuebloExterior" unique_id=890273540]
+z_index = 2
 position = Vector2(690, 860)
 collision_mask = 0
 
@@ -452,20 +466,20 @@ offset_bottom = 10.0
 color = Color(0.164706, 0.113725, 0.0823529, 1)
 
 [node name="Tablon" type="ColorRect" parent="PuebloExterior/CartelGuia" unique_id=1684173585]
-offset_left = -22.0
+offset_left = -32.0
 offset_top = -24.0
-offset_right = 22.0
+offset_right = 32.0
 offset_bottom = -8.0
 color = Color(0.239216, 0.168627, 0.117647, 1)
 
 [node name="Etiqueta" type="Label" parent="PuebloExterior/CartelGuia" unique_id=95561037]
-offset_left = -30.0
+offset_left = -36.0
 offset_top = -24.0
-offset_right = 30.0
+offset_right = 36.0
 offset_bottom = -8.0
-theme_override_colors/font_color = Color(0.85, 0.75, 0.6, 1)
+theme_override_colors/font_color = Color(0.92, 0.84, 0.68, 1)
 theme_override_font_sizes/font_size = 8
-text = "⬆ Taller"
+text = "Hacia el Taller"
 horizontal_alignment = 1
 
 [node name="ColisionCartel" type="CollisionShape2D" parent="PuebloExterior/CartelGuia" unique_id=771704225]
@@ -479,6 +493,7 @@ prompt_text = "Leer Cartel Guía de Madera"
 shape = SubResource("RectangleShape2D_sign_area")
 
 [node name="FachadaCasaTio" type="Node2D" parent="PuebloExterior" unique_id=557785701]
+z_index = 2
 position = Vector2(640, 640)
 
 [node name="CuerpoCasa" type="ColorRect" parent="PuebloExterior/FachadaCasaTio" unique_id=668365616]
@@ -487,6 +502,13 @@ offset_top = -35.0
 offset_right = 180.0
 offset_bottom = 45.0
 color = Color(0.24, 0.17, 0.12, 1)
+
+[node name="Techo" type="ColorRect" parent="PuebloExterior/FachadaCasaTio" unique_id=1523328220]
+offset_left = -190.0
+offset_top = -50.0
+offset_right = 190.0
+offset_bottom = -30.0
+color = Color(0.16, 0.09, 0.08, 1)
 
 [node name="TejadoInclinado" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
 color = Color(0.38, 0.14, 0.16, 1)
@@ -507,25 +529,21 @@ offset_bottom = 22.0
 color = Color(0.92, 0.64, 0.24, 0.85)
 
 [node name="HaloEntradaCalida" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
+visible = false
 position = Vector2(0, 52)
 color = Color(0.95, 0.68, 0.25, 0.22)
 polygon = PackedVector2Array(-48, -12, 48, -12, 72, 34, -72, 34)
-
-[node name="Techo" type="ColorRect" parent="PuebloExterior/FachadaCasaTio" unique_id=1523328220]
-offset_left = -190.0
-offset_top = -50.0
-offset_right = 190.0
-offset_bottom = -30.0
-color = Color(0.16, 0.09, 0.08, 1)
 
 [node name="CartelHerreria" type="Label" parent="PuebloExterior/FachadaCasaTio" unique_id=730786066]
 offset_left = -140.0
 offset_top = -24.0
 offset_right = 140.0
 offset_bottom = -2.0
-theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1)
+theme_override_colors/font_color = Color(0.92, 0.82, 0.62, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 11
-text = "🏠 HERRERÍA & TALLER DE RODRIK"
+text = "HERRERÍA Y TALLER DE RODRIK"
 horizontal_alignment = 1
 
 [node name="ColisionIzquierda" type="StaticBody2D" parent="PuebloExterior/FachadaCasaTio" unique_id=1796364317]
@@ -592,16 +610,20 @@ texture = ExtResource("8_stone_floor")
 stretch_mode = 1
 
 [node name="TituloMina" type="Label" parent="InteriorCasa/AccesoMina" unique_id=1875575048]
+z_index = 2
 offset_left = 540.0
 offset_top = 90.0
 offset_right = 740.0
 offset_bottom = 110.0
-theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1)
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 11
-text = "⛏️ ACCESO A LA MINA"
+text = "ACCESO A LA MINA"
 horizontal_alignment = 1
 
 [node name="EntradaMina" type="StaticBody2D" parent="InteriorCasa/AccesoMina" unique_id=1398780925]
+z_index = 1
 position = Vector2(640, 140)
 collision_mask = 0
 
@@ -660,6 +682,7 @@ prompt_text = "Túnel a la Mina Subterránea"
 shape = SubResource("RectangleShape2D_mine_area")
 
 [node name="Carretilla" type="StaticBody2D" parent="InteriorCasa/AccesoMina" unique_id=1159744563]
+z_index = 1
 position = Vector2(530, 220)
 collision_mask = 0
 
@@ -690,6 +713,7 @@ horizontal_alignment = 1
 shape = SubResource("RectangleShape2D_cart_body")
 
 [node name="EstanteriaHerramientas" type="StaticBody2D" parent="InteriorCasa/AccesoMina" unique_id=1987242851]
+z_index = 1
 position = Vector2(750, 160)
 collision_mask = 0
 
@@ -713,7 +737,7 @@ offset_top = 14.0
 offset_right = 40.0
 offset_bottom = 28.0
 theme_override_font_sizes/font_size = 8
-text = "Picos & Cuerdas"
+text = "Picos y Cuerdas"
 horizontal_alignment = 1
 
 [node name="ColisionEstanteria" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/EstanteriaHerramientas" unique_id=234819783]
@@ -737,23 +761,27 @@ texture = ExtResource("7_wood_floor")
 stretch_mode = 1
 
 [node name="TituloPasillo" type="Label" parent="InteriorCasa/Pasillo" unique_id=1155658989]
+z_index = 2
 offset_left = 480.0
 offset_top = 310.0
 offset_right = 660.0
 offset_bottom = 330.0
-theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1)
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 11
-text = "🏠 PASILLO DISTRIBUIDOR"
+text = "PASILLO DISTRIBUIDOR"
 horizontal_alignment = 1
 
 [node name="CartelDirecciones" type="Label" parent="InteriorCasa/Pasillo" unique_id=1329612958]
+z_index = 2
 offset_left = 480.0
 offset_top = 490.0
 offset_right = 800.0
 offset_bottom = 508.0
-theme_override_colors/font_color = Color(0.8, 0.72, 0.6, 1)
+theme_override_colors/font_color = Color(0.88, 0.8, 0.66, 1)
 theme_override_font_sizes/font_size = 9
-text = "⬅ Taller de Forja  |  ⬆ Mina  |  Dormitorio ➡"
+text = "Oeste: Taller de Forja  |  Norte: Mina  |  Este: Dormitorio"
 horizontal_alignment = 1
 
 [node name="TriggerPuertaSur" type="Area2D" parent="InteriorCasa/Pasillo" unique_id=1694611981]
@@ -765,6 +793,7 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_trigger_door_s")
 
 [node name="VisualPuertaSur" type="ColorRect" parent="InteriorCasa/Pasillo" unique_id=517407751]
+z_index = 1
 offset_left = 605.0
 offset_top = 515.0
 offset_right = 675.0
@@ -772,13 +801,14 @@ offset_bottom = 527.0
 color = Color(0.219608, 0.145098, 0.0941176, 1)
 
 [node name="EtiquetaPuertaSur" type="Label" parent="InteriorCasa/Pasillo" unique_id=240184077]
+z_index = 2
 offset_left = 610.0
 offset_top = 530.0
 offset_right = 670.0
 offset_bottom = 544.0
-theme_override_colors/font_color = Color(0.65, 0.58, 0.48, 1)
+theme_override_colors/font_color = Color(0.85, 0.78, 0.66, 1)
 theme_override_font_sizes/font_size = 8
-text = "🚪 A la Calle"
+text = "A la Calle"
 horizontal_alignment = 1
 
 [node name="TriggerPuertaTaller" type="Area2D" parent="InteriorCasa/Pasillo" unique_id=622404389]
@@ -790,6 +820,7 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_trigger_door_w")
 
 [node name="ArcoTallerOeste" type="Node2D" parent="InteriorCasa/Pasillo" unique_id=1300128577]
+z_index = 1
 position = Vector2(450, 410)
 
 [node name="ResplandorFragua" type="ColorRect" parent="InteriorCasa/Pasillo/ArcoTallerOeste" unique_id=1777068649]
@@ -807,16 +838,18 @@ offset_bottom = 6.0
 color = Color(0.08, 0.06, 0.05, 1)
 
 [node name="EtiquetaTaller" type="Label" parent="InteriorCasa/Pasillo/ArcoTallerOeste" unique_id=881620018]
+z_index = 2
 offset_left = -75.0
 offset_top = -50.0
 offset_right = 25.0
 offset_bottom = -34.0
 theme_override_colors/font_color = Color(0.960784, 0.619608, 0.0431373, 1)
 theme_override_font_sizes/font_size = 9
-text = "🔥 TALLER"
+text = "TALLER"
 horizontal_alignment = 1
 
 [node name="Mostrador" type="StaticBody2D" parent="InteriorCasa/Pasillo" unique_id=281282633]
+z_index = 1
 position = Vector2(740, 320)
 collision_mask = 0
 
@@ -863,15 +896,6 @@ offset_bottom = 520.0
 texture = ExtResource("7_wood_floor")
 stretch_mode = 1
 
-[node name="TituloDormitorio" type="Label" parent="InteriorCasa/Dormitorio" unique_id=115787474]
-offset_left = 830.0
-offset_top = 310.0
-offset_right = 970.0
-offset_bottom = 330.0
-theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1)
-theme_override_font_sizes/font_size = 11
-text = "🛏️ DORMITORIO"
-
 [node name="Alfombra" type="ColorRect" parent="InteriorCasa/Dormitorio" unique_id=2077404713]
 offset_left = 960.0
 offset_top = 360.0
@@ -879,7 +903,20 @@ offset_right = 1040.0
 offset_bottom = 460.0
 color = Color(0.196078, 0.0862745, 0.105882, 0.8)
 
+[node name="TituloDormitorio" type="Label" parent="InteriorCasa/Dormitorio" unique_id=115787474]
+z_index = 2
+offset_left = 830.0
+offset_top = 310.0
+offset_right = 970.0
+offset_bottom = 330.0
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 11
+text = "DORMITORIO"
+
 [node name="Cama" type="StaticBody2D" parent="InteriorCasa/Dormitorio" unique_id=352839330]
+z_index = 1
 position = Vector2(1070, 380)
 collision_mask = 0
 
@@ -924,6 +961,7 @@ prompt_text = "Descansar en la Cama (Avanzar Día)"
 shape = SubResource("RectangleShape2D_bed_area")
 
 [node name="MesitaNoche" type="StaticBody2D" parent="InteriorCasa/Dormitorio" unique_id=1129091711]
+z_index = 1
 position = Vector2(1070, 470)
 collision_mask = 0
 
@@ -952,6 +990,7 @@ color = Color(0.960784, 0.619608, 0.0431373, 1)
 shape = SubResource("RectangleShape2D_nightstand_body")
 
 [node name="Armario" type="StaticBody2D" parent="InteriorCasa/Dormitorio" unique_id=2091579328]
+z_index = 1
 position = Vector2(960, 330)
 collision_mask = 0
 
@@ -1066,6 +1105,7 @@ position = Vector2(810, 485)
 shape = SubResource("RectangleShape2D_wall_v_70")
 
 [node name="VigasMuros" type="Node2D" parent="InteriorCasa" unique_id=898957008]
+z_index = 2
 
 [node name="VigaNorteMina" type="ColorRect" parent="InteriorCasa/VigasMuros" unique_id=808711059]
 offset_left = 450.0

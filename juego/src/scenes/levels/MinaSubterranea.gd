@@ -150,7 +150,7 @@ func _inicializar_antorchas() -> void:
 		antorchas_encendidas[nombre_soporte] = false
 		var area: Area2D = soporte.get_node_or_null("AreaInteractiva") as Area2D
 		if area:
-			area.set("prompt_text", "[E] Encender Antorcha de Pared")
+			area.set("prompt_text", "Encender Antorcha de Pared")
 			area.interacted.connect(func() -> void: encender_antorcha(nombre_soporte))
 		_aplicar_estado_visual_antorcha(soporte, false)
 
@@ -175,8 +175,7 @@ func encender_antorcha(nombre_soporte: String) -> void:
 	if area:
 		area.set("prompt_text", "Antorcha Encendida")
 
-	var encendidas: int = obtener_cantidad_antorchas_encendidas()
-	GameManager.post_notification("¡Antorcha encendida! (%d/3) La penumbra de la caverna retrocede." % encendidas)
+	GameManager.post_notification("Antorcha encendida. La penumbra de la caverna retrocede ante el fuego.")
 
 func _aplicar_estado_visual_antorcha(soporte: Node2D, encendida: bool) -> void:
 	var llama: Polygon2D = soporte.get_node_or_null("LlamaAntorcha") as Polygon2D
@@ -195,7 +194,7 @@ func _aplicar_estado_visual_antorcha(soporte: Node2D, encendida: bool) -> void:
 
 func obtener_cantidad_antorchas_encendidas() -> int:
 	var total: int = 0
-	for clave in antorchas_encendidas:
+	for clave: String in antorchas_encendidas:
 		if antorchas_encendidas[clave]:
 			total += 1
 	return total
@@ -241,7 +240,7 @@ func _procesar_parpadeo_antorchas(delta: float) -> void:
 # ==============================================================================
 
 func _inicializar_vetas() -> void:
-	for nombre_veta in definicion_vetas:
+	for nombre_veta: String in definicion_vetas:
 		var nodo_veta: Node2D = contenedor_vetas.get_node_or_null(nombre_veta) as Node2D
 		if not is_instance_valid(nodo_veta):
 			continue
@@ -254,7 +253,7 @@ func _inicializar_vetas() -> void:
 		var area: Area2D = nodo_veta.get_node_or_null("AreaInteractiva") as Area2D
 		if area:
 			var nombre_legible: String = String(datos["nombre_legible"])
-			area.set("prompt_text", "[E] Picar Veta de %s (%d/%d)" % [nombre_legible, golpes_max, golpes_max])
+			area.set("prompt_text", "Picar Veta de %s" % nombre_legible)
 			area.interacted.connect(func() -> void: picar_veta(nombre_veta))
 		_actualizar_visual_veta(nodo_veta, false)
 
@@ -289,12 +288,11 @@ func picar_veta(nombre_veta: String) -> void:
 		_emitir_chispas_veta(nodo_veta)
 
 	if golpes_restantes > 0:
-		var golpes_max: int = int(datos["golpes_maximos"])
 		var nombre_legible: String = String(datos["nombre_legible"])
 		var area: Area2D = nodo_veta.get_node_or_null("AreaInteractiva") as Area2D if is_instance_valid(nodo_veta) else null
 		if area:
-			area.set("prompt_text", "[E] Picar Veta de %s (%d/%d)" % [nombre_legible, golpes_restantes, golpes_max])
-		GameManager.post_notification("¡CLANK! La roca de %s se agrieta (%d golpes restantes)." % [nombre_legible, golpes_restantes])
+			area.set("prompt_text", "Picar Veta de %s" % nombre_legible)
+		GameManager.post_notification("La roca de %s se agrieta bajo el pico." % nombre_legible)
 	else:
 		_quebrar_veta(nombre_veta, nodo_veta, datos)
 
@@ -363,7 +361,7 @@ func _emitir_chispas_veta(nodo_veta: Node2D) -> void:
 		chispas.emitting = true
 
 func regenerar_todas_las_vetas() -> void:
-	for nombre_veta in definicion_vetas:
+	for nombre_veta: String in definicion_vetas:
 		var datos: Dictionary = definicion_vetas[nombre_veta]
 		var golpes_max: int = int(datos["golpes_maximos"])
 		estado_vetas[nombre_veta] = {
@@ -376,7 +374,7 @@ func regenerar_todas_las_vetas() -> void:
 			var area: Area2D = nodo_veta.get_node_or_null("AreaInteractiva") as Area2D
 			if area:
 				var nombre_legible: String = String(datos["nombre_legible"])
-				area.set("prompt_text", "[E] Picar Veta de %s (%d/%d)" % [nombre_legible, golpes_max, golpes_max])
+				area.set("prompt_text", "Picar Veta de %s" % nombre_legible)
 
 func _al_iniciar_nuevo_dia(_nuevo_dia: int = 1) -> void:
 	regenerar_todas_las_vetas()
@@ -436,7 +434,7 @@ func cerrar_cinematica_primer_hierro() -> void:
 	await _tween_cinematica.finished
 	if is_instance_valid(cinematica_primer_hierro):
 		cinematica_primer_hierro.visible = false
-	GameManager.post_notification("Has archivado la Nota Grabada #1 del Diario del Tío Rodrik.")
+	GameManager.post_notification("Has archivado la nota grabada del Diario del Tío Rodrik.")
 
 # ==============================================================================
 # ESCALERA DE SALIDA AL TALLER / ACCESO MINA

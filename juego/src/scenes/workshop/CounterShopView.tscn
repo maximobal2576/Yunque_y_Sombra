@@ -482,7 +482,7 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(1, 0.92, 0.55, 1)
 theme_override_font_sizes/font_size = 13
-text = "🎯 SUELTA LA PIEZA AQUÍ PARA ENTREGAR"
+text = "SUELTA LA PIEZA AQUÍ PARA ENTREGAR"
 horizontal_alignment = 1
 
 [node name="EtiquetaNombre" type="Label" parent="MarcoVentana/ContenedorCliente"]
@@ -603,7 +603,7 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 11
-text = "🛎️ [CLIC] LLAMAR"
+text = "[CLIC] LLAMAR"
 horizontal_alignment = 1
 
 [node name="EfectoTimbre" type="Label" parent="MesaMostrador/ContenedorCampana"]
@@ -665,7 +665,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.188235, 0.0313725, 0.0627451, 1)
 theme_override_font_sizes/font_size = 15
-text = "📜 COMANDA DE ENCARGO"
+text = "COMANDA DE ENCARGO"
 horizontal_alignment = 1
 
 [node name="SeparadorComanda" type="HSeparator" parent="MesaMostrador/PergaminoComanda/ContenedorComanda"]
@@ -689,7 +689,7 @@ autowrap_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 1)
 theme_override_font_sizes/font_size = 12
-text = "💰 Paga Base: 25 Monedas de Oro"
+text = "Paga Base: 25 Monedas de Oro"
 horizontal_alignment = 1
 
 [node name="BotonAceptarComanda" type="Button" parent="MesaMostrador/PergaminoComanda/ContenedorComanda"]
@@ -699,7 +699,7 @@ mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_gold_btn")
-text = "✍️ Aceptar Comanda e Ir a Forja [ENTER]"
+text = "Aceptar Comanda e Ir a Forja [ENTER]"
 
 [node name="BandejaEntrega" type="Panel" parent="MesaMostrador"]
 visible = false
@@ -727,7 +727,7 @@ offset_bottom = 28.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.58, 1)
 theme_override_font_sizes/font_size = 13
-text = "🖐️ ARRASTRA LA PIEZA FORJADA HACIA EL CLIENTE"
+text = "ARRASTRA LA PIEZA FORJADA HACIA EL CLIENTE"
 horizontal_alignment = 1
 
 [node name="PanoCueroMesada" type="Polygon2D" parent="MesaMostrador/BandejaEntrega"]
@@ -807,7 +807,7 @@ mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 11
 theme_override_styles/normal = SubResource("StyleBoxFlat_gold_btn")
-text = "⬆️ Entregar Pieza (o arrastra al cliente)"
+text = "Entregar Pieza (o arrastra al cliente)"
 
 [node name="BotonIrAForja" type="Button" parent="MesaMostrador"]
 visible = false
@@ -827,4 +827,4 @@ mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_burgundy_btn")
-text = "🔨 Ir a la Forja y Banco de Trabajo"
+text = "Ir a la Forja y Banco de Trabajo"

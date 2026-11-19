@@ -161,7 +161,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🛎️ 1. MOSTRADOR"
+text = "MOSTRADOR"
 
 [node name="BotonPestanaFragua" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
 layout_mode = 2
@@ -169,7 +169,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🔥 2. FRAGUA"
+text = "FRAGUA"
 
 [node name="BotonPestanaYunque" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
 layout_mode = 2
@@ -177,7 +177,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🔨 3. YUNQUE CENITAL"
+text = "YUNQUE CENITAL"
 
 [node name="BotonPestanaCorte" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
 layout_mode = 2
@@ -185,7 +185,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "✂️ 4. CORTE MANUAL"
+text = "CORTE MANUAL"
 
 [node name="BotonPestanaTina" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
 layout_mode = 2
@@ -193,7 +193,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🌊 5. TINA DE TEMPLADO"
+text = "TINA DE TEMPLADO"
 
 [node name="BotonPestanaPulido" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
 layout_mode = 2
@@ -201,7 +201,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "✨ 6. PULIDO"
+text = "PULIDO"
 
 [node name="BotonSalirPasillo" type="Button" parent="PanelPrincipal/Cabecera"]
 layout_mode = 1
@@ -220,7 +220,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
-text = "🚪 Salir al Pasillo [ESC]"
+text = "Salir al Pasillo [ESC]"
 
 [node name="AreaContenido" type="Control" parent="PanelPrincipal"]
 layout_mode = 1
@@ -271,7 +271,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.55, 1)
 theme_override_font_sizes/font_size = 13
-text = "🛢️ BARRILES DE LINGOTES
+text = "BARRILES DE LINGOTES
 (Arrastra un lingote al horno)"
 horizontal_alignment = 1
 
@@ -537,7 +537,7 @@ offset_right = 125.0
 offset_bottom = -8.0
 theme_override_colors/font_color = Color(1, 0.88, 0.52, 0.95)
 theme_override_font_sizes/font_size = 12
-text = "🔥 Suelta o haz clic en un barril para meter el lingote"
+text = "Suelta o haz clic en un barril para meter el lingote"
 horizontal_alignment = 1
 
 [node name="LingoteArrastrado" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
@@ -680,7 +680,7 @@ grow_vertical = 0
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 11
-text = "💨 ATIZAR FUELLE [ESPACIO]"
+text = "ATIZAR FUELLE [ESPACIO]"
 horizontal_alignment = 1
 
 [node name="BotonLlevarAlYunque" type="Button" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
@@ -701,7 +701,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
-text = "➡️ LLEVAR AL YUNQUE CENITAL"
+text = "LLEVAR AL YUNQUE CENITAL"
 
 [node name="EtiquetaEstadoFragua" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
 layout_mode = 1
@@ -788,14 +788,14 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.188235, 0.0313725, 0.0627451, 1)
 theme_override_font_sizes/font_size = 18
-text = "📜 TICKET DE INSPECCIÓN ARTESANAL"
+text = "TICKET DE INSPECCIÓN ARTESANAL"
 horizontal_alignment = 1
 
 [node name="SubtituloTicket" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/CabeceraTicket"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 0.8)
 theme_override_font_sizes/font_size = 12
-text = "Evaluación Estricta de las 5 Etapas de Taller"
+text = "Evaluación Estricta de las Etapas de Taller"
 horizontal_alignment = 1
 
 [node name="Separador1" type="HSeparator" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
@@ -809,31 +809,31 @@ theme_override_constants/separation = 5
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
-text = "🔥 1. Temperatura Fragua: 95%"
+text = "Temperatura de Fragua: 95%"
 
 [node name="PuntajeYunque" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
-text = "🔨 2. Moldeado Yunque Cenital: 90%"
+text = "Moldeado en Yunque: 90%"
 
 [node name="PuntajeCorte" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
-text = "✂️ 3. Corte Manual de Rebabas: 92%"
+text = "Corte con Cizalla: 92%"
 
 [node name="PuntajeTina" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
-text = "🌊 4. Inmersión en Tina Fría: 100%"
+text = "Temple en Agua: 100%"
 
 [node name="PuntajePulido" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
-text = "✨ 5. Pulido & Desbaste: 94%"
+text = "Pulido en Arenisca: 94%"
 
 [node name="Separador2" type="HSeparator" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
 layout_mode = 2
@@ -849,14 +849,14 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 1)
 theme_override_font_sizes/font_size = 13
-text = "⭐⭐⭐ ¡OBRA MAESTRA DEL ARTESANO! ⭐⭐⭐"
+text = "¡OBRA MAESTRA DEL ARTESANO!"
 horizontal_alignment = 1
 
 [node name="EtiquetaRecompensa" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 14
-text = "💰 Paga Estimada: +24 Monedas de Oro"
+text = "Paga Estimada: +24 Monedas de Oro"
 horizontal_alignment = 1
 
 [node name="AccionesTicket" type="VBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
@@ -871,7 +871,7 @@ theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
 theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
-text = "📦 Llevar al Mostrador y Entregar"
+text = "Llevar al Mostrador y Entregar"
 
 [node name="ContenedorSecundario" type="HBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket"]
 layout_mode = 2
@@ -885,7 +885,7 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🔨 Forjar Otra Pieza"
+text = "Forjar Otra Pieza"
 
 [node name="BotonSalirTicket" type="Button" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket/ContenedorSecundario"]
 layout_mode = 2
@@ -895,4 +895,4 @@ theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
-text = "🚪 Salir al Pasillo"
+text = "Salir al Pasillo"

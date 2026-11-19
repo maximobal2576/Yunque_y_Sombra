@@ -55,21 +55,22 @@ const NUM_SLICES: int = 24
 const BAR_HALF_WIDTH: float = 140.0 # Semilargo objetivo de la silueta (-140 a +140)
 const INITIAL_HALF_WIDTH: float = 104.0 # El lingote sale más corto y macizo de la fragua (-104 a +104)
 const INITIAL_THICKNESS: float = 20.0 # Grosor inicial compacto (-10 a +10)
-const DEFORMATION_RADIUS: float = 54.0 # Radio de influencia longitudinal de cada martillazo
-const DEFORMATION_AMOUNT: float = 4.6 # Expansión transversal base
-const STRETCH_LONGITUDINAL: float = 7.8 # Estiramiento longitudinal (eje X) por impacto
+const DEFORMATION_RADIUS: float = 48.0 # Radio de influencia longitudinal de cada martillazo (herramienta inicial)
+const DEFORMATION_AMOUNT: float = 2.4 # Expansión transversal base progresiva (~48% más controlada)
+const STRETCH_LONGITUDINAL: float = 4.2 # Estiramiento longitudinal por impacto (~50% más gradual)
 
 # Cinemática del Martillo Móvil con Hitbox (/game_feel)
 const POSICION_REPOSO_MARTILLO: Vector2 = Vector2(465.0, 62.0)
 const RADIO_AGARRE_MARTILLO: float = 145.0 # Radio para tomar el martillo por su cabeza o mango
-const VELOCIDAD_MINIMA_GOLPE: float = 75.0 # px/s mínimos para registrar un impacto al chocar la hitbox
-const VELOCIDAD_IMPACTO_BASE: float = 520.0 # px/s que equivale a fuerza estándar (1.0x)
-const COOLDOWN_ENTRE_IMPACTOS: float = 0.14 # Evita rebotes múltiples en el mismo golpe
+const VELOCIDAD_MINIMA_GOLPE: float = 80.0 # px/s mínimos para registrar un impacto al chocar la hitbox
+const VELOCIDAD_IMPACTO_BASE: float = 680.0 # px/s que equivale a fuerza completa de martillo inicial
+const COOLDOWN_ENTRE_IMPACTOS: float = 0.16 # Evita rebotes múltiples en el mismo golpe
 
-# Termodinámica de enfriamiento en el yunque (/herrero)
+# Termodinámica de enfriamiento pausado en el yunque (/herrero)
 const TEMP_INICIAL_DEFECTO: float = 1085.0
-const ENFRIAMIENTO_POR_SEGUNDO: float = 22.0
-const ENFRIAMIENTO_POR_GOLPE: float = 4.0
+const TASA_ENFRIAMIENTO_YUNQUE: float = 10.5
+const ENFRIAMIENTO_POR_SEGUNDO: float = TASA_ENFRIAMIENTO_YUNQUE
+const ENFRIAMIENTO_POR_GOLPE: float = 2.0
 const PENALIZACION_GOLPE_TIBIO: float = 0.04
 const PENALIZACION_GOLPE_FRIO: float = 0.08
 
@@ -85,6 +86,7 @@ var strikes_count: int = 0
 const MIN_STRIKES: int = 5
 const MAX_STRIKES: int = 15
 var strike_history_x: Array[float] = []
+var _sonido_optimo_emitido: bool = false
 
 var temperatura_pieza: float = TEMP_INICIAL_DEFECTO
 var penalizacion_frio: float = 0.0
@@ -198,7 +200,7 @@ func _verificar_colision_continua_martillo() -> void:
 
 func _on_hitbox_martillo_area_entered(area: Area2D) -> void:
 	if area == area_colision_metal and _arrastrando_martillo and not _estaba_dentro_metal and not _ya_golpeo_en_esta_entrada and _cooldown_impacto <= 0.0:
-		var vel_efectiva: float = maxf(rapidez_martillo, 180.0)
+		var vel_efectiva: float = rapidez_martillo
 		if vel_efectiva >= VELOCIDAD_MINIMA_GOLPE:
 			_estaba_dentro_metal = true
 			_ya_golpeo_en_esta_entrada = true
@@ -207,7 +209,8 @@ func _on_hitbox_martillo_area_entered(area: Area2D) -> void:
 			_strike_at_position(martillo_forjador.position, factor_vel)
 
 func calcular_factor_fuerza_por_velocidad(rapidez_px_s: float) -> float:
-	return clampf(rapidez_px_s / VELOCIDAD_IMPACTO_BASE, 0.22, 1.85)
+	var norm: float = clampf((rapidez_px_s - VELOCIDAD_MINIMA_GOLPE) / (VELOCIDAD_IMPACTO_BASE - VELOCIDAD_MINIMA_GOLPE), 0.0, 1.35)
+	return clampf(0.08 + pow(norm, 1.35) * 0.82, 0.08, 1.15)
 
 ## Permite simular o ejecutar un impacto del MartilloForjador a una velocidad específica (px/s)
 func simular_golpe_martillo_con_velocidad(pos_objetivo: Vector2, rapidez_px_s: float) -> void:
@@ -225,6 +228,7 @@ func reset_station(initial_color: Color = Color(0.96, 0.62, 0.04), initial_temp:
 	golpes_en_frio = 0
 	penalizacion_frio = 0.0
 	ultimo_factor_velocidad = 1.0
+	_sonido_optimo_emitido = false
 	strike_history_x.clear()
 	btn_finish_anvil.disabled = true
 	_arrastrando_martillo = false
@@ -333,7 +337,7 @@ func _on_hit_area_gui_input(event: InputEvent) -> void:
 					tw_aviso.tween_property(martillo_forjador, "scale", Vector2(1.18, 1.18), 0.08)
 					tw_aviso.tween_property(martillo_forjador, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_ELASTIC)
 				if status_label:
-					status_label.text = "🖐️ Toma el Martillo Forjador y arrástralo contra el metal para golpear (más rápido = más fuerza)."
+					status_label.text = "Toma el Martillo Forjador y arrástralo contra el metal para golpear (más rápido = más fuerza)."
 					status_label.modulate = Color(0.98, 0.84, 0.35)
 		else:
 			_arrastrando_martillo = false
@@ -365,8 +369,11 @@ func _factor_deformacion_termica() -> float:
 		return 0.5
 	return 0.15
 
+func _apply_hammer_blow(local_pos: Vector2, factor_velocidad: float = 1.0) -> void:
+	_strike_at_position(local_pos, factor_velocidad)
+
 func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> void:
-	ultimo_factor_velocidad = clampf(factor_velocidad, 0.20, 1.95)
+	ultimo_factor_velocidad = clampf(factor_velocidad, 0.08, 1.25)
 	GameManager.consume_stamina(1.0)
 	AudioManager.play_anvil(temperatura_pieza)
 
@@ -426,7 +433,7 @@ func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> v
 
 		if dist_x < DEFORMATION_RADIUS:
 			var influence: float = 0.5 * (1.0 + cos((dist_x / DEFORMATION_RADIUS) * PI))
-			var paso_moldeado: float = clampf(0.34 * influence * potencia_total, 0.04, 0.72)
+			var paso_moldeado: float = clampf(0.22 * influence * potencia_total, 0.015, 0.38)
 
 			# Guiar hacia la silueta del objeto pedido (cabeza ancha a la izquierda, vástago central y punta cónica a la derecha)
 			# dejando un pequeño labio excedente (+2.5px) en el vástago para las rebabas de la estación de corte
@@ -434,8 +441,8 @@ func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> v
 			var meta_up: float = (target_upper[i] - margen_rebaba) * sesgo_arriba
 			var meta_low: float = (target_lower[i] + margen_rebaba) * sesgo_abajo
 
-			# Además de acercarse al perfil del clavo/perno, un golpe muy veloz (>1.25x) expande extra el metal
-			var empuje_velocidad: float = maxf(0.0, ultimo_factor_velocidad - 1.05) * DEFORMATION_AMOUNT * 0.55 * influence
+			# Golpes muy veloces (>0.95x) aportan una expansión adicional moderada y controlada
+			var empuje_velocidad: float = maxf(0.0, ultimo_factor_velocidad - 0.95) * DEFORMATION_AMOUNT * 0.28 * influence
 			upper_offsets[i] = lerpf(upper_offsets[i], meta_up, paso_moldeado) - empuje_velocidad * sesgo_arriba
 			lower_offsets[i] = lerpf(lower_offsets[i], meta_low, paso_moldeado) + empuje_velocidad * sesgo_abajo
 
@@ -463,6 +470,12 @@ func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> v
 	metal_polygon.scale = Vector2(1.0 + deform_escala, 1.0 - deform_escala * 1.2)
 	tween.tween_interval(0.035)
 	tween.tween_property(metal_polygon, "scale", Vector2.ONE, 0.13).set_trans(Tween.TRANS_ELASTIC)
+
+	var score_actual: float = _evaluate_current_shaping()
+	if strikes_count >= MIN_STRIKES and score_actual >= 0.92 and not _sonido_optimo_emitido:
+		_sonido_optimo_emitido = true
+		AudioManager.play_sfx("step_complete", 2.5, 0.02)
+		AudioManager.play_sfx("temp_ready", 1.5, 0.02)
 
 	_update_ui()
 
@@ -564,11 +577,11 @@ func _evaluate_current_shaping() -> float:
 	var max_possible_error: float = 0.0
 
 	for i in range(NUM_SLICES):
-		var diff_up: float = absf(upper_offsets[i] - target_upper[i])
-		var diff_down: float = absf(lower_offsets[i] - target_lower[i])
-		var diff_x: float = absf(_get_x_for_slice(i) - target_x[i]) * 0.25
+		var diff_up: float = maxf(0.0, absf(upper_offsets[i] - target_upper[i]) - 4.4)
+		var diff_down: float = maxf(0.0, absf(lower_offsets[i] - target_lower[i]) - 4.4)
+		var diff_x: float = maxf(0.0, absf(_get_x_for_slice(i) - target_x[i]) * 0.16 - 2.2)
 		total_error += (diff_up + diff_down + diff_x)
-		max_possible_error += 34.0
+		max_possible_error += 56.0
 
 	var base_accuracy: float = clampf(1.0 - (total_error / max_possible_error), 0.10, 1.0)
 	var accuracy: float = clampf(base_accuracy - penalizacion_frio, 0.10, 1.0)
@@ -581,13 +594,13 @@ func _evaluate_current_shaping() -> float:
 func _update_ui() -> void:
 	var current_acc: float = _evaluate_current_shaping()
 	var largo_mm: float = (_get_x_for_slice(NUM_SLICES - 1) - _get_x_for_slice(0))
-	strikes_label.text = "🔨 Golpes: %d (Fuerza: %.0f%% | Largo: %.0fpx)" % [
+	strikes_label.text = "Golpes: %d (Fuerza: %.0f%% | Largo: %.0fpx)" % [
 		strikes_count,
 		ultimo_factor_velocidad * 100.0,
 		largo_mm
 	]
 	if etiqueta_temperatura_pieza:
-		etiqueta_temperatura_pieza.text = "🌡️ Pieza: %.0f°C (%s)" % [
+		etiqueta_temperatura_pieza.text = "Pieza: %.0f°C (%s)" % [
 			temperatura_pieza,
 			EscalaTermica.nombre_tramo(temperatura_pieza)
 		]
@@ -601,13 +614,13 @@ func _update_ui() -> void:
 		btn_finish_anvil.disabled = false
 
 	if temperatura_pieza < EscalaTermica.TEMP_RESISTENCIA:
-		status_label.text = "❄️ ¡METAL FRÍO (%.0f°C)! Casi no se estira y agrieta el acero (-%.0f%%). ¡Vuelve a la Fragua!" % [
+		status_label.text = "¡METAL FRÍO (%.0f°C)! Casi no se estira y agrieta el acero (-%.0f%%). ¡Vuelve a la Fragua!" % [
 			temperatura_pieza,
 			penalizacion_frio * 100.0
 		]
 		status_label.modulate = Color(0.95, 0.55, 0.48)
 	elif temperatura_pieza < EscalaTermica.TEMP_DEFORMACION_PLENA:
-		status_label.text = "⚠️ Metal tibio (%.0f°C): se resiste al estirado (50%% fuerza, -%.0f%% precisión). Recalienta pronto." % [
+		status_label.text = "Metal tibio (%.0f°C): se resiste al estirado (50%% fuerza, -%.0f%% precisión). Recalienta pronto." % [
 			temperatura_pieza,
 			penalizacion_frio * 100.0
 		]

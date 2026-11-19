@@ -68,6 +68,8 @@ var drag_start_bench: Vector2 = Vector2.ZERO
 var cuts_completed: Array[bool] = [false, false, false] # 0: Superior, 1: Inferior, 2: Punta
 var cut_accuracy_scores: Array[float] = []
 var temperatura_pieza: float = 940.0
+var _sonido_corte_optimo_emitido: bool = false
+var _corto_en_arrastre_actual: bool = false
 
 # Coordenadas relativas al centro del banco (300, 150)
 var scrap_lines: Array[Dictionary] = [
@@ -122,6 +124,8 @@ func reset_station(base_color: Color = Color(0.96, 0.62, 0.04), incoming_shape: 
 	cut_accuracy_scores.clear()
 	btn_to_quench.disabled = true
 	is_dragging = false
+	_sonido_corte_optimo_emitido = false
+	_corto_en_arrastre_actual = false
 	temperatura_pieza = clampf(incoming_temp, 680.0, 1150.0)
 
 	_limpiar_hijos_dinamicos()
@@ -274,6 +278,7 @@ func _gui_input(event: InputEvent) -> void:
 
 func _start_drag_cut() -> void:
 	is_dragging = true
+	_corto_en_arrastre_actual = false
 	drag_start_bench = cut_bench.get_local_mouse_position()
 
 	cut_drag_line.visible = true
@@ -284,7 +289,7 @@ func _start_drag_cut() -> void:
 	cutter_tool.visible = true
 	cutter_tool.position = drag_start_bench
 
-	status_label.text = "Arrastra la cizalla por donde quieras cortar el metal y suelta para seccionar."
+	status_label.text = "Arrastra la cizalla sobre las líneas punteadas de corte para desprender cada rebaba."
 	status_label.modulate = Color(0.96, 0.78, 0.2)
 
 func _update_drag_cut() -> void:
@@ -298,6 +303,34 @@ func _update_drag_cut() -> void:
 	if delta.length() > 4.0:
 		cutter_tool.rotation = delta.angle()
 
+	# Corte en vivo al arrastrar sobre una línea guía marcada (>= 35 px de recorrido)
+	if delta.length() >= 35.0:
+		var bench_center: Vector2 = cut_bench.size / 2.0 if cut_bench.size.x > 0 else Vector2(300, 150)
+		var p1_local: Vector2 = drag_start_bench - bench_center
+		var p2_local: Vector2 = cur_bench - bench_center
+		var nodos_rebaba: Array[Polygon2D] = [scrap_top, scrap_bottom, scrap_tip]
+		for i in range(scrap_lines.size()):
+			if cuts_completed[i]:
+				continue
+			var g_start_bench: Vector2 = bench_center + scrap_lines[i]["start"]
+			var g_end_bench: Vector2 = bench_center + scrap_lines[i]["end"]
+			var reb: Polygon2D = nodos_rebaba[i]
+			var toca_guia: bool = _check_stroke_hits_guide(drag_start_bench, cur_bench, g_start_bench, g_end_bench)
+			var toca_rebaba: bool = reb != null and reb.visible and reb.polygon.size() >= 3 and _segmento_toca_poligono(p1_local, p2_local, reb.polygon, 28.0)
+			if toca_guia or toca_rebaba:
+				var g1_local: Vector2 = scrap_lines[i]["start"]
+				var g2_local: Vector2 = scrap_lines[i]["end"]
+				var prec: float = _calcular_precision_trazo(p1_local, p2_local, g1_local, g2_local)
+				_cortar_y_desprender_rebaba_exacta(i, reb, p1_local, p2_local, prec)
+				_registrar_cicatriz_corte(g1_local, g2_local)
+				_disparar_juice_corte(bench_center + (g1_local + g2_local) * 0.5)
+				_update_ui()
+				_corto_en_arrastre_actual = true
+				drag_start_bench = cur_bench
+				if cut_drag_line.get_point_count() >= 2:
+					cut_drag_line.set_point_position(0, drag_start_bench)
+				break
+
 func _end_drag_cut() -> void:
 	if not is_dragging:
 		return
@@ -309,64 +342,51 @@ func _end_drag_cut() -> void:
 
 	var stroke_length: float = drag_start_bench.distance_to(drag_end_bench)
 	if stroke_length < 18.0:
-		status_label.text = "Trazo demasiado corto. Arrastra la cizalla atravesando la sección que quieras cortar."
+		if _corto_en_arrastre_actual:
+			return
+		status_label.text = "Trazo demasiado corto. Arrastra la cizalla atravesando la línea guía marcada."
 		status_label.modulate = Color(0.85, 0.6, 0.4)
 		return
 
 	_ejecutar_corte_geometrico_libre(drag_start_bench, drag_end_bench)
 
-## Corta físicamente los polígonos del metal exactamente por la recta trazada (p1_bench -> p2_bench)
+## Corta limpiamente las rebabas siguiendo las líneas guía punteadas sin mutilar la pieza principal
 func _ejecutar_corte_geometrico_libre(p1_bench: Vector2, p2_bench: Vector2) -> void:
 	var bench_center: Vector2 = cut_bench.size / 2.0 if cut_bench.size.x > 0 else Vector2(300, 150)
 	var p1_local: Vector2 = p1_bench - bench_center
 	var p2_local: Vector2 = p2_bench - bench_center
 
 	var hubo_corte_geom: bool = false
-	var rebaba_index_cortada: int = -1
-	var mejor_precision: float = 0.88
-
-	# 1. Intentar biseccionar geométricamente cada rebaba activa y la pieza principal por la línea exacta del usuario
 	var nodos_rebaba: Array[Polygon2D] = [scrap_top, scrap_bottom, scrap_tip]
-	for i in range(nodos_rebaba.size()):
+	var pos_efecto: Vector2 = (p1_bench + p2_bench) * 0.5
+
+	# 1. Priorizar el corte limpio sobre cualquiera de las 3 líneas guía punteadas o sus rebabas asociadas
+	for i in range(scrap_lines.size()):
+		if cuts_completed[i]:
+			continue
 		var reb: Polygon2D = nodos_rebaba[i]
-		if reb and reb.visible and reb.polygon.size() >= 3:
-			if _segmento_toca_poligono(p1_local, p2_local, reb.polygon, 26.0):
-				var g_start: Vector2 = scrap_lines[i]["start"]
-				var g_end: Vector2 = scrap_lines[i]["end"]
-				mejor_precision = _calcular_precision_trazo(p1_local, p2_local, g_start, g_end)
-				_cortar_y_desprender_rebaba_exacta(i, reb, p1_local, p2_local)
-				rebaba_index_cortada = i
-				hubo_corte_geom = true
-				break
-
-	# 2. Además, si el trazo del jugador atraviesa el cuerpo de PiezaPrincipal (y no fue el desbarbado de la punta),
-	# recortar el borde de PiezaPrincipal exactamente con el ángulo y posición que marcó el jugador
-	if rebaba_index_cortada != 2 and main_workpiece and main_workpiece.polygon.size() >= 3:
-		if _segmento_toca_poligono(p1_local, p2_local, main_workpiece.polygon, 8.0):
-			var recorto_cuerpo: bool = _biseccionar_pieza_principal(p1_local, p2_local)
-			if recorto_cuerpo:
-				hubo_corte_geom = true
-
-	# 3. Si el trazo pasó dentro de la tolerancia de una línea guía aún no completada, asegurar su corte
-	if rebaba_index_cortada == -1:
-		for i in range(scrap_lines.size()):
-			if cuts_completed[i]:
-				continue
-			var g_start: Vector2 = bench_center + scrap_lines[i]["start"]
-			var g_end: Vector2 = bench_center + scrap_lines[i]["end"]
-			if _check_stroke_hits_guide(p1_bench, p2_bench, g_start, g_end):
-				var prec: float = _calcular_precision_trazo(p1_local, p2_local, scrap_lines[i]["start"], scrap_lines[i]["end"])
-				_cortar_y_desprender_rebaba_exacta(i, nodos_rebaba[i], p1_local, p2_local, prec)
-				hubo_corte_geom = true
-				break
+		var g1_local: Vector2 = scrap_lines[i]["start"]
+		var g2_local: Vector2 = scrap_lines[i]["end"]
+		var g_start_bench: Vector2 = bench_center + g1_local
+		var g_end_bench: Vector2 = bench_center + g2_local
+		var toca_guia: bool = _check_stroke_hits_guide(p1_bench, p2_bench, g_start_bench, g_end_bench)
+		var toca_rebaba: bool = reb != null and reb.visible and reb.polygon.size() >= 3 and _segmento_toca_poligono(p1_local, p2_local, reb.polygon, 32.0)
+		if toca_guia or toca_rebaba:
+			var prec: float = _calcular_precision_trazo(p1_local, p2_local, g1_local, g2_local)
+			_cortar_y_desprender_rebaba_exacta(i, reb, p1_local, p2_local, prec)
+			_registrar_cicatriz_corte(g1_local, g2_local)
+			pos_efecto = bench_center + (g1_local + g2_local) * 0.5
+			hubo_corte_geom = true
+			break
 
 	if not hubo_corte_geom:
-		status_label.text = "La cizalla no tocó el metal. Arrastra cruzando las rebabas o el borde que quieras recortar."
+		if _corto_en_arrastre_actual:
+			return
+		status_label.text = "La cizalla no tocó ninguna línea de corte. Arrastra sobre las líneas punteadas de las rebabas."
 		status_label.modulate = Color(0.85, 0.65, 0.4)
 		return
 
-	_registrar_cicatriz_corte(p1_local, p2_local)
-	_disparar_juice_corte((p1_bench + p2_bench) * 0.5)
+	_disparar_juice_corte(pos_efecto)
 	_update_ui()
 
 func _cortar_y_desprender_rebaba_exacta(index: int, reb: Polygon2D, p1: Vector2, p2: Vector2, precision_override: float = -1.0) -> void:
@@ -374,31 +394,10 @@ func _cortar_y_desprender_rebaba_exacta(index: int, reb: Polygon2D, p1: Vector2,
 	var g_end: Vector2 = scrap_lines[index]["end"]
 	var prec: float = precision_override if precision_override > 0.0 else _calcular_precision_trazo(p1, p2, g_start, g_end)
 
-	# Si el jugador trazó una línea que parte la rebaba en dos, dejamos pegada a la pieza principal
-	# la parte que el jugador dejó del lado interior de su trazo, y desprendemos volando el resto exacto!
-	var partes: Dictionary = _dividir_poligono_por_recta(reb.polygon, p1, p2, Vector2.ZERO)
-	var exterior: PackedVector2Array = partes["exterior"]
-	var interior: PackedVector2Array = partes["interior"]
-
-	if exterior.size() >= 3 and interior.size() >= 3:
-		# El fragmento exterior sale volando con la forma exacta del corte del usuario
-		_desprender_fragmento_real(exterior, _direccion_expulsion_rebaba(index, p1, p2))
-		# Y si el corte del usuario dejó un remanente interior significativo, queda visible en el borde
-		# de la pieza para que el jugador vea exactamente por dónde pasó su tijera
-		var area_int: float = _area_poligono(interior)
-		var area_total: float = _area_poligono(reb.polygon)
-		if area_int > area_total * 0.12 and area_int < area_total * 0.85:
-			_fusionar_remanente_visual(interior)
+	# Desprender la rebaba limpiamente a lo largo de la línea guía sin mutilar ni deformar main_workpiece
+	if reb and reb.visible and reb.polygon.size() >= 3:
+		_desprender_fragmento_real(reb.polygon, _direccion_expulsion_rebaba(index, g_start, g_end))
 		reb.visible = false
-	else:
-		# Si el corte pasó al ras de la raíz de la rebaba, toda la rebaba se desprende siguiendo el ángulo del trazo
-		_desprender_fragmento_real(reb.polygon, _direccion_expulsion_rebaba(index, p1, p2))
-		reb.visible = false
-
-	# Si fue el corte de una rebaba lateral (0 o 1), también perfilar el borde de PiezaPrincipal si el trazo entró en ángulo;
-	# si fue la rebaba de la punta (index == 2), conservar la punta piramidal afilada del clavo.
-	if index != 2:
-		_biseccionar_pieza_principal(p1, p2)
 
 	if not cuts_completed[index]:
 		cuts_completed[index] = true
@@ -410,6 +409,11 @@ func _cortar_y_desprender_rebaba_exacta(index: int, reb: Polygon2D, p1: Vector2,
 		cut_line_bottom.visible = false
 	elif index == 2:
 		cut_line_tip.visible = false
+
+	if _all_cuts_completed() and not _sonido_corte_optimo_emitido:
+		_sonido_corte_optimo_emitido = true
+		AudioManager.play_sfx("step_complete", 2.5, 0.02)
+		AudioManager.play_sfx("temp_ready", 1.5, 0.02)
 
 func _biseccionar_pieza_principal(p1: Vector2, p2: Vector2) -> bool:
 	if p1.distance_to(p2) < 8.0 or main_workpiece.polygon.size() < 3:
@@ -514,7 +518,7 @@ func _disparar_juice_corte(hit_pos: Vector2) -> void:
 		chispas_corte.restart()
 		chispas_corte.emitting = true
 
-	crac_label.text = "✂️ ¡CIZALLADO!"
+	crac_label.text = "¡CIZALLADO!"
 	crac_label.position = hit_pos - Vector2(55, 24)
 	crac_label.visible = true
 	crac_label.modulate.a = 1.0
@@ -536,19 +540,21 @@ func _calcular_precision_trazo(p1: Vector2, p2: Vector2, g1: Vector2, g2: Vector
 	var dir_trazo: Vector2 = (p2 - p1).normalized()
 	var dir_guia: Vector2 = (g2 - g1).normalized()
 	var paralelismo: float = absf(dir_trazo.dot(dir_guia))
-	var score_dist: float = clampf(1.0 - (dist / 42.0), 0.65, 1.0)
-	var score_ang: float = lerpf(0.78, 1.0, paralelismo)
-	return clampf(score_dist * 0.7 + score_ang * 0.3, 0.72, 0.99)
+	var score_dist: float = clampf(1.0 - (dist / 48.0), 0.78, 1.0)
+	var score_ang: float = lerpf(0.84, 1.0, paralelismo)
+	return clampf(score_dist * 0.7 + score_ang * 0.3, 0.82, 0.99)
 
 func _check_stroke_hits_guide(p1: Vector2, p2: Vector2, q1: Vector2, q2: Vector2) -> bool:
 	if _segments_intersect(p1, p2, q1, q2):
 		return true
 	var stroke_mid: Vector2 = (p1 + p2) * 0.5
-	if _distance_point_to_segment(stroke_mid, q1, q2) < 32.0:
+	if _distance_point_to_segment(stroke_mid, q1, q2) <= 38.0:
 		return true
-	if _distance_point_to_segment(p2, q1, q2) < 30.0:
+	if _distance_point_to_segment(p2, q1, q2) <= 38.0:
 		return true
-	if _distance_point_to_segment(p1, q1, q2) < 30.0:
+	if _distance_point_to_segment(p1, q1, q2) <= 38.0:
+		return true
+	if _distance_point_to_segment((q1 + q2) * 0.5, p1, p2) <= 38.0:
 		return true
 	return false
 
@@ -567,7 +573,7 @@ func _update_ui() -> void:
 	for done in cuts_completed:
 		if done:
 			total_done += 1
-	progress_label.text = "✂️ Rebabas Cortadas: %d / 3" % total_done
+	progress_label.text = "Rebabas Cortadas: %d / 3" % total_done
 	if etiqueta_precision_corte:
 		var avg_p: float = 1.0
 		if not cut_accuracy_scores.is_empty():

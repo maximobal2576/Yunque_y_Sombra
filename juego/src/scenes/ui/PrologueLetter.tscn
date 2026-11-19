@@ -111,7 +111,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
 theme_override_font_sizes/font_size = 20
-text = "📜 CARTA DE TU MADRE"
+text = "CARTA DE TU MADRE"
 horizontal_alignment = 1
 
 [node name="EtiquetaSubtitulo" type="Label" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical/CabeceraCarta"]

@@ -52,21 +52,32 @@ var is_underwater: bool = false
 var has_quenched: bool = false
 var quench_time: float = 0.0
 var temperatura_temple: float = 880.0
+var _drag_offset_y: float = 0.0
 
 const WATER_SURFACE_Y: float = 140.0
 const INITIAL_TONGS_Y: float = 50.0
 
-# Ventana óptima de templado (viraje a martensita / gris acero templado)
-const TARGET_TIME_MIN: float = 2.2
-const TARGET_TIME_MAX: float = 2.8
+# Ventana óptima de templado amplia y cómoda (viraje a martensita / gris acero templado)
+const TARGET_TIME_MIN: float = 2.0
+const TARGET_TIME_MAX: float = 3.4
+const OPTIMAL_TIME_MIN: float = TARGET_TIME_MIN
+const OPTIMAL_TIME_MAX: float = TARGET_TIME_MAX
 
 var current_metal_color: Color = Color(0.96, 0.62, 0.04) # #f59e0b
 var final_score: float = 0.0
 var _textura_vapor: GradientTexture2D = null
+var _sonido_temple_optimo_emitido: bool = false
 
 func _ready() -> void:
 	_crear_textura_vapor()
 	btn_to_polish.pressed.connect(_on_to_polish_pressed)
+	if tongs_container:
+		tongs_container.gui_input.connect(_gui_input)
+		var hitbox_agarre: Control = tongs_container.get_node_or_null("HitboxAgarreTenazas") as Control
+		if hitbox_agarre:
+			hitbox_agarre.gui_input.connect(_gui_input)
+	if tub_panel:
+		tub_panel.gui_input.connect(_gui_input)
 	tssss_label.visible = false
 	btn_to_polish.disabled = true
 	reset_station()
@@ -92,6 +103,7 @@ func reset_station(initial_color: Color = Color(0.96, 0.62, 0.04), incoming_shap
 	quench_time = 0.0
 	temperatura_temple = 880.0
 	final_score = 0.0
+	_sonido_temple_optimo_emitido = false
 	btn_to_polish.disabled = true
 	tssss_label.visible = false
 	if burbujas_ebullicion:
@@ -110,7 +122,7 @@ func reset_station(initial_color: Color = Color(0.96, 0.62, 0.04), incoming_shap
 	_actualizar_shader_metal()
 	tongs_container.position.y = INITIAL_TONGS_Y
 
-	temp_indicator_label.text = "🌡️ Estado: Acero en Austenita / Rojo Cereza (880°C)"
+	temp_indicator_label.text = "Estado: Acero en Austenita / Rojo Cereza (880°C)"
 	temp_indicator_label.modulate = Color(0.98, 0.78, 0.45)
 	status_label.text = "Haz clic en las tenazas y arrastra la pieza HACIA ABAJO dentro del agua de pozo."
 	status_label.modulate = Color(0.95, 0.9, 0.8)
@@ -124,6 +136,10 @@ func _process(delta: float) -> void:
 		return
 	if is_underwater and not has_quenched:
 		quench_time += delta
+		if quench_time >= OPTIMAL_TIME_MIN and not _sonido_temple_optimo_emitido:
+			_sonido_temple_optimo_emitido = true
+			AudioManager.play_sfx("temp_ready", 2.5, 0.02)
+			AudioManager.play_sfx("step_complete", 2.5, 0.02)
 		_process_thermal_transition(delta)
 		_spawn_steam_cloud()
 		if burbujas_ebullicion and not burbujas_ebullicion.emitting:
@@ -132,34 +148,74 @@ func _process(delta: float) -> void:
 		burbujas_ebullicion.emitting = false
 
 func _process_thermal_transition(_delta: float) -> void:
-	# Descenso real de temperatura por choque térmico en agua (880°C -> 180°C en ~3.0s)
-	temperatura_temple = clampf(lerpf(880.0, 180.0, quench_time / 2.8), 80.0, 880.0)
+	# Descenso pausado de temperatura por choque térmico en agua (880°C -> 180°C en ~3.4s)
+	temperatura_temple = clampf(lerpf(880.0, 180.0, quench_time / TARGET_TIME_MAX), 80.0, 880.0)
 	_actualizar_shader_metal()
 
 	if resplandor_inmersion:
-		var int_brillo: float = clampf(1.0 - (quench_time / 2.3), 0.0, 1.0)
+		var int_brillo: float = clampf(1.0 - (quench_time / 2.8), 0.0, 1.0)
 		resplandor_inmersion.modulate.a = 0.75 * int_brillo
 
-	if quench_time < 1.2:
-		var t: float = quench_time / 1.2
+	if quench_time < 1.1:
+		var t: float = quench_time / 1.1
 		current_metal_color = Color(0.96, 0.62, 0.04).lerp(Color(0.75, 0.22, 0.17), t)
-		temp_indicator_label.text = "🌡️ Enfriando en agua... %.0f°C Rojo Sombra (%.1fs)" % [temperatura_temple, quench_time]
+		temp_indicator_label.text = "Enfriando en agua... %.0f°C Rojo Sombra (%.1fs)" % [temperatura_temple, quench_time]
 		temp_indicator_label.modulate = Color(0.95, 0.55, 0.42)
-	elif quench_time <= 2.8:
-		var t: float = (quench_time - 1.2) / 1.3
+	elif quench_time <= TARGET_TIME_MAX:
+		var t: float = clampf((quench_time - 1.1) / 1.4, 0.0, 1.0)
 		current_metal_color = Color(0.75, 0.22, 0.17).lerp(Color(0.22, 0.26, 0.32), t)
 		if quench_time >= TARGET_TIME_MIN:
-			temp_indicator_label.text = "✅ ¡TEMPLE MARTENSÍTICO (%.0f°C)! ¡SUELTA PARA RETIRAR AHORA! (%.1fs)" % [temperatura_temple, quench_time]
+			temp_indicator_label.text = "¡TEMPLE MARTENSÍTICO (%.0f°C)! ¡SUELTA PARA RETIRAR AHORA! (%.1fs)" % [temperatura_temple, quench_time]
 			temp_indicator_label.modulate = Color(0.45, 0.95, 0.55)
 		else:
-			temp_indicator_label.text = "🌡️ Pasando a Gris Acero Templado... %.0f°C (%.1fs)" % [temperatura_temple, quench_time]
+			temp_indicator_label.text = "Pasando a Gris Acero Templado... %.0f°C (%.1fs)" % [temperatura_temple, quench_time]
 			temp_indicator_label.modulate = Color(0.92, 0.82, 0.55)
 	else:
 		current_metal_color = Color(0.12, 0.17, 0.22)
-		temp_indicator_label.text = "⚠️ ¡EXCESO DE TEMPLE (%.0f°C)! Tensión interna excesiva y fragilidad (%.1fs)" % [temperatura_temple, quench_time]
+		temp_indicator_label.text = "¡EXCESO DE TEMPLE (%.0f°C)! Tensión interna excesiva y fragilidad (%.1fs)" % [temperatura_temple, quench_time]
 		temp_indicator_label.modulate = Color(0.92, 0.42, 0.38)
 
 	metal_piece.color = current_metal_color
+
+func _puede_agarrar_tenazas(local_pos_tub: Vector2) -> bool:
+	var centro_x: float = tub_panel.size.x * 0.5 if tub_panel.size.x > 0.0 else 260.0
+	var dentro_ancho: bool = absf(local_pos_tub.x - centro_x) <= 185.0
+	var min_y_tenaza: float = tongs_container.position.y - 95.0
+	var max_y_tenaza: float = tongs_container.position.y + 125.0
+	return dentro_ancho and local_pos_tub.y >= min_y_tenaza and local_pos_tub.y <= max_y_tenaza
+
+func _actualizar_posicion_arrastre_tenazas() -> void:
+	var local_y: float = tub_panel.get_local_mouse_position().y - _drag_offset_y
+	var clamped_y: float = clampf(local_y, INITIAL_TONGS_Y, WATER_SURFACE_Y + 70.0)
+	tongs_container.position.y = clamped_y
+
+	var now_underwater: bool = clamped_y >= WATER_SURFACE_Y
+	if now_underwater != is_underwater:
+		is_underwater = now_underwater
+		tssss_label.visible = is_underwater
+		if is_underwater:
+			AudioManager.start_quench_steam()
+			if sacudida_trauma and sacudida_trauma.has_method("agregar_trauma"):
+				sacudida_trauma.agregar_trauma(0.45)
+			status_label.text = "¡Choque térmico en curso! Mantén sumergido y suelta justo entre 2.2s y 2.8s."
+			status_label.modulate = Color(0.96, 0.78, 0.2)
+		else:
+			AudioManager.stop_quench_steam()
+			tssss_label.visible = false
+
+func _input(event: InputEvent) -> void:
+	if not visible or not is_visible_in_tree() or has_quenched:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed and not is_dragging:
+			var local_pos: Vector2 = tub_panel.get_local_mouse_position()
+			if _puede_agarrar_tenazas(local_pos):
+				is_dragging = true
+				_drag_offset_y = clampf(local_pos.y - tongs_container.position.y, -95.0, 95.0)
+		elif not event.pressed and is_dragging:
+			_handle_release()
+	elif event is InputEventMouseMotion and is_dragging:
+		_actualizar_posicion_arrastre_tenazas()
 
 func _gui_input(event: InputEvent) -> void:
 	if has_quenched:
@@ -167,31 +223,16 @@ func _gui_input(event: InputEvent) -> void:
 
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			var local_y: float = tub_panel.get_local_mouse_position().y
-			if absf(local_y - tongs_container.position.y) < 110.0 or local_y < WATER_SURFACE_Y:
+			var local_pos: Vector2 = tub_panel.get_local_mouse_position()
+			if _puede_agarrar_tenazas(local_pos):
 				is_dragging = true
+				_drag_offset_y = clampf(local_pos.y - tongs_container.position.y, -95.0, 95.0)
 		else:
 			if is_dragging:
 				_handle_release()
 
 	elif event is InputEventMouseMotion and is_dragging:
-		var local_y: float = tub_panel.get_local_mouse_position().y
-		var clamped_y: float = clampf(local_y, INITIAL_TONGS_Y, WATER_SURFACE_Y + 70.0)
-		tongs_container.position.y = clamped_y
-
-		var now_underwater: bool = clamped_y >= WATER_SURFACE_Y
-		if now_underwater != is_underwater:
-			is_underwater = now_underwater
-			tssss_label.visible = is_underwater
-			if is_underwater:
-				AudioManager.start_quench_steam()
-				if sacudida_trauma and sacudida_trauma.has_method("agregar_trauma"):
-					sacudida_trauma.agregar_trauma(0.45)
-				status_label.text = "¡Choque térmico en curso! Mantén sumergido y suelta justo entre 2.2s y 2.8s."
-				status_label.modulate = Color(0.96, 0.78, 0.2)
-			else:
-				AudioManager.stop_quench_steam()
-				tssss_label.visible = false
+		_actualizar_posicion_arrastre_tenazas()
 
 func _handle_release() -> void:
 	is_dragging = false
@@ -261,6 +302,10 @@ func simulate_quench(duration: float = 2.5) -> void:
 	metal_piece.color = current_metal_color
 	_actualizar_shader_metal()
 	has_quenched = true
+	if quench_time >= OPTIMAL_TIME_MIN and not _sonido_temple_optimo_emitido:
+		_sonido_temple_optimo_emitido = true
+		AudioManager.play_sfx("temp_ready", 2.5, 0.02)
+		AudioManager.play_sfx("step_complete", 2.5, 0.02)
 	_evaluate_quench_quality()
 
 func _on_quench_pressed() -> void:

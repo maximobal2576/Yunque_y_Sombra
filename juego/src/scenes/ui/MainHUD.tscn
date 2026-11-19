@@ -61,7 +61,7 @@ theme_override_constants/separation = 20
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
 theme_override_font_sizes/font_size = 13
-text = "📅 DÍA 1 | ⏰ 06:00 AM | [DIURNA]"
+text = "DÍA 1  |  06:00 AM  |  DIURNA"
 
 [node name="ContenedorCentro" type="CenterContainer" parent="BarraInferior/ContenedorFila"]
 layout_mode = 2
@@ -71,7 +71,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1.0)
 theme_override_font_sizes/font_size = 14
-text = "👉 [E] Interactuar"
+text = "[E] Interactuar"
 
 [node name="ContenedorEstadisticas" type="HBoxContainer" parent="BarraInferior/ContenedorFila"]
 layout_mode = 2
@@ -90,10 +90,10 @@ show_percentage = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
 theme_override_font_sizes/font_size = 12
-text = "⚡ 100 / 100"
+text = "Vigor: 100 / 100"
 
 [node name="EtiquetaMonedas" type="Label" parent="BarraInferior/ContenedorFila/ContenedorEstadisticas"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1.0)
 theme_override_font_sizes/font_size = 13
-text = "🪙 50 Oro"
+text = "Oro: 50"

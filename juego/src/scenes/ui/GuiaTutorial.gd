@@ -1,6 +1,6 @@
 # GuiaTutorial.gd
 # Sistema de Tutorial Interactivo, Contextual y Diegético para 'Yunque & Sombra'
-# Especialidades combinadas: /programador_godot + /disenador_grafico + /game_feel
+# Especialidades combinadas: /programador_godot + /disenador_grafico + /sonidista + /game_feel
 # Nomenclatura de nodos 100% en español y tipado estricto (:=) conforme a docs/idea.txt §8.2
 extends CanvasLayer
 
@@ -12,7 +12,7 @@ const TOTAL_PASOS: int = 9
 const INTERVALO_OBSERVACION: float = 0.25
 
 # Paleta de herrería auténtica (/disenador_grafico — WCAG 2.1 AAA > 10:1)
-const COLOR_FONDO_CARBON: Color = Color(0.117647, 0.090196, 0.074510, 0.95) # #1e1713 (95% opacidad)
+const COLOR_FONDO_CARBON: Color = Color(0.117647, 0.090196, 0.074510, 0.88) # #1e1713 (88% opacidad)
 const COLOR_BORDE_BRONCE: Color = Color(0.709804, 0.603922, 0.415686, 1.0) # #b59a6a
 const COLOR_TEXTO_MARFIL: Color = Color(0.949020, 0.901961, 0.800000, 1.0) # #f2e6cc
 const COLOR_SUBTITULO_AMBAR: Color = Color(0.960784, 0.760784, 0.258824, 1.0) # #f5c242
@@ -21,48 +21,48 @@ const COLOR_VERDE_EXITO: Color = Color(0.45, 0.88, 0.52, 1.0)
 const PASOS_TUTORIAL: Array[Dictionary] = [
 	{
 		"numero": 1,
-		"subtitulo": "Paso 1 de 9 — El Legado del Tío",
-		"descripcion": "Lee la carta de tu madre y camina siguiendo las flechas doradas hacia el norte hasta la Herrería de tu tío Rodrik."
+		"subtitulo": "El Legado del Tío",
+		"descripcion": "Lee la carta y sigue las flechas al norte hasta la Herrería de tu tío Rodrik."
 	},
 	{
 		"numero": 2,
-		"subtitulo": "Paso 2 de 9 — El Taller y la Campana",
-		"descripcion": "Cruza la puerta oeste hacia el Taller de Forja o toca la campana de bronce en el mostrador para recibir a tu primer cliente."
+		"subtitulo": "El Taller y la Campana",
+		"descripcion": "Entra por la puerta oeste al Taller y toca la campana de bronce en el mostrador."
 	},
 	{
 		"numero": 3,
-		"subtitulo": "Paso 3 de 9 — El Encargo Artesanal",
-		"descripcion": "Revisa el pergamino de pedido sobre la mesa y pulsa 'Aceptar Comanda e Ir a Forja'."
+		"subtitulo": "El Encargo Artesanal",
+		"descripcion": "Revisa el pergamino de pedido en la mesa y pulsa 'Aceptar Comanda e Ir a Forja'."
 	},
 	{
 		"numero": 4,
-		"subtitulo": "Paso 4 de 9 — La Fragua y los Barriles",
-		"descripcion": "Arrastra un lingote desde los barriles de la izquierda hacia las brasas del horno. Luego atiza el fuelle [ESPACIO o Clic] con paciencia hasta alcanzar el Caldeo Óptimo (1000°C - 1150°C) y llévalo al yunque. El horno tiene inercia térmica real y sube gradualmente."
+		"subtitulo": "La Fragua y los Barriles",
+		"descripcion": "Arrastra un lingote del barril al horno, atiza el fuelle [ESPACIO o Clic] hasta 1000°C-1150°C y pasa al yunque."
 	},
 	{
 		"numero": 5,
-		"subtitulo": "Paso 5 de 9 — El Yunque Cenital",
-		"descripcion": "Golpea el metal incandescente con el martillo (mínimo 5 impactos bien distribuidos) para moldearlo según la silueta guía."
+		"subtitulo": "El Yunque Cenital",
+		"descripcion": "Golpea el hierro incandescente con el martillo (mín. 5 impactos) siguiendo la silueta guía."
 	},
 	{
 		"numero": 6,
-		"subtitulo": "Paso 6 de 9 — Corte de Rebabas",
-		"descripcion": "Arrastra la cizalla a lo largo de las 3 líneas punteadas para recortar el material sobrante."
+		"subtitulo": "Corte con Cizalla",
+		"descripcion": "Arrastra la cizalla por las 3 líneas punteadas para recortar las rebabas sobrantes."
 	},
 	{
 		"numero": 7,
-		"subtitulo": "Paso 7 de 9 — Choque Térmico (Templado)",
-		"descripcion": "Arrastra las tenazas hacia el agua fría y mantén sumergida la pieza entre 2.2 y 2.8 segundos hasta que cese el vapor."
+		"subtitulo": "Templado en Agua",
+		"descripcion": "Sumerge la pieza con las tenazas en el agua fría entre 2.2 y 2.8 segundos hasta disipar el vapor."
 	},
 	{
 		"numero": 8,
-		"subtitulo": "Paso 8 de 9 — Pulido en Piedra Arenisca",
-		"descripcion": "Frota la piedra de afilar de izquierda a derecha sobre el metal hasta quitar la cascarilla de óxido (85%+) y concluir la pieza."
+		"subtitulo": "Pulido en Arenisca",
+		"descripcion": "Frota la piedra de afilar sobre el metal hasta limpiar la cascarilla de óxido (85%+)."
 	},
 	{
 		"numero": 9,
-		"subtitulo": "Paso 9 de 9 — Entrega y Exploración de la Mina",
-		"descripcion": "¡Pieza terminada! Entrégala en la bandeja del mostrador para cobrar tus monedas, o sal al pasillo y explora la puerta norte hacia la Mina Subterránea para extraer minerales con tu pico."
+		"subtitulo": "Entrega y Mina",
+		"descripcion": "Entrega la pieza en la bandeja del mostrador o explora la puerta norte hacia la Mina Subterránea."
 	}
 ]
 
@@ -121,23 +121,23 @@ func _ready() -> void:
 	_resolver_referencias_escena()
 
 func _configurar_filtros_raton_seguros() -> void:
-	# Garantiza que el contenedor y etiquetas jamás bloqueen clics en estaciones (MOUSE_FILTER_PASS / IGNORE)
+	# Garantiza que el contenedor y etiquetas jamás bloqueen clics en campana ni estaciones (MOUSE_FILTER_IGNORE)
 	if is_instance_valid(contenedor_raiz_tutorial):
-		contenedor_raiz_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		contenedor_raiz_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(panel_pergamino_tutorial):
-		panel_pergamino_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		panel_pergamino_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(contenedor_vertical_tutorial):
-		contenedor_vertical_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		contenedor_vertical_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(cabecera_tutorial):
-		cabecera_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		cabecera_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(etiqueta_subtitulo_paso):
-		etiqueta_subtitulo_paso.mouse_filter = Control.MOUSE_FILTER_PASS
+		etiqueta_subtitulo_paso.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(barra_progreso_tutorial):
-		barra_progreso_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		barra_progreso_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(etiqueta_instruccion_tutorial):
-		etiqueta_instruccion_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		etiqueta_instruccion_tutorial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if is_instance_valid(boton_saltar_tutorial):
-		boton_saltar_tutorial.mouse_filter = Control.MOUSE_FILTER_PASS
+		boton_saltar_tutorial.mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not tutorial_activo or tutorial_finalizado or not visible:
@@ -164,7 +164,7 @@ func avanzar_a_paso(nuevo_paso: int) -> void:
 func notificar_evento(evento_id: String) -> void:
 	if not tutorial_activo or tutorial_finalizado:
 		return
-	var clave: String = evento_id.strip_edges().to_lower()
+	var clave := evento_id.strip_edges().to_lower()
 	match clave:
 		"pasillo_entrado", "taller_abierto", "paso_1_completado":
 			if paso_actual == 1:
@@ -207,11 +207,11 @@ func saltar_tutorial() -> void:
 	_animar_ocultamiento_panel()
 
 func _actualizar_vista_paso(num_paso: int, con_feedback: bool) -> void:
-	var idx: int = clampi(num_paso - 1, 0, PASOS_TUTORIAL.size() - 1)
+	var idx := clampi(num_paso - 1, 0, PASOS_TUTORIAL.size() - 1)
 	var datos: Dictionary = PASOS_TUTORIAL[idx]
 
 	if is_instance_valid(etiqueta_subtitulo_paso):
-		etiqueta_subtitulo_paso.text = "📜 " + str(datos.get("subtitulo", ""))
+		etiqueta_subtitulo_paso.text = str(datos.get("subtitulo", ""))
 		etiqueta_subtitulo_paso.add_theme_color_override("font_color", COLOR_SUBTITULO_AMBAR)
 
 	if is_instance_valid(etiqueta_instruccion_tutorial):
@@ -221,7 +221,7 @@ func _actualizar_vista_paso(num_paso: int, con_feedback: bool) -> void:
 	if is_instance_valid(barra_progreso_tutorial):
 		barra_progreso_tutorial.max_value = float(TOTAL_PASOS)
 		if con_feedback:
-			var tw_barra: Tween = create_tween()
+			var tw_barra := create_tween()
 			tw_barra.tween_property(barra_progreso_tutorial, "value", float(num_paso), 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		else:
 			barra_progreso_tutorial.value = float(num_paso)
@@ -232,10 +232,8 @@ func _actualizar_vista_paso(num_paso: int, con_feedback: bool) -> void:
 
 func _reproducir_sonido_paso() -> void:
 	if is_instance_valid(AudioManager) and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("step_complete", 0.5, 0.03)
-		# Si la muestra "step_complete" no está registrada en AudioManager.audio_streams, usar campana sutil de respaldo
-		if "audio_streams" in AudioManager and not AudioManager.audio_streams.has("step_complete"):
-			AudioManager.play_sfx("bell", -5.0, 0.05)
+		AudioManager.play_sfx("step_complete", 2.0, 0.04)
+		AudioManager.play_sfx("bell", -6.0, 0.05)
 
 func _aplicar_pulso_elastico() -> void:
 	if not is_instance_valid(panel_pergamino_tutorial):
@@ -244,10 +242,10 @@ func _aplicar_pulso_elastico() -> void:
 		_tween_activo.kill()
 
 	panel_pergamino_tutorial.pivot_offset = panel_pergamino_tutorial.size * 0.5
-	panel_pergamino_tutorial.scale = Vector2(1.06, 0.94)
+	panel_pergamino_tutorial.scale = Vector2(1.05, 0.95)
 	_tween_activo = create_tween()
-	_tween_activo.tween_property(panel_pergamino_tutorial, "scale", Vector2(0.98, 1.03), 0.09).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_tween_activo.tween_property(panel_pergamino_tutorial, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_tween_activo.tween_property(panel_pergamino_tutorial, "scale", Vector2(0.98, 1.02), 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween_activo.tween_property(panel_pergamino_tutorial, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _completar_tutorial_con_exito() -> void:
 	if tutorial_finalizado:
@@ -258,11 +256,11 @@ func _completar_tutorial_con_exito() -> void:
 		temporizador_observacion.stop()
 
 	if is_instance_valid(etiqueta_subtitulo_paso):
-		etiqueta_subtitulo_paso.text = "⚒️ ¡Aprendizaje de Forja Completado!"
+		etiqueta_subtitulo_paso.text = "Oficio de Herrero Completado"
 		etiqueta_subtitulo_paso.add_theme_color_override("font_color", COLOR_VERDE_EXITO)
 
 	if is_instance_valid(etiqueta_instruccion_tutorial):
-		etiqueta_instruccion_tutorial.text = "¡Felicitaciones, herrero! Ya dominas el ciclo artesanal del taller de tu tío Rodrik. Forja de día, explora la mina de noche y descubre la verdad del pueblo."
+		etiqueta_instruccion_tutorial.text = "Dominas el ciclo del taller. Forja de día, explora la mina de noche y descubre la verdad del pueblo."
 
 	if is_instance_valid(barra_progreso_tutorial):
 		barra_progreso_tutorial.value = float(TOTAL_PASOS)
@@ -274,7 +272,7 @@ func _completar_tutorial_con_exito() -> void:
 	_aplicar_pulso_elastico()
 	tutorial_completado.emit()
 
-	var tw_cierre: Tween = create_tween()
+	var tw_cierre := create_tween()
 	tw_cierre.tween_interval(3.8)
 	tw_cierre.tween_callback(_animar_ocultamiento_panel)
 
@@ -336,14 +334,14 @@ func _verificar_estado_juego() -> void:
 
 	_resolver_referencias_escena()
 
-	var zona_pueblo: int = -1
+	var zona_pueblo := -1
 	if is_instance_valid(_ref_pueblo) and "current_zone" in _ref_pueblo:
 		zona_pueblo = int(_ref_pueblo.current_zone)
 
-	var taller_abierto: bool = false
-	var pestana_actual: int = -1
+	var taller_abierto := false
+	var pestana_actual := -1
 	var mostrador: Node = null
-	var ticket_visible: bool = false
+	var ticket_visible := false
 
 	if is_instance_valid(_ref_taller) and _ref_taller is CanvasLayer:
 		taller_abierto = (_ref_taller as CanvasLayer).visible
@@ -363,7 +361,7 @@ func _verificar_estado_juego() -> void:
 	# Paso 2 -> 3: Se abre WorkshopStationView y se toca la campana / aparece el pergamino de comanda
 	if paso_actual == 2:
 		if taller_abierto and is_instance_valid(mostrador):
-			var comanda_visible: bool = false
+			var comanda_visible := false
 			if "pergamino_comanda" in mostrador and is_instance_valid(mostrador.pergamino_comanda):
 				comanda_visible = (mostrador.pergamino_comanda as Control).visible
 			elif "has_active_order" in mostrador and bool(mostrador.has_active_order):
@@ -404,7 +402,7 @@ func _verificar_estado_juego() -> void:
 
 	# Paso 8 -> 9: Se muestra el Ticket Final o la pieza queda lista en la bandeja del mostrador
 	if paso_actual <= 8:
-		var pieza_lista_en_mostrador: bool = false
+		var pieza_lista_en_mostrador := false
 		if is_instance_valid(mostrador) and "has_finished_piece" in mostrador:
 			pieza_lista_en_mostrador = bool(mostrador.has_finished_piece)
 		if (taller_abierto and ticket_visible) or pieza_lista_en_mostrador:

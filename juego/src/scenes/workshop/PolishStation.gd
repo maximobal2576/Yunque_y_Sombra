@@ -48,14 +48,17 @@ var btn_finish_polish: Button:
 # Estado de pulido
 var is_rubbing: bool = false
 var total_rub_distance: float = 0.0
-const REQUIRED_RUB_DISTANCE: float = 1200.0 # Píxeles de frotado efectivo
+const REQUIRED_RUB_DISTANCE: float = 1950.0 # Píxeles de frotado efectivo (piedra arenisca inicial)
+const DISTANCIA_ZONA_PULIDO: float = 520.0 # ~38% más gradual por pasada
 
 var slag_cleaned: Array[float] = [0.0, 0.0, 0.0] # 0 a 1.0 por zona
 var last_bench_pos: Vector2 = Vector2.ZERO
 var last_mouse_pos: Vector2 = Vector2.ZERO
 var is_finished: bool = false
 var final_score: float = 0.0
+var polish_progress: float = 0.0
 var sound_cooldown: float = 0.0
+var _sonido_pulido_optimo_emitido: bool = false
 
 func _ready() -> void:
 	btn_finish_polish.pressed.connect(_on_finish_polish_pressed)
@@ -71,6 +74,8 @@ func reset_station(incoming_shape: PackedVector2Array = PackedVector2Array()) ->
 	total_rub_distance = 0.0
 	slag_cleaned = [0.0, 0.0, 0.0]
 	final_score = 0.0
+	polish_progress = 0.0
+	_sonido_pulido_optimo_emitido = false
 	progress_bar.value = 0.0
 	btn_finish_polish.disabled = true
 	shine_highlight.visible = false
@@ -130,7 +135,8 @@ func _process_rubbing(opt_pos = null) -> void:
 		last_bench_pos = cur_bench_pos
 
 		if delta_dist > 1.5:
-			total_rub_distance += delta_dist
+			var paso_efectivo: float = minf(delta_dist, 26.0) if opt_pos == null else delta_dist
+			total_rub_distance += paso_efectivo
 			_spawn_polish_dust(cur_bench_pos)
 			_show_rub_fx()
 
@@ -138,21 +144,32 @@ func _process_rubbing(opt_pos = null) -> void:
 				AudioManager.play_whetstone()
 				sound_cooldown = 0.16
 
-			# Limpiar cascarilla según la zona del frotado
-			if local_m.x < -38.0:
-				slag_cleaned[0] = minf(1.0, slag_cleaned[0] + (delta_dist / 320.0))
-				slag_overlay_left.modulate.a = 1.0 - slag_cleaned[0]
-			elif local_m.x > 38.0:
-				slag_cleaned[2] = minf(1.0, slag_cleaned[2] + (delta_dist / 320.0))
-				slag_overlay_right.modulate.a = 1.0 - slag_cleaned[2]
+			# Limpiar cascarilla según la zona del frotado con ritmo gradual de herramienta inicial
+			var avance_limpieza: float = paso_efectivo / DISTANCIA_ZONA_PULIDO
+			if local_m.x < -25.0:
+				slag_cleaned[0] = minf(1.0, slag_cleaned[0] + avance_limpieza)
+				slag_cleaned[1] = minf(1.0, slag_cleaned[1] + avance_limpieza * 0.25)
+			elif local_m.x > 25.0:
+				slag_cleaned[2] = minf(1.0, slag_cleaned[2] + avance_limpieza)
+				slag_cleaned[1] = minf(1.0, slag_cleaned[1] + avance_limpieza * 0.25)
 			else:
-				slag_cleaned[1] = minf(1.0, slag_cleaned[1] + (delta_dist / 320.0))
-				slag_overlay_center.modulate.a = 1.0 - slag_cleaned[1]
+				slag_cleaned[1] = minf(1.0, slag_cleaned[1] + avance_limpieza)
+				slag_cleaned[0] = minf(1.0, slag_cleaned[0] + avance_limpieza * 0.20)
+				slag_cleaned[2] = minf(1.0, slag_cleaned[2] + avance_limpieza * 0.20)
+			slag_overlay_left.modulate.a = 1.0 - slag_cleaned[0]
+			slag_overlay_center.modulate.a = 1.0 - slag_cleaned[1]
+			slag_overlay_right.modulate.a = 1.0 - slag_cleaned[2]
 
 			var avg_clean: float = (slag_cleaned[0] + slag_cleaned[1] + slag_cleaned[2]) / 3.0
 			metal_base.color = Color(0.24, 0.27, 0.33).lerp(Color(0.68, 0.72, 0.76), avg_clean)
 
-			progress_bar.value = avg_clean * 100.0
+			polish_progress = avg_clean * 100.0
+			progress_bar.value = polish_progress
+
+			if polish_progress >= 95.0 and not _sonido_pulido_optimo_emitido:
+				_sonido_pulido_optimo_emitido = true
+				AudioManager.play_sfx("step_complete", 2.5, 0.02)
+				AudioManager.play_sfx("temp_ready", 1.5, 0.02)
 
 			if avg_clean >= 0.85:
 				btn_finish_polish.disabled = false
@@ -190,7 +207,12 @@ func simulate_polish() -> void:
 	slag_overlay_left.modulate.a = 0.0
 	slag_overlay_center.modulate.a = 0.0
 	slag_overlay_right.modulate.a = 0.0
+	polish_progress = 100.0
 	progress_bar.value = 100.0
+	if not _sonido_pulido_optimo_emitido:
+		_sonido_pulido_optimo_emitido = true
+		AudioManager.play_sfx("step_complete", 2.5, 0.02)
+		AudioManager.play_sfx("temp_ready", 1.5, 0.02)
 	btn_finish_polish.disabled = false
 	shine_highlight.visible = true
 	status_label.text = "¡Cascarilla eliminada! El acero brilla con lustre de armero. Puedes concluir."
