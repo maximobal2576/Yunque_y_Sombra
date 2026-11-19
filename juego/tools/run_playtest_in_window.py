@@ -40,9 +40,31 @@ def bring_window_to_front():
         return True
     return False
 
+def _get_project_root() -> str:
+    curr = os.path.dirname(os.path.abspath(__file__))
+    while curr and os.path.dirname(curr) != curr:
+        if os.path.exists(os.path.join(curr, "project.godot")):
+            return curr
+        curr = os.path.dirname(curr)
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def _find_godot_exe() -> str:
+    env_path = os.environ.get("GODOT_PATH")
+    if env_path and os.path.exists(env_path):
+        return env_path
+    candidates = [
+        r"C:\Users\curso\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe",
+        r"C:\Users\curso\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64.exe",
+        r"C:\Users\admin\Downloads\Godot_v4.7.2-stable_win64.exe",
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return "godot"
+
 def main():
-    godot_exe = r"C:\Users\admin\Downloads\Godot_v4.7.2-stable_win64.exe"
-    project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    godot_exe = _find_godot_exe()
+    project_dir = _get_project_root()
     
     env = os.environ.copy()
     env["GODOT_PLAYTEST"] = "1"

@@ -16,9 +16,9 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
-GameManager="*res://src/autoloads/GameManager.gd"
-TimeManager="*res://src/autoloads/TimeManager.gd"
-AudioManager="*res://src/autoloads/AudioManager.gd"
+GameManager="*res://src/autoload/GameManager.gd"
+TimeManager="*res://src/autoload/TimeManager.gd"
+AudioManager="*res://src/autoload/AudioManager.gd"
 
 [display]
 

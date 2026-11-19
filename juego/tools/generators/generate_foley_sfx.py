@@ -428,9 +428,16 @@ def gen_step_complete() -> list[float]:
             samples[i] += (lute + chime) * amp * attack
     return samples
 
+def _get_project_root() -> str:
+    curr = os.path.dirname(os.path.abspath(__file__))
+    while curr and os.path.dirname(curr) != curr:
+        if os.path.exists(os.path.join(curr, "project.godot")):
+            return curr
+        curr = os.path.dirname(curr)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 def main() -> None:
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
+    project_root = _get_project_root()
     base_dir = os.path.join(project_root, "assets", "audio", "sfx")
     create_wav(os.path.join(base_dir, "bell_ring.wav"), gen_bell_ring())
     create_wav(os.path.join(base_dir, "bellows_air.wav"), gen_bellows_air())

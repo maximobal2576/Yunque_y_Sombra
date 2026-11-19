@@ -277,6 +277,11 @@ points = PackedVector2Array(-8, 22, 0, 21, 8, 22)
 width = 2.0
 default_color = Color(0.32, 0.16, 0.14, 1)
 
+[node name="BocaCliente" type="Polygon2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoSargentoGodofredo/CabezaCliente"]
+position = Vector2(0, 22)
+color = Color(0.24, 0.08, 0.09, 1)
+polygon = PackedVector2Array(-8, -1.5, 0, -2.5, 8, -1.5, 6, 3.5, 0, 4.5, -6, 3.5)
+
 [node name="YelmoNasalAcero" type="Node2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoSargentoGodofredo/CabezaCliente"]
 
 [node name="DomoYelmo" type="Polygon2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoSargentoGodofredo/CabezaCliente/YelmoNasalAcero"]
@@ -354,6 +359,11 @@ points = PackedVector2Array(-9, 18, 0, 22, 9, 18)
 width = 2.0
 default_color = Color(0.95, 0.88, 0.78, 0.9)
 
+[node name="BocaCliente" type="Polygon2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoMolineroEustaquio/CabezaMolinero"]
+position = Vector2(0, 20)
+color = Color(0.26, 0.09, 0.09, 1)
+polygon = PackedVector2Array(-8, -1.5, 0, -2, 8, -1.5, 6, 3.5, 0, 4.5, -6, 3.5)
+
 [node name="MiradaMolinero" type="Node2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoMolineroEustaquio/CabezaMolinero"]
 position = Vector2(0, -4)
 
@@ -425,6 +435,11 @@ polygon = PackedVector2Array(-32, -18, 32, -18, 36, 28, 24, 42, -24, 42, -36, 28
 [node name="RostroMercader" type="Polygon2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoMercaderValeria/CabezaMercader"]
 color = Color(0.92, 0.76, 0.64, 1)
 polygon = PackedVector2Array(-24, -18, 24, -18, 25, 8, 16, 24, 0, 30, -16, 24, -25, 8)
+
+[node name="BocaCliente" type="Polygon2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoMercaderValeria/CabezaMercader"]
+position = Vector2(0, 18)
+color = Color(0.46, 0.14, 0.18, 1)
+polygon = PackedVector2Array(-7, -1.5, 0, -2.5, 7, -1.5, 5, 3, 0, 4, -5, 3)
 
 [node name="MiradaMercader" type="Node2D" parent="MarcoVentana/ContenedorCliente/PersonajeClienteArticulado/BustoMercaderValeria/CabezaMercader"]
 position = Vector2(0, -3)
@@ -522,7 +537,7 @@ offset_right = 80.0
 offset_bottom = 105.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dialogue")
 
 [node name="TextoDialogo" type="Label" parent="CajaDialogo"]

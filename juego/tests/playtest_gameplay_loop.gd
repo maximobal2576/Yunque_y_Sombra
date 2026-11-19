@@ -4,7 +4,7 @@
 
 extends SceneTree
 
-const GameManagerScript = preload("res://src/autoloads/GameManager.gd")
+const GameManagerScript = preload("res://src/autoload/GameManager.gd")
 var game_manager: Node = null
 
 var total_assertions: int = 0

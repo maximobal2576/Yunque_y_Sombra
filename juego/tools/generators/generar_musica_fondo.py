@@ -273,8 +273,17 @@ def build_medieval_track() -> list:
     return pcm_samples
 
 
+def _get_project_root() -> str:
+    curr = os.path.dirname(os.path.abspath(__file__))
+    while curr and os.path.dirname(curr) != curr:
+        if os.path.exists(os.path.join(curr, "project.godot")):
+            return curr
+        curr = os.path.dirname(curr)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 def main() -> None:
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = _get_project_root()
     out_dir = os.path.join(base_dir, "assets", "audio", "music")
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "musica_fondo_tranquila.wav")

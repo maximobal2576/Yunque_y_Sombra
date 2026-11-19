@@ -338,6 +338,12 @@ func close_station() -> void:
 	emit_signal("workshop_closed")
 
 func reset_recipe() -> void:
+	_reiniciar_estaciones_para_nuevo_encargo()
+	if vista_mostrador and vista_mostrador.has_method("reset_if_stuck"):
+		vista_mostrador.reset_if_stuck()
+	_switch_tab(StationTab.COUNTER)
+
+func _reiniciar_estaciones_para_nuevo_encargo() -> void:
 	capa_ticket_final.visible = false
 	score_forge = 0.0
 	score_anvil = 0.0
@@ -369,14 +375,10 @@ func reset_recipe() -> void:
 	etiqueta_estado_fragua.modulate = Color(0.95, 0.9, 0.8)
 	_update_forge_ui()
 
-	if vista_mostrador and vista_mostrador.has_method("reset_if_stuck"):
-		vista_mostrador.reset_if_stuck()
 	estacion_yunque.reset_station()
 	estacion_corte.reset_station()
 	estacion_tina.reset_station()
 	estacion_pulido.reset_station()
-
-	_switch_tab(StationTab.COUNTER)
 
 func _switch_tab(tab: StationTab) -> void:
 	current_station = tab
@@ -396,6 +398,7 @@ func _switch_tab(tab: StationTab) -> void:
 # --- FLUJO DE EVENTOS ENTRE ESTACIONES ---
 
 func _on_order_accepted(order_info: Dictionary) -> void:
+	_reiniciar_estaciones_para_nuevo_encargo()
 	var nombre_item: String = str(order_info.get("item_name", "Clavo Forjado de Compuerta"))
 	if estacion_yunque and estacion_yunque.has_method("configurar_molde_encargo"):
 		estacion_yunque.configurar_molde_encargo(nombre_item)
@@ -629,4 +632,4 @@ func _on_deliver_to_counter_pressed() -> void:
 	_switch_tab(StationTab.COUNTER)
 
 func _on_customer_item_delivered(_quality: float, _reward: int) -> void:
-	pass
+	_reiniciar_estaciones_para_nuevo_encargo()

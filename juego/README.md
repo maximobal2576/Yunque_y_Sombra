@@ -106,30 +106,33 @@ juego/
 │   ├── live_*                     # Capturas de verificación en vivo del taller
 │   └── playtest_*                 # Secuencia completa de estaciones y ticket final
 │
-├── scripts/                       # Scripts de automatización y generación procedural
-│   ├── capture_game_views.gd      # Capturador automatizado de pantallas de escenas
-│   ├── generate_author_sprites.py # Generador de sprites y visuales de personajes
-│   ├── generate_foley_sfx.py      # Síntesis procedural de efectos de sonido (Foley)
-│   ├── generate_workshop_assets.py# Generador procedural de fondos y estaciones de taller
-│   └── run_playtest_in_window.py  # Wrapper Win32 para forzar ventana en primer plano
-│
 ├── src/                           # Código fuente en GDScript y escenas de Godot 4
-│   ├── autoloads/                 # Singletons globales (GameManager, TimeManager)
+│   ├── autoload/                  # Singletons globales (GameManager, TimeManager, AudioManager)
+│   ├── common/                    # Clases base, recursos .tres y utilidades compartidas
+│   ├── components/                # Componentes térmicos y cinéticos desacoplados
 │   └── scenes/                    # Escenas y nodos modulares
-│       ├── levels/                # Entornos y niveles (GreyboxTown, etc.)
-│       ├── objects/               # Componentes interactivos desacoplados
+│       ├── levels/                # Entornos y niveles (GreyboxTown, MinaSubterranea)
+│       ├── objects/               # Componentes y objetos interactivos (InteractableArea)
 │       ├── player/                # Controlador cinemático del jugador
-│       ├── ui/                    # Interfaces de usuario y HUD persistente
-│       └── workshop/              # Minijuegos y estaciones de forja
+│       ├── ui/                    # Interfaces de usuario y HUD persistente (MainHUD, GuiaTutorial)
+│       └── workshop/              # Minijuegos y estaciones de forja en primer plano
 │
 ├── tests/                         # Pruebas automatizadas y simulaciones de usuario
+│   ├── capture_game_views.gd      # Capturador automatizado de pantallas de escenas
+│   ├── PlaytestDriver.gd          # Conductor interactivo de pruebas en pantalla
 │   ├── playtest_gameplay_loop.gd  # Bucle completo de juego automatizado de punta a punta
 │   ├── playtest_interactive_runner.gd # Corredor visual interactivo para pantalla
 │   ├── playtest_yunque_juice.gd   # Test de sensación física y juice del yunque
 │   └── retroalimentacion/         # Informes de evaluación por arquetipos de jugador
 │       └── fase_02_taller_comercial/ # Reportes de casual, veterano, narrativo, UI y síntesis
 │
-└── tools/                         # Herramientas de soporte al desarrollo
+└── tools/                         # Herramientas de soporte y subsistemas externos
+    ├── generators/                # Generadores procedurales de audio, sprites y texturas
+    │   ├── generar_musica_fondo.py     # Síntesis acústica de fondo en Re Dórico
+    │   ├── generate_author_sprites.py  # Generador procedural PIL de sprites 2D
+    │   ├── generate_foley_sfx.py       # Síntesis procedural de efectos de sonido (Foley)
+    │   └── generate_workshop_assets.py # Generador procedural de fondo y piezas de taller
+    ├── run_playtest_in_window.py  # Wrapper Win32 para forzar ventana en primer plano
     └── voice_assistant/           # Asistente por voz Jarvis, daemon y telemetría
         ├── asistente_daemon.py    # Servicio daemon de escucha y procesamiento
         ├── auto_auditor.py        # Auditoría continua de salud y rendimiento

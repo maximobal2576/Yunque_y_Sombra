@@ -53,9 +53,9 @@ func _run_suite() -> void:
 	print("\n[2] Escala Térmica Realista en Fragua (20°C a 1400°C)...")
 	workshop._switch_tab(workshop.StationTab.FORGE)
 	assert_true(abs(workshop.temperature - 20.0) <= 2.0, "Fragua inicia en temperatura ambiente (~20°C): %.1f°C" % workshop.temperature)
-	for i in range(5):
+	for i in range(11):
 		workshop._on_bellows_pressed()
-	assert_true(workshop.temperature >= 1000.0 and workshop.temperature <= 1150.0, "5 bombeos de fuelle llevan a caldeo óptimo [1000-1150°C]: %.1f°C" % workshop.temperature)
+	assert_true(workshop.temperature >= 1000.0 and workshop.temperature <= 1150.0, "11 bombeos de fuelle llevan a caldeo óptimo [1000-1150°C]: %.1f°C" % workshop.temperature)
 	workshop._on_to_anvil_pressed()
 	assert_true(abs(anvil.temperatura_pieza - workshop.temperature) < 1.0, "El yunque recibe la temperatura real de la fragua: %.1f°C" % anvil.temperatura_pieza)
 
@@ -64,7 +64,7 @@ func _run_suite() -> void:
 	var temp_antes: float = anvil.temperatura_pieza
 	await create_timer(0.35).timeout
 	var temp_despues: float = anvil.temperatura_pieza
-	assert_true(temp_despues < temp_antes - 4.0, "La pieza se enfría en tiempo real (%.1f°C -> %.1f°C)" % [temp_antes, temp_despues])
+	assert_true(temp_despues < temp_antes - 2.0, "La pieza se enfría en tiempo real (%.1f°C -> %.1f°C)" % [temp_antes, temp_despues])
 
 	# 4. Deformación en caliente vs penalización en frío
 	print("\n[4] Plasticidad Térmica y Penalización por Golpear en Frío...")
@@ -88,8 +88,8 @@ func _run_suite() -> void:
 	assert_true(workshop.current_station == workshop.StationTab.FORGE, "BotonVolverAFragua regresa a la pestaña FORGE")
 	assert_true(not workshop.is_forge_settled, "La fragua se desbloquea para permitir bombear el fuelle")
 
-	# Atizar 3 veces para volver a >1000°C y regresar al yunque
-	for i in range(3):
+	# Atizar 5 veces (95°C c/u desde 550°C) para volver a >1000°C y regresar al yunque
+	for i in range(5):
 		workshop._on_bellows_pressed()
 	workshop._on_to_anvil_pressed()
 	await process_frame

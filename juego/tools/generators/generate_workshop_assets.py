@@ -16,7 +16,15 @@ import math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+def _get_project_root() -> str:
+    curr = os.path.dirname(os.path.abspath(__file__))
+    while curr and os.path.dirname(curr) != curr:
+        if os.path.exists(os.path.join(curr, "project.godot")):
+            return curr
+        curr = os.path.dirname(curr)
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+BASE_DIR = _get_project_root()
 WORKSHOP_DIR = os.path.join(BASE_DIR, "assets", "sprites", "workshop")
 os.makedirs(WORKSHOP_DIR, exist_ok=True)
 

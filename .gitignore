@@ -5,4 +5,5 @@
 # Cache and logs
 __pycache__/
 *.pyc
+*.tmp
 *.log

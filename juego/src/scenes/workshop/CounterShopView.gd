@@ -70,6 +70,8 @@ var order_sheet: Control:
 	get: return pergamino_comanda
 var order_title_label: Label:
 	get: return etiqueta_titulo_comanda
+var order_item_label: Label:
+	get: return etiqueta_desc_comanda
 var order_desc_label: Label:
 	get: return etiqueta_desc_comanda
 var order_specs_label: Label:
@@ -144,6 +146,16 @@ var finished_piece_quality: float = 0.0
 var _arrastrando_pieza_entrega: bool = false
 var _tiempo_anim_cliente: float = 0.0
 var _convocando_cliente: bool = false
+var _hablando_cliente: bool = false
+var _saltar_escritura_dialogo: bool = false
+var _revelando_comanda: bool = false
+var _tween_comanda_texto: Tween = null
+
+const PITCH_VOZ_CLIENTE: Dictionary = {
+	"sargento": 0.82,
+	"molinero": 0.98,
+	"mercader": 1.16
+}
 
 func _ready() -> void:
 	bell_button.pressed.connect(_on_bell_clicked)
@@ -151,6 +163,10 @@ func _ready() -> void:
 	btn_to_forge.pressed.connect(_on_go_to_forge_pressed)
 	btn_deliver_item.pressed.connect(_on_deliver_item_pressed)
 	bandeja_entrega.gui_input.connect(_on_bandeja_entrega_gui_input)
+	if caja_dialogo:
+		caja_dialogo.gui_input.connect(_on_caja_dialogo_gui_input)
+
+	_asegurar_nodos_boca_clientes()
 
 	order_sheet.visible = false
 	delivery_tray.visible = false
@@ -181,11 +197,62 @@ func _process(delta: float) -> void:
 	if personaje_cliente_articulado and customer_container.modulate.a > 0.05:
 		# Respiración orgánica y ligero balanceo del cliente en la ventanilla
 		var resp: float = sin(_tiempo_anim_cliente * 2.4)
-		personaje_cliente_articulado.position.y = 178.0 + resp * 2.2
+		var extra_habla_y: float = absf(sin(_tiempo_anim_cliente * 17.5)) * 1.8 if _hablando_cliente else 0.0
+		personaje_cliente_articulado.position.y = 178.0 + resp * 2.2 - extra_habla_y
 		personaje_cliente_articulado.scale = Vector2(1.0 + resp * 0.008, 1.0 - resp * 0.010)
 		var cabeza_activa: Node2D = _obtener_cabeza_cliente_activa()
 		if cabeza_activa:
-			cabeza_activa.rotation = sin(_tiempo_anim_cliente * 1.4) * 0.032
+			if _hablando_cliente:
+				cabeza_activa.rotation = sin(_tiempo_anim_cliente * 14.0) * 0.048
+				cabeza_activa.position.y = -51.0 + sin(_tiempo_anim_cliente * 19.0) * 1.4
+			else:
+				cabeza_activa.rotation = sin(_tiempo_anim_cliente * 1.4) * 0.032
+		var boca_activa: Node2D = _obtener_boca_cliente_activa()
+		if boca_activa:
+			if _hablando_cliente:
+				var pulso_silaba: float = 0.5 + 0.5 * sin(_tiempo_anim_cliente * 24.0)
+				boca_activa.scale = Vector2(lerpf(0.92, 1.08, pulso_silaba), lerpf(0.4, 1.45, pulso_silaba))
+			else:
+				boca_activa.scale = Vector2(1.0, 0.4)
+
+func _asegurar_nodos_boca_clientes() -> void:
+	var config_bustos: Array[Dictionary] = [
+		{"busto": busto_sargento_godofredo, "cabeza": "CabezaCliente", "pos": Vector2(0, 22), "color": Color(0.24, 0.08, 0.09, 1)},
+		{"busto": busto_molinero_eustaquio, "cabeza": "CabezaMolinero", "pos": Vector2(0, 20), "color": Color(0.26, 0.09, 0.09, 1)},
+		{"busto": busto_mercader_valeria, "cabeza": "CabezaMercader", "pos": Vector2(0, 18), "color": Color(0.46, 0.14, 0.18, 1)}
+	]
+	for cfg in config_bustos:
+		var busto_n: Node2D = cfg["busto"]
+		if busto_n == null:
+			continue
+		var cabeza_n: Node2D = busto_n.get_node_or_null(str(cfg["cabeza"])) as Node2D
+		if cabeza_n == null:
+			continue
+		var boca_n: Polygon2D = cabeza_n.get_node_or_null("BocaCliente") as Polygon2D
+		if boca_n == null:
+			boca_n = Polygon2D.new()
+			boca_n.name = "BocaCliente"
+			boca_n.position = cfg["pos"]
+			boca_n.color = cfg["color"]
+			boca_n.polygon = PackedVector2Array([
+				Vector2(-7, -1.5), Vector2(0, -2.5), Vector2(7, -1.5),
+				Vector2(5, 3.5), Vector2(0, 4.5), Vector2(-5, 3.5)
+			])
+			cabeza_n.add_child(boca_n)
+		boca_n.scale = Vector2(1.0, 0.4)
+
+func _obtener_boca_cliente_activa() -> Node2D:
+	var cabeza: Node2D = _obtener_cabeza_cliente_activa()
+	if cabeza:
+		return cabeza.get_node_or_null("BocaCliente") as Node2D
+	return null
+
+func _on_caja_dialogo_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _hablando_cliente:
+			_saltar_escritura_dialogo = true
+		elif _revelando_comanda:
+			_completar_revelado_comanda_inmediato()
 
 func _obtener_cabeza_cliente_activa() -> Node2D:
 	if busto_sargento_godofredo and busto_sargento_godofredo.visible:
@@ -292,31 +359,85 @@ func _summon_customer() -> void:
 	if _convocando_cliente:
 		return
 	_convocando_cliente = true
+	var es_headless: bool = DisplayServer.get_name() == "headless"
 	var customer: Dictionary = customers[current_customer_index]
 	active_order = customer
+	var visual_id: String = str(customer.get("visual_id", "sargento"))
 
 	customer_portrait.texture = customer["portrait"]
-	_actualizar_busto_cliente(str(customer.get("visual_id", "sargento")))
+	_actualizar_busto_cliente(visual_id)
 	customer_name_label.text = customer["name"]
 	customer_status_label.text = customer["faction"]
 
+	# 1. Al llegar el cliente: ocultar la receta mientras empieza y habla el comentario
+	order_sheet.visible = false
+	dialogue_box.visible = false
+
+	var dur_llegada: float = 0.18 if es_headless else 0.45
 	var center_x: float = (size.x - customer_container.size.x) * 0.5 if size.x > 0 else 540.0
 	customer_container.position.x = center_x + 70.0
 	customer_container.modulate.a = 0.0
 	var enter_tween: Tween = create_tween().set_parallel(true)
-	enter_tween.tween_property(customer_container, "position:x", center_x, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	enter_tween.tween_property(customer_container, "modulate:a", 1.0, 0.45)
+	enter_tween.tween_property(customer_container, "position:x", center_x, dur_llegada).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	enter_tween.tween_property(customer_container, "modulate:a", 1.0, dur_llegada)
 
 	await enter_tween.finished
 
+	# 2. Mostrar diálogo primero con efecto letra por letra, movimiento de boca y balbuceo
 	dialogue_box.visible = true
-	dialogue_text.text = customer["dialogue_intro"]
+	order_sheet.visible = false
+	var texto_intro: String = str(customer.get("dialogue_intro", ""))
+	var dur_dialogo: float = 0.14 if es_headless else clampf(float(texto_intro.length()) / 45.0, 1.2, 3.8)
+	await _reproducir_dialogo_cliente(texto_intro, visual_id, dur_dialogo)
 
+	if not es_headless and not _saltar_escritura_dialogo:
+		await get_tree().create_timer(0.25).timeout
+
+	# 3. Recién cuando termina el comentario, se despliega la comanda y su contenido aparece de a poco
+	await _desplegar_y_revelar_comanda(customer, es_headless)
+
+	bell_label.text = "Cliente en ventanilla: Revisa la comanda y acéptala"
+	_convocando_cliente = false
+
+func _reproducir_dialogo_cliente(texto: String, visual_id: String, duracion_total: float) -> void:
+	dialogue_box.visible = true
+	dialogue_text.text = texto
+	var total_chars: int = texto.length()
+	if total_chars <= 0:
+		dialogue_text.visible_characters = -1
+		return
+
+	dialogue_text.visible_characters = 0
+	_hablando_cliente = true
+	_saltar_escritura_dialogo = false
+	var pitch_cliente: float = float(PITCH_VOZ_CLIENTE.get(visual_id, 0.98))
+	var ultimo_blip_char: int = -3
+	var tiempo_transcurrido: float = 0.0
+
+	while tiempo_transcurrido < duracion_total and not _saltar_escritura_dialogo:
+		await get_tree().process_frame
+		tiempo_transcurrido += get_process_delta_time()
+		var progreso: float = clampf(tiempo_transcurrido / maxf(duracion_total, 0.01), 0.0, 1.0)
+		var chars_visibles: int = int(round(progreso * float(total_chars)))
+		dialogue_text.visible_characters = chars_visibles
+		if chars_visibles - ultimo_blip_char >= 3 and chars_visibles < total_chars:
+			ultimo_blip_char = chars_visibles
+			_emitir_sonido_balbuceo(pitch_cliente)
+
+	dialogue_text.visible_characters = -1
+	_hablando_cliente = false
+	var boca: Node2D = _obtener_boca_cliente_activa()
+	if boca:
+		boca.scale = Vector2(1.0, 0.4)
+
+func _emitir_sonido_balbuceo(pitch_cliente: float) -> void:
+	if AudioManager.has_method("play_voice_blip"):
+		AudioManager.call("play_voice_blip", pitch_cliente)
+	else:
+		AudioManager.play_sfx("place_item", -15.0, 0.12)
+
+func _desplegar_y_revelar_comanda(customer: Dictionary, es_headless: bool) -> void:
 	AudioManager.play_sfx("place_item", 0.5, 0.05)
-	order_sheet.visible = true
-	order_sheet.modulate.a = 0.0
-	order_sheet.pivot_offset = order_sheet.size * 0.5
-	order_sheet.scale = Vector2(0.86, 1.12)
 	order_title_label.text = "COMANDA: %s" % customer["item_name"]
 	order_desc_label.text = customer["description"]
 	order_specs_label.text = customer["specs"]
@@ -324,12 +445,46 @@ func _summon_customer() -> void:
 	btn_accept_order.disabled = false
 	btn_accept_order.text = "Aceptar Encargo y Forjar"
 
-	var order_tween: Tween = create_tween().set_parallel(true)
-	order_tween.tween_property(order_sheet, "modulate:a", 1.0, 0.25)
-	order_tween.tween_property(order_sheet, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	order_title_label.visible_ratio = 0.0
+	order_desc_label.visible_ratio = 0.0
+	order_specs_label.visible_ratio = 0.0
+	order_reward_label.visible_ratio = 0.0
 
-	bell_label.text = "Cliente en ventanilla: Revisa la comanda y acéptala"
-	_convocando_cliente = false
+	order_sheet.visible = true
+	order_sheet.modulate.a = 0.0
+	order_sheet.pivot_offset = order_sheet.size * 0.5
+	order_sheet.scale = Vector2(0.86, 1.12)
+
+	var dur_entrada_papel: float = 0.04 if es_headless else 0.24
+	var dur_campo: float = 0.03 if es_headless else 0.21
+
+	_revelando_comanda = true
+	if _tween_comanda_texto and _tween_comanda_texto.is_valid():
+		_tween_comanda_texto.kill()
+
+	_tween_comanda_texto = create_tween()
+	_tween_comanda_texto.set_parallel(true)
+	_tween_comanda_texto.tween_property(order_sheet, "modulate:a", 1.0, dur_entrada_papel)
+	_tween_comanda_texto.tween_property(order_sheet, "scale", Vector2.ONE, dur_entrada_papel).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	_tween_comanda_texto.chain().tween_property(order_title_label, "visible_ratio", 1.0, dur_campo)
+	_tween_comanda_texto.chain().tween_property(order_desc_label, "visible_ratio", 1.0, dur_campo)
+	_tween_comanda_texto.chain().tween_property(order_specs_label, "visible_ratio", 1.0, dur_campo)
+	_tween_comanda_texto.chain().tween_property(order_reward_label, "visible_ratio", 1.0, dur_campo)
+
+	await _tween_comanda_texto.finished
+	_completar_revelado_comanda_inmediato()
+
+func _completar_revelado_comanda_inmediato() -> void:
+	if _tween_comanda_texto and _tween_comanda_texto.is_valid():
+		_tween_comanda_texto.kill()
+	order_sheet.visible = true
+	order_sheet.modulate.a = 1.0
+	order_sheet.scale = Vector2.ONE
+	order_title_label.visible_ratio = 1.0
+	order_desc_label.visible_ratio = 1.0
+	order_specs_label.visible_ratio = 1.0
+	order_reward_label.visible_ratio = 1.0
+	_revelando_comanda = false
 
 func _on_accept_order_pressed() -> void:
 	has_active_order = true
@@ -436,20 +591,27 @@ func _on_deliver_item_pressed() -> void:
 
 	dialogue_box.visible = true
 	var item_name: String = str(customer.get("item_name", "Clavo Forjado"))
+	var visual_id: String = str(customer.get("visual_id", "sargento"))
+	var respuesta_final: String = ""
 	if is_good:
-		dialogue_text.text = str(customer.get("dialogue_good", "¡Excelente trabajo!")) + ("\n[Cobraste +%d monedas]" % final_reward)
+		respuesta_final = str(customer.get("dialogue_good", "¡Excelente trabajo!")) + ("\n[Cobraste +%d monedas]" % final_reward)
 	else:
-		dialogue_text.text = str(customer.get("dialogue_bad", "Trabajo tosco.")) + ("\n[Cobraste solo +%d monedas]" % final_reward)
+		respuesta_final = str(customer.get("dialogue_bad", "Trabajo tosco.")) + ("\n[Cobraste solo +%d monedas]" % final_reward)
 
 	GameManager.record_crafted_item(item_name, finished_piece_quality, final_reward)
 	AudioManager.play_coins()
 	emit_signal("item_delivered", finished_piece_quality, final_reward)
 
+	var es_headless: bool = DisplayServer.get_name() == "headless"
+	var dur_respuesta: float = 0.14 if es_headless else clampf(float(respuesta_final.length()) / 48.0, 1.1, 2.8)
+	await _reproducir_dialogo_cliente(respuesta_final, visual_id, dur_respuesta)
+
+	var dur_salida: float = 0.22 if es_headless else 0.5
 	var center_x: float = (size.x - customer_container.size.x) * 0.5 if size.x > 0 else 540.0
 	var exit_tween: Tween = create_tween().set_parallel(true)
-	exit_tween.tween_property(customer_container, "position:x", center_x - 100.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	exit_tween.tween_property(customer_container, "modulate:a", 0.0, 0.5)
-	exit_tween.tween_property(delivery_tray, "modulate:a", 0.0, 0.4)
+	exit_tween.tween_property(customer_container, "position:x", center_x - 100.0, dur_salida).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	exit_tween.tween_property(customer_container, "modulate:a", 0.0, dur_salida)
+	exit_tween.tween_property(delivery_tray, "modulate:a", 0.0, dur_salida * 0.8)
 
 	await exit_tween.finished
 	delivery_tray.visible = false

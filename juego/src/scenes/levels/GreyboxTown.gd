@@ -152,7 +152,7 @@ func _ready() -> void:
 
 	if OS.get_environment("GODOT_PLAYTEST") == "1":
 		print("[GREYBOX] Activando PlaytestDriver por variable de entorno GODOT_PLAYTEST=1...")
-		var driver_script: Script = load("res://src/scenes/tests/PlaytestDriver.gd") as Script
+		var driver_script: Script = load("res://tests/PlaytestDriver.gd") as Script
 		if driver_script:
 			var driver := CanvasLayer.new()
 			driver.name = "ConductorPlaytest"

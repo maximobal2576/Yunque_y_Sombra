@@ -1,9 +1,18 @@
-# Godot 4+ cache and local SSL keys
+# Godot 4+ cache
 .godot/
-build/web/*.pem
+
+# Python cache and ephemeral files
 __pycache__/
 *.pyc
-*.log
+*.tmp
+
+# Secrets and local environment keys
 .env
 *.env
 
+# Telemetry and ephemeral logs (Axioma 4 de Higiene en Git)
+*.log
+logs/*
+!logs/.gitkeep
+tools/voice_assistant/logs/*
+!tools/voice_assistant/logs/.gitkeep
