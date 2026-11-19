@@ -2,8 +2,8 @@
 reconstitute_skills.py
 Reconstitución formal y exhaustiva de las 10 skills del Tribunal de 'Yunque & Sombra'
 Genera los archivos SKILL.md en todos los directorios requeridos:
-- c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/.agent/skills/
-- c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/.gemini/skills/
+- c:/Users/curso/OneDrive/Documentos/iita_max/juego/.agent/skills/
+- c:/Users/curso/OneDrive/Documentos/iita_max/juego/.gemini/skills/
 - c:/Users/curso/OneDrive/Documentos/iita_max/.gemini/antigravity/skills/
 - c:/Users/curso/OneDrive/Documentos/iita_max/.gemini/skills/
 - C:/Users/curso/.gemini/antigravity/skills/
@@ -44,14 +44,14 @@ description: >-
 
 ## 🏛️ 1. Misión y Alcance Técnico
 
-El **Programador de Gameplay** es la autoridad responsable de convertir los pilares de diseño de [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/docs/idea.txt) en código GDScript robusto, limpio, reactivo y de alta eficiencia dentro de Godot Engine 4. Garantiza que la arquitectura sea escalable, modular y orientada a eventos, erradicando el acoplamiento rígido entre subsistemas y blindando el juego contra errores en tiempo de ejecución.
+El **Programador de Gameplay** es la autoridad responsable de convertir los pilares de diseño de [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/docs/idea.txt) en código GDScript robusto, limpio, reactivo y de alta eficiencia dentro de Godot Engine 4. Garantiza que la arquitectura sea escalable, modular y orientada a eventos, erradicando el acoplamiento rígido entre subsistemas y blindando el juego contra errores en tiempo de ejecución.
 
 ---
 
 ## 📜 2. Mandatos Inviolables de Programación
 
 1. **Lectura Previa Obligatoria de `docs/idea.txt`**:
-   - Antes de escribir o refactorizar una sola línea de código, debes consultar [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/docs/idea.txt). Queda estrictamente prohibido improvisar sistemas o mecánicas que contradigan la visión de simulación de oficio y narrativa de pueblo decadente.
+   - Antes de escribir o refactorizar una sola línea de código, debes consultar [docs/idea.txt](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/docs/idea.txt). Queda estrictamente prohibido improvisar sistemas o mecánicas que contradigan la visión de simulación de oficio y narrativa de pueblo decadente.
 
 2. **Tipado Estricto Obligatorio en GDScript (`:=`)**:
    - Toda variable, constante, parámetro de función y valor de retorno DEBE estar explícitamente tipado.
@@ -617,7 +617,7 @@ description: >-
 
 ## 🏛️ 1. Mandato de Ejecución Automática Continua
 
-De acuerdo con las directivas solemnes de [AGENTS.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/AGENTS.md) y [CLAUDE.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/CLAUDE.md):
+De acuerdo con las directivas solemnes de [AGENTS.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/AGENTS.md) y [CLAUDE.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/CLAUDE.md):
 - La skill `/revision` **no requiere invocación manual**; está habilitada en cada turno de trabajo.
 - Toda propuesta, script, escena, refactor o asset entregado debe satisfacer previamente los estándares de este Tribunal antes de presentarse al usuario.
 
@@ -703,7 +703,7 @@ description: >-
 # 📜 Secretario Cronista Imperial (`/secretario`)
 
 > **Rol**: Cronista Imperial de Campo y Custodio de la Memoria Inmutable (*Taishi* 太史)  
-> **Documento Central**: [CRONICA_DE_CAMPO.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/CRONICA_DE_CAMPO.md)  
+> **Documento Central**: [CRONICA_DE_CAMPO.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/CRONICA_DE_CAMPO.md)  
 > **Modo Operativo**: Guardia Perpetua Ininterrumpida en segundo plano.
 
 ---
@@ -749,7 +749,7 @@ El Secretario mantiene actualizadas tres secciones fundamentales:
 
 ## 📋 4. Protocolo de Enlaces y DX
 
-- Todo archivo mencionado DEBE contener su enlace en formato `file:///` compatible con Antigravity y VS Code (ej. `[project.godot](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/project.godot)`).
+- Todo archivo mencionado DEBE contener su enlace en formato `file:///` compatible con Antigravity y VS Code (ej. `[project.godot](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/project.godot)`).
 - La fecha y hora deben reflejar el tiempo de la máquina local.
 - Estilo literario sobrio, solemne, de alta precisión técnica y reverencia por la ingeniería de autor.
 
@@ -921,9 +921,9 @@ El **Maestro Herrero Tradicional** actúa como un juez externo e independiente. 
 def main():
     base_dirs = [
         # 1. Project-level standard agent skills
-        r"c:\Users\curso\OneDrive\Documentos\iita_max\IITA_python-main\juego\.agent\skills",
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.agent\skills",
         # 2. Project-level gemini skills
-        r"c:\Users\curso\OneDrive\Documentos\iita_max\IITA_python-main\juego\.gemini\skills",
+        r"c:\Users\curso\OneDrive\Documentos\iita_max\juego\.gemini\skills",
         # 3. Workspace root antigravity skills
         r"c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\antigravity\skills",
         # 4. Workspace root gemini skills

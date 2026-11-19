@@ -1,8 +1,9 @@
 # 🏛️ CATÁLOGO MAESTRO DEL TRIBUNAL DE SKILLS: 'YUNQUE & SOMBRA'
 
-> **Ámbito de Aplicación**: Proyecto *Yunque & Sombra* (`IITA_python-main/juego`)  
+> **Ámbito de Aplicación**: Proyecto *Yunque & Sombra* (`iita_max/juego`)  
 > **Motor**: Godot Engine 4.x (GDScript 4 tipado estricto `:=`)  
 > **Estándar**: Skills Antigravity / Gemini (`SKILL.md` con frontmatter YAML, directivas, mandatos y checklists)  
+> **Repositorio Oficial**: `https://github.com/maximobal2576/Yunque_y_Sombra.git`  
 > **Estado**: 🟢 100% Reconstituidas, Verificadas y Operativas en el Sistema
 
 ---
@@ -67,8 +68,8 @@ Para garantizar portabilidad absoluta y compatibilidad inmediata con el motor An
 | **1** | **Antigravity Global (Sesión Activa)** | `C:\Users\curso\.gemini\antigravity\skills\<skill_name>\SKILL.md` | Invocación inmediata por slash command (`/skill`) en cualquier ventana de chat. |
 | **2** | **Workspace Root Antigravity** | `c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\antigravity\skills\<skill_name>\SKILL.md` | Configuración a nivel de workspace en Antigravity. |
 | **3** | **Workspace Root Gemini** | `c:\Users\curso\OneDrive\Documentos\iita_max\.gemini\skills\<skill_name>\SKILL.md` | Soporte de tooling estándar de Gemini CLI / IDE. |
-| **4** | **Proyecto Juego Local (.gemini)** | `c:\Users\curso\OneDrive\Documentos\iita_max\IITA_python-main\juego\.gemini\skills\<skill_name>\SKILL.md` | Persistencia y trazabilidad dentro del repositorio de Godot. |
-| **5** | **Proyecto Juego Portable (.agent)** | `c:\Users\curso\OneDrive\Documentos\iita_max\IITA_python-main\juego\.agent\skills\<skill_name>\SKILL.md` | Estándar agnóstico git para portabilidad entre diferentes máquinas. |
+| **4** | **Proyecto Juego Local (.gemini)** | `c:\Users\curso\OneDrive\Documentos\iita_max\juego\.gemini\skills\<skill_name>\SKILL.md` | Persistencia y trazabilidad dentro del repositorio de Godot. |
+| **5** | **Proyecto Juego Portable (.agent)** | `c:\Users\curso\OneDrive\Documentos\iita_max\juego\.agent\skills\<skill_name>\SKILL.md` | Estándar agnóstico git para portabilidad entre diferentes máquinas. |
 
 ---
 
@@ -203,7 +204,7 @@ Para garantizar portabilidad absoluta y compatibilidad inmediata con el motor An
 - **Subcomandos / Tags**: `/secretario registrar_acta`, `/secretario sync`, `/secretario status`
 - **Competencias Técnicas**:
   * Guardia perpetua ininterrumpida: Documenta en segundo plano sin frenar al desarrollador.
-  * Redacción formal de actas imperiales en [CRONICA_DE_CAMPO.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/IITA_python-main/juego/CRONICA_DE_CAMPO.md).
+  * Redacción formal de actas imperiales en [CRONICA_DE_CAMPO.md](file:///c:/Users/curso/OneDrive/Documentos/iita_max/juego/CRONICA_DE_CAMPO.md).
   * Estructura protocolar: Sello temporal, problema, decisión canónica, alternativas descartadas, código afectado y certificación de QA.
   * Trazabilidad completa con hipervínculos absolutos `file:///`.
   * Preservación del estilo solemne de autor (Bordó noble, carbón cálido, marfil, oro).

@@ -1,7 +1,9 @@
 # 🛡️ DIRECTIVA DE WORKSPACE: GESTIÓN CONTINUA, ADMINISTRACIÓN ASÍNCRONA, REVISIÓN Y SINCRONIZACIÓN GIT
 
-> **Ámbito de aplicación**: Este workspace (`juego`) y todos sus subdirectorios.  
-> **Destinatarios**: Aplica a Claude y subagentes en Antigravity.
+> **Ámbito de aplicación**: Este workspace (`iita_max/juego`) y todos sus subdirectorios.  
+> **Destinatarios**: Aplica a Claude y subagentes en Antigravity.  
+> **Repositorio Remoto Oficial Único**: `https://github.com/maximobal2576/Yunque_y_Sombra.git` (Rama: `main`)  
+> *(Desvinculado permanentemente de repositorios generales anteriores; enfocado 100% en el proyecto Yunque & Sombra).*
 
 ---
 
@@ -9,8 +11,13 @@
 
 Para garantizar la integridad del código al alternar entre múltiples dispositivos (PC local, laptop, celular/tablet vía Remote Control o entornos Cloud) y evitar pérdidas de avance entre chats diarios nuevos:
 
+### Repositorio Remoto Configurado
+- **URL Remota**: `https://github.com/maximobal2576/Yunque_y_Sombra.git`
+- **Rama**: `main`
+- **Alias**: `origin`
+
 ### A. Al iniciar una sesión nueva (Arranque / Primer Turno del Chat):
-1. **Comprobación Obligatoria de Remoto**: En el primer turno de cualquier nueva conversación o sesión, antes de inspeccionar o modificar código, el agente **DEBE** verificar el estado del repositorio remoto:
+1. **Comprobación Obligatoria de Remoto**: En el primer turno de cualquier nueva conversación o sesión, antes de inspeccionar o modificar código, el agente **DEBE** verificar el estado del repositorio remoto contra el repo oficial:
    ```bash
    git fetch origin
    git status -uno
@@ -27,7 +34,7 @@ Para garantizar la integridad del código al alternar entre múltiples dispositi
    - Debe verificar los cambios con `git status`.
    - Ejecutar `git add <archivos>` (o `git add .` según corresponda).
    - Crear un commit con mensaje descriptivo y claro (convención: `feat:`, `fix:`, `refactor:`, `docs:`).
-   - Ejecutar inmediatamente `git push origin main` al repositorio remoto.
+   - Ejecutar inmediatamente `git push origin main` al repositorio remoto oficial (`https://github.com/maximobal2576/Yunque_y_Sombra.git`).
 2. Informar al usuario en la respuesta el commit generado y la confirmación de subida a GitHub para que quede disponible al instante en cualquier otro dispositivo.
 
 ---
