@@ -1,0 +1,162 @@
+================================================================================
+          DOCUMENTO DE DISEÑO DE JUEGO (GDD) - BASE MAESTRA DEL PROYECTO
+================================================================================
+NOTA PARA MODELOS DE IA Y DESARROLLADORES:
+Este documento es la fuente canónica de verdad del juego. Define la visión,
+la arquitectura de bucles jugables, el tono narrativo, los sistemas mecánicos
+y la progresión. Ningún desarrollo posterior debe desviar estos pilares sin
+instrucción explícita.
+================================================================================
+
+1. FICHA TÉCNICA & VISIÓN GENERAL
+--------------------------------------------------------------------------------
+- GÉNERO: Simulación de Oficio / Aventura RPG 2D / Misterio Narrativo.
+- PERSPECTIVA DUAL:
+    * Modo Exploración & Minería: Top-Down 2D cenital (estilo Stardew Valley / Pokémon clásico).
+    * Modo Mostrador & Forja: Vista de estación interactiva en primer plano (estilo Papa's Freezeria / Potion Punch).
+- AMBIENTACIÓN: Época medieval rústica, artesanal, decadente pero viva. Texturas de madera envejecida, barro, piedra musgosa, hierro forjado y faroles de aceite.
+- FILOSOFÍA DE DISEÑO:
+    * Trabajo manual y táctil: satisfacción instantánea (juice, feedback háptico/sonoro).
+    * Bucle dual de dos mundos: rutina comercial de día, investigación y minería de noche.
+    * Tensión psicológica: calidez inicial que vira sutilmente a conspiración y suspenso.
+
+2. NARRATIVA, LORE & GIRO ARGUMENTAL
+--------------------------------------------------------------------------------
+2.1 EL PRÓLOGO (ONBOARDING)
+- El jugador despierta o aparece en el centro de un pueblo venido abajo.
+- Carta en pantalla completa (pergamino): Su madre le escribe pidiéndole perdón por enviarlo a ese lugar remoto; afirma que es la única manera de que aprenda un verdadero oficio y desarrolle su sabiduría. La madre actúa con absoluta inocencia y buena fe, creyendo que su hermano (el tío del jugador) simplemente se jubiló o marchó de viaje.
+- Al cerrar la carta, aparece una flecha indicadora en el suelo que guía al jugador por los callejones hasta una casa andrajosa y cubierta de telarañas.
+
+2.2 EL SECRETO DEL TÍO HERRERO
+- El taller pertenecía al tío desaparecido.
+- El tío era un genio metalúrgico e innovador que buscaba modernizar el pueblo: canalizar agua, iluminar las calles con faroles eternos y dotar de herramientas de hierro resistentes a los agricultores.
+- Los Gobernantes / Señores Feudales descubrieron sus planes y lo silenciaron/desaparecieron en secreto. Para ellos, un pueblo sumido en la pobreza y la oscuridad es fácil de manipular, dependiente y sumiso a los tributos.
+
+2.3 LA NARRATIVA AMBIENTAL: "LAS HOJAS DEL DIARIO PERDIDO"
+- La historia no se impone por cinemáticas extensas; se reconstruye explorando y trabajando:
+    * Reparación del taller: Si el jugador arregla el techo (forjando clavos en el yunque y martillándolos), limpiando vigas o quitando telarañas de estantes, caen hojas arrugadas o hechas un bollo.
+    * Minería: Entre fisuras de rocas profundas o cerca de picos rotos abandonados, aparecen notas grabadas.
+    * Cada fragmento recuperado se archiva en el diario personal, revelando la cronología de cómo el tío fue acorralado.
+
+2.4 EL CLÍMAX Y EL GIRO FINAL (DESTIERRO)
+- Condición de activación: El jugador alcanza el nivel máximo de maestría, el pueblo florece en su máximo esplendor visual y se compran casi todas las mejoras.
+- La Emboscada: Una noche, al salir del taller, cesa la música alegre del pueblo. Reina un silencio tenso. Guardias de armadura pesada y emisarios de los gobernadores rodean al jugador.
+- La Sentencia: "Cometiste el mismo error que tu tío... Creíste que este pueblo necesitaba despertar. Un pueblo próspero es un pueblo que hace preguntas."
+- El Destierro: El jugador es noqueado, encapuchado y subido a un carruaje en plena tormenta. Es arrojado al barro en otro pueblo desconocido, infinitamente más miserable, hostil y derruido que el primero, esta vez sin herramientas, sin dinero y sin taller.
+- La cámara se eleva sobre la lluvia y comienzan a rodar los créditos finales.
+
+3. ARQUITECTURA DEL BUCLE DIARIO & SISTEMA DE TIEMPO
+--------------------------------------------------------------------------------
+El juego se rige por un reloj de 24 horas continuo reflejado en un HUD específico:
+
+3.0 HUD INFERIOR PERSISTENTE (ESTILO BARRA DE TAREAS)
+- En el borde inferior de la pantalla se despliega una barra fija de control que acompaña al jugador en ambos modos:
+    * Reloj de 24 horas (digital y analógico con ciclo solar/lunar).
+    * Barra de Energía / Estamina del personaje.
+    * Notificaciones de estado (fatiga, alertas horarias).
+
+3.1 FASE 1: MODO DÍA - EL MOSTRADOR DE FORJA (06:00 A 17:00)
+- APERTURA: El jugador interactúa para levantar un portón de madera corredizo ("hacia arriba") con sonido de poleas.
+- RELOJ COMERCIAL: El tiempo avanza entre las 06:00 y las 17:00.
+- LLEGADA DE CLIENTES (ESTILO PAPA'S / POTION PUNCH):
+    * Los aldeanos se forman frente al mostrador con bocadillos de pedidos.
+    * Cada cliente posee una BARRA DE PACIENCIA que se consume mientras espera.
+    * Gama de pedidos progresiva:
+        - Inicio: Utensilios cotidianos (tenedores, cucharas, clavos, herraduras).
+        - Medio: Herramientas de campo (hachas, picos) y armas ligeras (dagas, espadas cortas).
+        - Avanzado: Armamento de élite, corazas, coronas y orfebrería con gemas.
+- ESTACIONES INTERACTIVAS DE FABRICACIÓN (ZOOM CON INSTRUCCIONES):
+    1. Estación de Fundición: Seleccionar el mineral del inventario de trabajo, colocarlo en el crisol, atizar el fuelle hasta la temperatura requerida y verter en el molde.
+    2. Estación del Yunque (Golpeo Rítmico): Martillar con precisión y ritmo sobre las zonas marcadas de la pieza al rojo vivo antes de que pierda temperatura.
+    3. Estación de Acabado & Templado: Sumergir en agua fría (sonido *tsss* y nube de vapor), afilar en muela giratoria o engarzar mangos/piedras preciosas.
+- EVALUACIÓN Y COBRO:
+    * El cliente evalúa la calidad (porcentaje de precisión de forja y tiempo de espera).
+    * Otorga monedas, propinas según satisfacción y reputación para el taller.
+
+3.2 FASE 2: MODO TARDE/NOCHE - EXPLORACIÓN, MINA & MISTERIO (17:00 A 00:00)
+- A las 17:00 se baja el portón comercial. El jugador queda libre en perspectiva Top-Down 2D.
+- LA MINA SECRETA (ACCESO TRASERO):
+    * Una puerta andrajosa al fondo del taller conduce a túneles subterráneos.
+    * Mecánica de iluminación: Zonas de oscuridad absoluta donde se deben colocar antorchas para no desorientarse.
+    * El Primer Hito: Al picar la primera roca con el pico inicial, ocurre una cinemática a pantalla completa con zoom donde la piedra se quiebra y revela una veta reluciente de hierro puro.
+    * Progresión por profundidad:
+        - Superficie: Piedra, carbón, cobre, hierro.
+        - Zonas medias: Plata, estaño, oro, obsidiana.
+        - Profundidades extremas: Rubíes, zafiros, esmeraldas y diamantes (para collares y gemología).
+- VIDA SOCIAL & CASAS DE VECINOS (ESTILO POKÉMON):
+    * Caminar por el pueblo, hablar con los habitantes (diálogos costumbristas, rumores y datos sueltos de lore).
+    * Al ganar afinidad con los vecinos, se puede entrar a sus casas. Se aprecian los objetos que el jugador les forjó integrados en sus hogares.
+- TIENDAS DEL PUEBLO:
+    * Tienda de Minerales & Chatarra: Compra/venta de fundentes y carbón.
+    * Bazar General: Solventes, pociones de estamina, antorchas.
+    * Sastrería: Vestimentas y delantales de protección con ventajas pasivas.
+    * Mueblería & Carpintería de Juan (ver Sección 5).
+
+3.3 SISTEMA DE MEDIANOCHE (00:00), SUEÑO & PENALIZACIONES
+El jugador tiene como hora límite las 00:00 (12 de la noche) para retirarse a dormir:
+- CASO 1: SUEÑO VOLUNTARIO (EL BOTÓN DE CAMA 🛏️)
+    * Al entrar al taller/casa, el jugador interactúa con el botón o icono de cama 🛏️ antes de las 00:00.
+    * Cinemática de Timelapse: La cámara realiza un paneo hacia el exterior del pueblo. Se observa el movimiento acelerado de las sombras, la luna cruzando el cielo y nubes de "zzzzz" brotando por la chimenea/tejado de la casa hasta alcanzar las 06:00 AM.
+    * Resultado: El jugador despierta puntualmente con el 100% de su energía restaurada.
+- CASO 2: DESMAYO FORZADO DENTRO DE CASA (00:00)
+    * Si la medianoche sorprende al jugador dentro de su taller/casa sin haber presionado la cama, se desmaya en el suelo por agotamiento.
+    * Resultado: No sufre robos (está a resguardo), pero despierta al día siguiente con penalización de FATIGA (barra de energía reducida al 50%-60%).
+- CASO 3: DESMAYO FORZADO EN EXTERIORES (00:00)
+    * Si las 00:00 sorprenden al jugador en las calles del pueblo, callejones o dentro de la mina, se desploma inconsciente.
+    * Resultado Crítico: ES VÍCTIMA DE UN ROBO nocturno (pierde una porción de sus monedas de oro y/o materiales valiosos recolectados) y despierta en su cama con severa FATIGA (energía disminuida).
+
+4. EL LIBRO BRILLANTE (ÁRBOL TECNOLÓGICO CON MUGRE)
+--------------------------------------------------------------------------------
+- Debajo del mostrador pulsa un libro antiguo con brillo dorado tenue.
+- MECÁNICA DE LIMPIEZA & RECETAS OCULTAS:
+    * El libro está deteriorado, cubierto de hollín, grasa y cera seca que tapan páginas enteras.
+    * A medida que el pueblo prospera, el comerciante del bazar recibe solventes especiales ("¡Mirá lo que me acaba de llegar de los mercaderes foráneos!").
+    * Minijuego de limpieza: Aplicar el solvente con una esponja/paño para disolver la mugre y revelar nuevas recetas de forja de mayor complejidad.
+    * Los aldeanos a veces piden objetos antes de desbloquear la receta limpia, generando intriga sin penalizar reputación.
+- LA ÚLTIMA HOJA:
+    * Al final del libro se halla una página limpia y suelta escrita de puño y letra por el tío: la primera advertencia directa sobre el peligro de los señores feudales.
+
+5. MUEBLERÍA DE JUAN & MECÁNICA DE CONFORT
+--------------------------------------------------------------------------------
+- CONFIANZA VECINAL: Al comprar muebles, cortinas, bancos o floreros en la maderera de Juan, el dependiente dice amablemente: "Dejámelo a mí, más tarde paso y te lo dejo instalado en tu taller; acá nos conocemos todos, vos no te preocupes".
+- INSTALACIÓN AUTOMÁTICA: Los objetos comprados aparecen colocados en la casa/taller al regresar.
+- BUFFS PASIVOS DE CONFORT:
+    * Un banco cómodo o un florero en la sala de espera aumenta significativamente la barra de paciencia de los clientes durante el turno de 06:00 a 17:00.
+    * Cortinas y decoración reducen la penalización por retrasos en los pedidos.
+- IMPACTO SOCIAL CIRCULAR:
+    * El dinero invertido en la mueblería hace que Juan prospere.
+    * Al día siguiente, los aldeanos comentan en la plaza: "¿Viste que Juan donó vigas de roble para restaurar el puente viejo? Qué tipazo". El pueblo progresa orgánicamente.
+
+6. TENSIÓN PROGRESIVA & EL EFECTO "GOOD PIZZA, GREAT PIZZA"
+--------------------------------------------------------------------------------
+- DÍAS 1 AL 4 (CALIDEZ & COZY): Rutina alegre, agradecimiento de los vecinos, satisfacción de forja y limpieza del taller.
+- EL DÍA 5 (EL PUNTO DE INFLEXIÓN):
+    * Entre los clientes cotidianos aparece un emisario silencioso o guardia del Señor Feudal.
+    * Solicita un encargo perturbador: cadenas reforzadas, picos para demolición o adoquines de control, comentando fríamente que "los campesinos han empezado a quejarse de las calles y a reunirse de más".
+    * Deja una advertencia velada sobre hacer demasiado ruido o alterar la paz del pueblo.
+- ATMÓSFERA CRECIENTE: Desde el día 5, el jugador experimenta la sensación permanente de que cada avance despierta sospechas en las sombras.
+
+7. METAPROGRESIÓN VISUAL DEL POBLADO
+--------------------------------------------------------------------------------
+El pueblo evoluciona en 3 etapas visibles:
+1. ETAPA INICIAL (ABANDONO): Calles de barro, casas con maderas podridas, techos rotos, chimeneas apagadas, ausencia de faroles nocturnos.
+2. ETAPA MEDIA (RECONSTRUCCIÓN): Senderos empedrados rústicos, muelle reparado, ventanas limpias, faroles encendidos al anochecer.
+3. ETAPA FINAL (ESPLENDOR): Calles adoquinadas, fuentes de agua cristalina, carteles de madera pulida, ambiente próspero y dinámico.
+
+8. MANDATOS DIRECTIVOS DE INGENIERÍA Y TRABAJO (ANTI-DIVAGACIÓN)
+--------------------------------------------------------------------------------
+8.1 LECTURA OBLIGATORIA PREVIA DE ESTE DOCUMENTO
+- Antes de proponer, planificar o ejecutar cualquier línea de código, escena o refactor, TODO AGENTE Y SUBAGENTE DEBE LEER 'docs/idea.txt'.
+- Este documento es la ley fundacional. Queda terminantemente prohibido divagar, inventar subsistemas ajenos al bucle artesanal o complicar las interfaces con clichés de videojuegos convencionales.
+
+8.2 NOMENCLATURA 100% EN ESPAÑOL EN EL ÁRBOL DE NODOS DE GODOT (.tscn)
+- Todos los nodos dentro del SceneTree de Godot deben estar nombrados obligatoriamente en ESPAÑOL claro, legible y descriptivo (ej. 'EstacionFragua', 'BotonAtizarFuelle', 'ManometroTemperatura', 'HornoFragua', 'EstacionYunqueCenital', 'ParedesColision').
+- Esto garantiza que el desarrollador/usuario comprenda inmediatamente qué es cada elemento en el editor gráfico de Godot y pueda modificarlo sin barreras de idioma ni confusiones técnicas.
+
+8.3 EL MAESTRO HERRERO (/herrero) COMO ÁRBITRO DE REALISMO OBJETIVO
+- Se consagra la figura del Maestro Herrero Tradicional como auditor independiente.
+- Toda mecánica de forja, calentamiento, martillado, corte, templado y pulido debe contrastarse contra la física y el oficio de la herrería real (radiación de color, inercia térmica, conservación de volumen en el yunque, química del choque térmico en agua).
+
+================================================================================
+FIN DEL DOCUMENTO DE ESPECIFICACIÓN MAESTRA
+================================================================================

@@ -1,0 +1,248 @@
+================================================================================
+   PLAN MAESTRO DE ACCION INTEGRAL: YUNQUE & SOMBRA: LA HERENCIA DEL ARTESANO
+================================================================================
+PROYECTO: Yunque & Sombra (Project Anvil)
+MOTOR: Godot Engine 4 (GDScript 4 tipado estricto)
+ARQUITECTURA: Modular, desacoplada por componentes y orientada a eventos.
+GRUPO DE TRABAJO ARTIFICIAL:
+  - Tribunal de Revision (/revision)
+  - Playtester Destructor / QA Adversarial (/playtester)
+  - Diseñador de Niveles & Arquitecto Espacial (/disenador_de_niveles)
+  - Ingeniero de Game Feel & Juice (/game_feel)
+  - Diseñador Grafico & Director de Arte (/disenador_grafico)
+  - Sonidista & Diseñador Acustico (/sonidista)
+  - Secretario Cronista Imperial (/secretario)
+================================================================================
+
+--------------------------------------------------------------------------------
+INDICE DE FASES DE DESARROLLO
+--------------------------------------------------------------------------------
+1. FASE 0: FUNDACION TECNICA, INFRAESTRUCTURA & SINGLETONS
+2. FASE 1: PROTOTIPO FUNCIONAL GREYBOX & GAME FEEL (TESTING TEMPRANO)
+3. FASE 2: BUCLE COMERCIAL DIURNO - EL MOSTRADOR DE FORJA TACTIL (06:00 - 17:00)
+4. FASE 3: BUCLE NOCTURNO - EXPLORACION TOP-DOWN & MINA SUBTERRANEA (17:00 - 00:00)
+5. FASE 4: METASISTEMAS, ECONOMIA, MUEBLERIA & CODICE MANCHADO
+6. FASE 5: VESTUARIO GRAFICO, ILUMINACION & DIRECCION DE ARTE (/disenador_grafico)
+7. FASE 6: PAISAJE SONORO, FOLEY & MUSICA ADAPTATIVA (/sonidista)
+8. FASE 7: NARRATIVA, TENSION SOCIOPOLITICA & CLIMAX (EL DESTIERRO)
+9. FASE 8: QA DESTRUCTIVO, HARDENING, OPTIMIZACION & RELEASE (/playtester)
+
+================================================================================
+FASE 0: FUNDACION TECNICA, INFRAESTRUCTURA & SINGLETONS
+================================================================================
+OBJETIVO:
+  Crear el esqueleto base del proyecto Godot 4, mapear controles y levantar
+  los gestores globales desacoplados (Autoloads).
+
+TAREAS:
+  0.1 Configurar 'project.godot':
+      - Resolucion base: 1280x720 (Aspect: keep_height / canvas_items).
+      - Mapeo de Input Map:
+          * 'move_up', 'move_down', 'move_left', 'move_right' (WASD + Flechas).
+          * 'interact' (Tecla E / Espacio / Boton de control).
+          * 'action' (Click Izquierdo / Espacio).
+          * 'cancel_escape' (Escape / Tecla Q).
+      - Physics Layers:
+          * Layer 1: Mundo / Muros solidos.
+          * Layer 2: Jugador.
+          * Layer 3: Interacciones / NPCs / Estaciones.
+          * Layer 4: Triggers / Zonas de transicion / Cama.
+          * Layer 5: Death Zones / Limites de mapa.
+  0.2 Singleton 'GameManager.gd' (Autoload):
+      - Maquina de estados global:
+          * STATE_MENU, STATE_OVERWORLD (Top-Down), STATE_WORKSHOP (Primer plano),
+            STATE_MINING (Mina subterránea), STATE_PAUSE, STATE_CINEMATIC.
+      - Eventos globales y control de transicion de escenas.
+  0.3 Singleton 'TimeManager.gd' (Autoload):
+      - Reloj continuo de 24 horas (06:00 apertura, 17:00 cierre comercial, 00:00 limite).
+      - Señales de cambio de hora, campana de cierre y cambio de fase diurna/nocturna.
+      - Metodos para acelerar el tiempo al dormir (timelapse).
+  0.4 Singleton 'InventoryManager.gd' (Autoload):
+      - Registro de minerales, carbón, lingotes forjados, herramientas y dinero.
+
+ENTREGABLE DE FASE:
+  Proyecto Godot 4 funcional que compila e inicializa sin advertencias ni errores.
+
+================================================================================
+FASE 1: PROTOTIPO FUNCIONAL GREYBOX & GAME FEEL (TESTING TEMPRANO)
+================================================================================
+OBJETIVO:
+  Tener un juego completamente jugable y divertido usando geometria basica
+  (bloques de color/rectangulos), validando que los controles respondan de
+  forma agil y deliciosa antes de invertir tiempo en graficos.
+
+TAREAS:
+  1.1 Controlador del Jugador ('Player.tscn' y 'Player.gd'):
+      - Tipo: CharacterBody2D con colision circular/capsula.
+      - Movimiento Top-Down 8 direcciones.
+      - Algoritmos de /game_feel:
+          * Aceleracion y friccion con decaimiento exponencial independiente de FPS.
+          * Turn-Around Boost: frenado instantaneo al invertir direccion (sin patinaje).
+          * Camera2D anclada con suavizado elastico (position_smoothing_enabled).
+          * Indicador/Raycast de orientacion para interactuar con estaciones.
+  1.2 Escena de Nivel Greybox ('GreyboxTown.tscn') por /disenador_de_niveles:
+      - Geometria basica del Taller (paredes, mostrador, yunque, tina, cama).
+      - Salida hacia el patio exterior y entrada al pozo minero.
+      - Verificacion de colisiones estancas para evitar atascos.
+  1.3 Minijuego Funcional de Forja ('MiniForge.tscn'):
+      - Interfaz funcional en primer plano al interactuar con el yunque.
+      - Calentamiento: barra con zona optima de temperatura.
+      - Martilleo: aguja oscilante rítmica; pulsar en verde otorga calidad perfecta.
+      - Templado: tina de agua con temporizador de enfriamiento.
+      - Resultado: genera un item de forja con calificacion (% de maestria).
+  1.4 HUD Funcional ('MainHUD.tscn'):
+      - Reloj de 24 horas y barra de estamina en la franja inferior.
+      - Mensajes de interaccion contextual ('[E] Forjar', '[E] Dormir').
+
+CRITERIO DE EXITO:
+  Poder abrir Godot, mover al personaje con placer tactil, caminar hacia el yunque,
+  forjar un clavo/herradura, ver pasar la hora y dormir en la cama para pasar al dia 2.
+
+================================================================================
+FASE 2: BUCLE COMERCIAL DIURNO - EL MOSTRADOR DE FORJA TACTIL (06:00 - 17:00)
+================================================================================
+OBJETIVO:
+  Implementar la rutina comercial estilo Papa's / Potion Punch durante el dia.
+
+TAREAS:
+  2.1 Porton Comercial Corredizo:
+      - A las 06:00 el porton sube con sonido de poleas.
+      - Bloqueo de salida al pueblo; el foco se concentra en el mostrador.
+  2.2 Sistema de Clientes & Paciencia ('CustomerSpawner'):
+      - Generacion procedural o por tabla de clientes con cola de espera.
+      - Bocadillos de pedido (item requerido, material y tiempo limite).
+      - Barra de paciencia decreciente con penalizacion en propinas si expira.
+  2.3 Catalogo Progresivo de Recetas de Forja:
+      - Nivel 1: Clavos, bisagras, herraduras, tenedores.
+      - Nivel 2: Hachas de leñador, picos de minero, dagas.
+      - Nivel 3: Espadas largas, corazas, coronas y orfebreria con gemas.
+  2.4 Evaluacion y Cobro:
+      - Calculo de satisfaccion: Precision de golpe rítmico + Velocidad de entrega.
+      - Ganancia de Monedas, Propinas y Reputacion del Taller.
+  2.5 Cierre Comercial (17:00):
+      - Campana de fin de turno, bajada del porton y resumen de ganancias del dia.
+
+================================================================================
+FASE 3: BUCLE NOCTURNO - EXPLORACION TOP-DOWN & MINA SUBTERRANEA (17:00 - 00:00)
+================================================================================
+OBJETIVO:
+  Permitir al jugador salir del taller al atardecer, explorar el pueblo y descender
+  a las minas para recolectar minerales e investigar el misterio.
+
+TAREAS:
+  3.1 Mina Subterranea ('MinaSubterranea.tscn') por /disenador_de_niveles:
+      - Navegacion Top-Down a oscuras utilizando 'PointLight2D' y faroles/antorchas.
+      - Vetas de mineral interactuables: piedra, carbon, cobre, hierro, plata, oro.
+      - Mecanica de picado: 3 a 5 golpes con animacion de sacudida (Trauma Shake).
+      - Hito del Primer Hierro: cinemática de revelacion al quebrar la primera veta.
+  3.2 Vida de Pueblo Nocturno:
+      - Habitantes transitando las calles y taberna.
+      - Sistema de dialogo interactivo estilo RPG clasico.
+      - Tiendas del pueblo abiertas de noche:
+          * Bazar General (antorchas, pociones de estamina).
+          * Chatarra & Minerales (fundentes, carbon adicional).
+          * Muebleria de Juan (carpinteria comunitaria).
+  3.3 Sistema de Medianoche (00:00) & Sueño:
+      - Caso A (Exitoso): Volver antes de las 00:00, tocar cama, timelapse y 100% estamina.
+      - Caso B (Desmayo): A las 00:00 el personaje cae inconsciente; amanece con 50%
+        de estamina y cobro de honorarios medicos o perdida de minerales.
+
+================================================================================
+FASE 4: METASISTEMAS, ECONOMIA, MUEBLERIA & CODICE MANCHADO
+================================================================================
+OBJETIVO:
+  Proveer sistemas profundos de progresion y retencion a largo plazo.
+
+TAREAS:
+  4.1 Muebleria Comunitaria de Juan:
+      - Catalogo de muebles comprables (estantes de secado, fuelle mejorado, taburete).
+      - Instalacion nocturna: Juan los coloca mientras duermes; amanecen activos.
+      - Ventajas pasivas: +15% de velocidad de enfriado, mayor paciencia de clientes.
+  4.2 El Codice Metalurgico Manchado:
+      - Libro tech-tree con recetas ocultas bajo mugre y tizne.
+      - Minijuego de limpieza táctil con esponja y solventes para descifrar diagramas.
+  4.3 Metaprogresion Visual del Pueblo:
+      - Estado 1: Barro, tablas rotas y desolacion inicial.
+      - Estado 2: Faroles encendidos, tejados reparados y herramientas nuevas.
+      - Estado 3: Calles adoquinadas, estandartes y prosperidad artesanal.
+
+================================================================================
+FASE 5: VESTUARIO GRAFICO, ILUMINACION & DIRECCION DE ARTE (/disenador_grafico)
+================================================================================
+OBJETIVO:
+  Reemplazar el greybox con la direccion de arte de autor, respetando
+  la colorimetria, el contraste WCAG 2.1 AAA y la estetica medieval rustica.
+
+TAREAS:
+  5.1 Paleta de Autor 60-30-10 & Iluminacion 2D:
+      - Fondo dominante 60%: Madera añeja, barro, piedra caliza (#211a16 / oklch oscuro).
+      - Soporte estructural 30%: Bordo noble, cuero curtido, hierro templado (#6e1f2b / #45121b).
+      - Acentos focales 10%: Oro fundido, rescoldos de forja, marfil (#b59a6a / #f2e6cc).
+  5.2 Sprites y Tilesets 2D:
+      - Personaje artesano y aldeanos con animaciones fluidas (Walk, Forge, Idle).
+      - Estaciones de forja detalladas en primer plano (crisol incandescente, yunque, vapor).
+  5.3 HUD & Tipografia Anti-IA:
+      - Barra inferior solida sin transparencias clónicas ni esquinas redondeadas exageradas.
+      - Tipografia legible de alta definicion con relacion de contraste > 7:1.
+
+================================================================================
+FASE 6: PAISAJE SONORO, FOLEY & MUSICA ADAPTATIVA (/sonidista)
+================================================================================
+OBJETIVO:
+  Diseñar una experiencia acustica organica, calida y contundente sin fatiga auditiva.
+
+TAREAS:
+  6.1 Arquitectura de Buses de Audio:
+      - Buses estandar: Master -> Music, SFX, Ambient, UI.
+      - Atenuacion automatica (Ducking): La musica baja -4 dB durante el martilleo.
+  6.2 Efectos de Sonido Táctiles (Juice Acustico):
+      - Golpe de yunque: Impacto metalico pesado con variacion aleatoria de pitch (+/- 7%).
+      - Fuelle: Respiracion de viento sibilante y crepitar de brasas ardientes.
+      - Tina de templado: Siseo contundente de vapor ('tsss').
+      - Mina: Eco de picado y crujido de desprendimiento de roca.
+  6.3 Pistas Musicales Tematicas:
+      - Dia: Laud rustico, flautas de madera y ritmo alegre de labor.
+      - Noche: Cuerdas tenues, grillos, viento frio y sensacion de investigacion.
+
+================================================================================
+FASE 7: NARRATIVA, TENSION SOCIOPOLITICA & CLIMAX (EL DESTIERRO)
+================================================================================
+OBJETIVO:
+  Tejer el suspenso y el misterio politico hasta el desenlace de la historia.
+
+TAREAS:
+  7.1 Hojas del Diario Perdido del Tio:
+      - Descubrimiento de notas arrugadas al reparar vigas, estantes o picar vetas.
+      - Reconstruccion cronologica de la advertencia: el progreso condeno al tio.
+  7.2 Los Pedidos de la Guardia Feudal:
+      - A partir del Dia 4: Guardias con armadura pesada exigen armas y tributos elevados.
+      - Tension progresiva en los dialogos de los clientes habituales.
+  7.3 El Climax & Cinemática Final:
+      - Al alcanzar el esplendor del pueblo, una noche la musica cesa por completo.
+      - Emboscada de emisarios feudales: sentencia final por despertar al pueblo.
+      - Destierro: Carruaje en tormenta, despojo de herramientas y arrojo en un
+        pueblo aun mas derruido. Creditos finales.
+
+================================================================================
+FASE 8: QA DESTRUCTIVO, HARDENING, OPTIMIZACION & RELEASE (/playtester)
+================================================================================
+OBJETIVO:
+  Blindar la estabilidad y entregar una version comercial pulida.
+
+TAREAS:
+  8.1 Bateria de Pruebas Destructivas (/playtester):
+      - Corner clipping en todas las esquinas y colisiones de paredes.
+      - Entradas simultaneas contradictorias (SOCD: pulsar Izquierda + Derecha al mismo tiempo).
+      - Spam masivo de interaccion a 60 Hz sobre yunques, portones y puertas.
+      - Pruebas de desmayo y transicion forzada de medianoche con inventario lleno.
+  8.2 Auditoria Integral del Tribunal (/revision):
+      - Verificacion de memoria y recolector de basura (sin memory leaks).
+      - Codigo limpio: principios SOLID, ausencia de codigo espagueti en Godot 4.
+  8.3 Empaquetado y Exportacion:
+      - Compilacion de Release para Windows (x86_64) con assets empaquetados en .pck.
+
+================================================================================
+REGISTRO Y SEGUIMIENTO:
+  Cada paso ejecutado sera auditado por el Tribunal de Revision (/revision)
+  y asentado de forma inmutable en 'CRONICA_DE_CAMPO.md' por el Secretario (/secretario).
+================================================================================

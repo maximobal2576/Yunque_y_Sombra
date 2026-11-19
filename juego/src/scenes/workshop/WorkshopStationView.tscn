@@ -1,0 +1,898 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/workshop/WorkshopStationView.gd" id="1_station_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/workshop/CounterShopView.tscn" id="2_counter_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/workshop/AnvilTopDownStation.tscn" id="3_anvil_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/workshop/ManualCutStation.tscn" id="4_cut_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/workshop/QuenchStation.tscn" id="5_quench_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/workshop/PolishStation.tscn" id="6_polish_scene"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/workshop_room_bg.png" id="7_room_bg_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/forge_hearth.png" id="8_hearth_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/bellows_tool.png" id="9_bellows_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/thermal_gauge.png" id="10_gauge_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/gauge_needle.png" id="11_needle_tex"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.0705882, 0.054902, 0.0470588, 0.96)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.129412, 0.101961, 0.086275, 1)
+border_width_bottom = 3
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_btn"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.211765, 0.160784, 0.137255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.270588, 0.070588, 0.105882, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.709804, 0.603922, 0.415686, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sub_btn"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.270588, 0.070588, 0.105882, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.709804, 0.603922, 0.415686, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_btn_hover"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.847059, 0.772549, 0.647059, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.129412, 0.101961, 0.086275, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_btn"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.709804, 0.603922, 0.415686, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ticket"]
+bg_color = Color(0.94902, 0.901961, 0.8, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 18
+
+[node name="VistaEstacionesTaller" type="CanvasLayer"]
+layer = 12
+visible = false
+script = ExtResource("1_station_script")
+
+[node name="PanelPrincipal" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="Cabecera" type="Panel" parent="PanelPrincipal"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="ContenedorPestanas" type="HBoxContainer" parent="PanelPrincipal/Cabecera"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -20.0
+offset_right = 1060.0
+offset_bottom = 20.0
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="BotonPestanaMostrador" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🛎️ 1. MOSTRADOR"
+
+[node name="BotonPestanaFragua" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🔥 2. FRAGUA"
+
+[node name="BotonPestanaYunque" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🔨 3. YUNQUE CENITAL"
+
+[node name="BotonPestanaCorte" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "✂️ 4. CORTE MANUAL"
+
+[node name="BotonPestanaTina" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🌊 5. TINA DE TEMPLADO"
+
+[node name="BotonPestanaPulido" type="Button" parent="PanelPrincipal/Cabecera/ContenedorPestanas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "✨ 6. PULIDO"
+
+[node name="BotonSalirPasillo" type="Button" parent="PanelPrincipal/Cabecera"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -18.0
+offset_right = -16.0
+offset_bottom = 18.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
+text = "🚪 Salir al Pasillo [ESC]"
+
+[node name="AreaContenido" type="Control" parent="PanelPrincipal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FondoTaller" type="TextureRect" parent="PanelPrincipal/AreaContenido"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_room_bg_tex")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="VistaMostrador" parent="PanelPrincipal/AreaContenido" instance=ExtResource("2_counter_scene")]
+layout_mode = 1
+
+[node name="EstacionFragua" type="Control" parent="PanelPrincipal/AreaContenido"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContenedorBarrilesMetales" type="VBoxContainer" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 26.0
+offset_top = -225.0
+offset_right = 236.0
+offset_bottom = 205.0
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="TituloBarriles" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "🛢️ BARRILES DE LINGOTES
+(Arrastra un lingote al horno)"
+horizontal_alignment = 1
+
+[node name="BarrilHierroDulce" type="Panel" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales"]
+custom_minimum_size = Vector2(205, 114)
+layout_mode = 2
+mouse_default_cursor_shape = 6
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="ArteBarril" type="Node2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce"]
+position = Vector2(44, 62)
+
+[node name="CuerpoMadera" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+color = Color(0.34, 0.21, 0.13, 1)
+polygon = PackedVector2Array(-24, -24, 24, -24, 29, 0, 24, 34, -24, 34, -29, 0)
+
+[node name="AroSuperior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+offset_left = -27.0
+offset_top = -14.0
+offset_right = 27.0
+offset_bottom = -8.0
+mouse_filter = 2
+color = Color(0.2, 0.22, 0.25, 1)
+
+[node name="AroInferior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+offset_left = -27.0
+offset_top = 14.0
+offset_right = 27.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.2, 0.22, 0.25, 1)
+
+[node name="BocaBarril" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+color = Color(0.11, 0.08, 0.06, 1)
+polygon = PackedVector2Array(-24, -24, 0, -30, 24, -24, 0, -18)
+
+[node name="LingoteAsomando1" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+color = Color(0.58, 0.64, 0.7, 1)
+polygon = PackedVector2Array(-16, -22, -8, -42, 0, -40, -6, -20)
+
+[node name="LingoteAsomando2" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce/ArteBarril"]
+color = Color(0.68, 0.74, 0.8, 1)
+polygon = PackedVector2Array(-2, -21, 6, -44, 15, -40, 8, -20)
+
+[node name="EtiquetaBarril" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilHierroDulce"]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 14.0
+offset_right = 198.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "HIERRO DULCE
+Dúctil y noble.
+Ideal: Clavos y herrajes."
+autowrap_mode = 2
+
+[node name="BarrilAceroCarbono" type="Panel" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales"]
+custom_minimum_size = Vector2(205, 114)
+layout_mode = 2
+mouse_default_cursor_shape = 6
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="ArteBarril" type="Node2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono"]
+position = Vector2(44, 62)
+
+[node name="CuerpoMadera" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+color = Color(0.29, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-24, -24, 24, -24, 29, 0, 24, 34, -24, 34, -29, 0)
+
+[node name="AroSuperior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+offset_left = -27.0
+offset_top = -14.0
+offset_right = 27.0
+offset_bottom = -8.0
+mouse_filter = 2
+color = Color(0.45, 0.36, 0.22, 1)
+
+[node name="AroInferior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+offset_left = -27.0
+offset_top = 14.0
+offset_right = 27.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.45, 0.36, 0.22, 1)
+
+[node name="BocaBarril" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+color = Color(0.11, 0.08, 0.06, 1)
+polygon = PackedVector2Array(-24, -24, 0, -30, 24, -24, 0, -18)
+
+[node name="LingoteAsomando1" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+color = Color(0.36, 0.4, 0.46, 1)
+polygon = PackedVector2Array(-16, -22, -8, -42, 0, -40, -6, -20)
+
+[node name="LingoteAsomando2" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono/ArteBarril"]
+color = Color(0.44, 0.49, 0.55, 1)
+polygon = PackedVector2Array(-2, -21, 6, -44, 15, -40, 8, -20)
+
+[node name="EtiquetaBarril" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilAceroCarbono"]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 14.0
+offset_right = 198.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "ACERO AL CARBONO
+Alta dureza.
+Ideal: Pernos y hojas."
+autowrap_mode = 2
+
+[node name="BarrilBronceCobre" type="Panel" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales"]
+custom_minimum_size = Vector2(205, 114)
+layout_mode = 2
+mouse_default_cursor_shape = 6
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="ArteBarril" type="Node2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre"]
+position = Vector2(44, 62)
+
+[node name="CuerpoMadera" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+color = Color(0.38, 0.22, 0.14, 1)
+polygon = PackedVector2Array(-24, -24, 24, -24, 29, 0, 24, 34, -24, 34, -29, 0)
+
+[node name="AroSuperior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+offset_left = -27.0
+offset_top = -14.0
+offset_right = 27.0
+offset_bottom = -8.0
+mouse_filter = 2
+color = Color(0.68, 0.42, 0.24, 1)
+
+[node name="AroInferior" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+offset_left = -27.0
+offset_top = 14.0
+offset_right = 27.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.68, 0.42, 0.24, 1)
+
+[node name="BocaBarril" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+color = Color(0.11, 0.08, 0.06, 1)
+polygon = PackedVector2Array(-24, -24, 0, -30, 24, -24, 0, -18)
+
+[node name="LingoteAsomando1" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+color = Color(0.78, 0.48, 0.28, 1)
+polygon = PackedVector2Array(-16, -22, -8, -42, 0, -40, -6, -20)
+
+[node name="LingoteAsomando2" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre/ArteBarril"]
+color = Color(0.86, 0.56, 0.34, 1)
+polygon = PackedVector2Array(-2, -21, 6, -44, 15, -40, 8, -20)
+
+[node name="EtiquetaBarril" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ContenedorBarrilesMetales/BarrilBronceCobre"]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 14.0
+offset_right = 198.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "BRONCE / COBRE
+Maleable y cálido.
+Ideal: Orfebrería."
+autowrap_mode = 2
+
+[node name="HornoFragua" type="TextureRect" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -220.0
+offset_right = 180.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_hearth_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResplandorFuego" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -105.0
+offset_top = 8.0
+offset_right = 105.0
+offset_bottom = 86.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.960784, 0.45098, 0.05098, 0.32)
+
+[node name="LingoteFragua" type="ColorRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = 35.0
+offset_right = 70.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="InteriorBocaHorno" type="Node2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua"]
+position = Vector2(270, 232)
+
+[node name="CavidadOscuraHogar" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+color = Color(0.08, 0.04, 0.03, 0.92)
+polygon = PackedVector2Array(-92, 18, -82, -26, -42, -48, 0, -54, 42, -48, 82, -26, 92, 18, 76, 26, -76, 26)
+
+[node name="LechoBrasasFondo" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+color = Color(0.78, 0.22, 0.06, 0.9)
+polygon = PackedVector2Array(-78, 12, -55, -8, -18, -14, 24, -12, 62, -6, 80, 12, 68, 22, -68, 22)
+
+[node name="LingoteEnBrasas" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+position = Vector2(0, 2)
+rotation = -0.14
+color = Color(0.45, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-58, -8, 52, -12, 62, -2, 54, 10, -56, 12, -64, 2)
+
+[node name="CaraSuperiorLingote" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno/LingoteEnBrasas"]
+color = Color(0.65, 0.7, 0.75, 0.55)
+polygon = PackedVector2Array(-54, -7, 48, -10, 54, -3, -52, 0)
+
+[node name="LlamasInternasHogar" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+color = Color(1, 0.58, 0.12, 0.42)
+polygon = PackedVector2Array(-62, 14, -44, -18, -24, 4, -4, -26, 16, 2, 38, -20, 58, 14)
+
+[node name="BrasasDelanterasOclusion" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+color = Color(0.22, 0.08, 0.05, 0.96)
+polygon = PackedVector2Array(-86, 16, -64, 3, -38, 10, -14, 1, 14, 9, 40, 2, 66, 9, 86, 16, 78, 28, -78, 28)
+
+[node name="AscuasVivasDelanteras" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+color = Color(0.96, 0.38, 0.08, 0.85)
+polygon = PackedVector2Array(-68, 16, -46, 8, -24, 15, -6, 6, 18, 14, 42, 7, 64, 16, 52, 22, -54, 22)
+
+[node name="ArcoBocaHorno" type="Line2D" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+points = PackedVector2Array(-92, 18, -82, -26, -42, -48, 0, -54, 42, -48, 82, -26, 92, 18)
+width = 8.0
+default_color = Color(0.18, 0.11, 0.08, 0.92)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="IndicadorBocaHorno" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/HornoFragua/InteriorBocaHorno"]
+offset_left = -125.0
+offset_top = -34.0
+offset_right = 125.0
+offset_bottom = -8.0
+theme_override_colors/font_color = Color(1, 0.88, 0.52, 0.95)
+theme_override_font_sizes/font_size = 12
+text = "🔥 Suelta o haz clic en un barril para meter el lingote"
+horizontal_alignment = 1
+
+[node name="LingoteArrastrado" type="Polygon2D" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+visible = false
+z_index = 20
+color = Color(0.62, 0.68, 0.74, 1)
+polygon = PackedVector2Array(-48, -10, 48, -10, 54, 0, 48, 10, -48, 10, -54, 0)
+
+[node name="ManometroTemperatura" type="Control" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 130.0
+offset_top = -220.0
+offset_right = 350.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FondoManometro" type="TextureRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ManometroTemperatura"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_gauge_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PivoteAguja" type="Control" parent="PanelPrincipal/AreaContenido/EstacionFragua/ManometroTemperatura"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -2.0944
+
+[node name="AgujaManometro" type="TextureRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/ManometroTemperatura/PivoteAguja"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -75.0
+offset_right = 12.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("11_needle_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EtiquetaTemperatura" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ManometroTemperatura"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 8.0
+offset_bottom = 34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.960784, 0.619608, 0.0431373, 1)
+theme_override_font_sizes/font_size = 18
+text = "20°C"
+horizontal_alignment = 1
+
+[node name="EtiquetaZonaOptima" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/ManometroTemperatura"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 34.0
+offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.847059, 0.772549, 0.647059, 1)
+theme_override_font_sizes/font_size = 11
+text = "Zona Óptima: 1000°C - 1150°C"
+horizontal_alignment = 1
+
+[node name="BotonAtizarFuelle" type="Button" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 165.0
+offset_top = 65.0
+offset_right = 315.0
+offset_bottom = 215.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_card")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
+
+[node name="IconoFuelle" type="TextureRect" parent="PanelPrincipal/AreaContenido/EstacionFragua/BotonAtizarFuelle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -65.0
+offset_right = 60.0
+offset_bottom = 45.0
+pivot_offset = Vector2(60, 55)
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("9_bellows_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EtiquetaFuelle" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua/BotonAtizarFuelle"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "💨 ATIZAR FUELLE [ESPACIO]"
+horizontal_alignment = 1
+
+[node name="BotonLlevarAlYunque" type="Button" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = 175.0
+offset_right = 80.0
+offset_bottom = 225.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
+text = "➡️ LLEVAR AL YUNQUE CENITAL"
+
+[node name="EtiquetaEstadoFragua" type="Label" parent="PanelPrincipal/AreaContenido/EstacionFragua"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -55.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.847059, 0.772549, 0.647059, 1)
+theme_override_font_sizes/font_size = 13
+text = "Atiza el fuelle para avivar las brasas hasta alcanzar la zona de caldeo (1000°C - 1150°C)."
+horizontal_alignment = 1
+
+[node name="EstacionYunqueCenital" parent="PanelPrincipal/AreaContenido" instance=ExtResource("3_anvil_scene")]
+visible = false
+layout_mode = 1
+
+[node name="EstacionCorteManual" parent="PanelPrincipal/AreaContenido" instance=ExtResource("4_cut_scene")]
+visible = false
+layout_mode = 1
+
+[node name="EstacionTinaTemplado" parent="PanelPrincipal/AreaContenido" instance=ExtResource("5_quench_scene")]
+visible = false
+layout_mode = 1
+
+[node name="EstacionPulido" parent="PanelPrincipal/AreaContenido" instance=ExtResource("6_polish_scene")]
+visible = false
+layout_mode = 1
+
+[node name="CapaTicketFinal" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FondoOscuro" type="ColorRect" parent="CapaTicketFinal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.04, 0.03, 0.96)
+
+[node name="PanelTicket" type="Panel" parent="CapaTicketFinal"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -260.0
+offset_right = 310.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ticket")
+
+[node name="ContenidoTicket" type="VBoxContainer" parent="CapaTicketFinal/PanelTicket"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 20.0
+offset_right = -28.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="CabeceraTicket" type="VBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="TituloTicket" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/CabeceraTicket"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.188235, 0.0313725, 0.0627451, 1)
+theme_override_font_sizes/font_size = 18
+text = "📜 TICKET DE INSPECCIÓN ARTESANAL"
+horizontal_alignment = 1
+
+[node name="SubtituloTicket" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/CabeceraTicket"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "Evaluación Estricta de las 5 Etapas de Taller"
+horizontal_alignment = 1
+
+[node name="Separador1" type="HSeparator" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+
+[node name="GrillaPuntajes" type="VBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="PuntajeFragua" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+text = "🔥 1. Temperatura Fragua: 95%"
+
+[node name="PuntajeYunque" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+text = "🔨 2. Moldeado Yunque Cenital: 90%"
+
+[node name="PuntajeCorte" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+text = "✂️ 3. Corte Manual de Rebabas: 92%"
+
+[node name="PuntajeTina" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+text = "🌊 4. Inmersión en Tina Fría: 100%"
+
+[node name="PuntajePulido" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/GrillaPuntajes"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+text = "✨ 5. Pulido & Desbaste: 94%"
+
+[node name="Separador2" type="HSeparator" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+
+[node name="EtiquetaCalidadTotal" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
+theme_override_font_sizes/font_size = 19
+text = "CALIDAD GENERAL: 94%"
+horizontal_alignment = 1
+
+[node name="EtiquetaRango" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 1)
+theme_override_font_sizes/font_size = 13
+text = "⭐⭐⭐ ¡OBRA MAESTRA DEL ARTESANO! ⭐⭐⭐"
+horizontal_alignment = 1
+
+[node name="EtiquetaRecompensa" type="Label" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 14
+text = "💰 Paga Estimada: +24 Monedas de Oro"
+horizontal_alignment = 1
+
+[node name="AccionesTicket" type="VBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/separation = 8
+
+[node name="BotonEntregarMostrador" type="Button" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket"]
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_action_btn_hover")
+text = "📦 Llevar al Mostrador y Entregar"
+
+[node name="ContenedorSecundario" type="HBoxContainer" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BotonForjarDeNuevo" type="Button" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket/ContenedorSecundario"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🔨 Forjar Otra Pieza"
+
+[node name="BotonSalirTicket" type="Button" parent="CapaTicketFinal/PanelTicket/ContenidoTicket/AccionesTicket/ContenedorSecundario"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_sub_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_btn_hover")
+text = "🚪 Salir al Pasillo"

@@ -1,0 +1,118 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/player/Player.gd" id="1_player_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 14.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(32, 32)
+
+[node name="Jugador" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player_script")
+
+[node name="ColisionCuerpo" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="RaizVisual" type="Node2D" parent="."]
+
+[node name="SombraPies" type="Polygon2D" parent="RaizVisual"]
+color = Color(0.08, 0.06, 0.05, 0.52)
+polygon = PackedVector2Array(-13, 8, -8, 4, 8, 4, 13, 8, 10, 14, -10, 14)
+
+[node name="BotaIzquierda" type="Polygon2D" parent="RaizVisual"]
+position = Vector2(-5, 9)
+color = Color(0.22, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -3, 4, -3, 5, 4, -4, 4)
+
+[node name="BotaDerecha" type="Polygon2D" parent="RaizVisual"]
+position = Vector2(5, 9)
+color = Color(0.22, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -3, 4, -3, 4, 4, -5, 4)
+
+[node name="TorsoTunica" type="Polygon2D" parent="RaizVisual"]
+color = Color(0.75, 0.65, 0.46, 1)
+polygon = PackedVector2Array(-11, -12, 11, -12, 13, 7, -13, 7)
+
+[node name="DelantalCuero" type="Polygon2D" parent="RaizVisual"]
+color = Color(0.431373, 0.121569, 0.168627, 1)
+polygon = PackedVector2Array(-8, -10, 8, -10, 10, 9, -10, 9)
+
+[node name="CorreasDelantal" type="Line2D" parent="RaizVisual"]
+points = PackedVector2Array(-7, -12, 0, -4, 7, -12)
+width = 2.0
+default_color = Color(0.28, 0.16, 0.11, 1)
+
+[node name="CinturonHerramientas" type="ColorRect" parent="RaizVisual"]
+offset_left = -11.0
+offset_top = 0.0
+offset_right = 11.0
+offset_bottom = 3.0
+color = Color(0.24, 0.15, 0.1, 1)
+
+[node name="HebillaLaton" type="ColorRect" parent="RaizVisual"]
+offset_left = -2.0
+offset_top = -1.0
+offset_right = 2.0
+offset_bottom = 4.0
+color = Color(0.85, 0.72, 0.36, 1)
+
+[node name="BrazoIzquierdo" type="Polygon2D" parent="RaizVisual"]
+position = Vector2(-12, -5)
+color = Color(0.71, 0.6, 0.42, 1)
+polygon = PackedVector2Array(-3, -6, 3, -6, 3, 7, -3, 7)
+
+[node name="ManoIzquierda" type="Polygon2D" parent="RaizVisual/BrazoIzquierdo"]
+position = Vector2(0, 8)
+color = Color(0.92, 0.8, 0.68, 1)
+polygon = PackedVector2Array(-3, -2, 3, -2, 3, 2, -3, 2)
+
+[node name="BrazoDerecho" type="Polygon2D" parent="RaizVisual"]
+position = Vector2(12, -5)
+color = Color(0.71, 0.6, 0.42, 1)
+polygon = PackedVector2Array(-3, -6, 3, -6, 3, 7, -3, 7)
+
+[node name="ManoDerecha" type="Polygon2D" parent="RaizVisual/BrazoDerecho"]
+position = Vector2(0, 8)
+color = Color(0.92, 0.8, 0.68, 1)
+polygon = PackedVector2Array(-3, -2, 3, -2, 3, 2, -3, 2)
+
+[node name="CabezaArtesano" type="Polygon2D" parent="RaizVisual"]
+position = Vector2(0, -20)
+color = Color(0.94, 0.84, 0.72, 1)
+polygon = PackedVector2Array(-8, -7, -5, -10, 5, -10, 8, -7, 9, 3, 6, 8, -6, 8, -9, 3)
+
+[node name="CabelloArtesano" type="Polygon2D" parent="RaizVisual/CabezaArtesano"]
+color = Color(0.26, 0.16, 0.11, 1)
+polygon = PackedVector2Array(-9, -4, -7, -11, 0, -12, 7, -11, 9, -4, 7, -1, 4, -5, -4, -5, -7, -1)
+
+[node name="RostroMirada" type="Node2D" parent="RaizVisual/CabezaArtesano"]
+
+[node name="OjoIzquierdo" type="ColorRect" parent="RaizVisual/CabezaArtesano/RostroMirada"]
+offset_left = -5.0
+offset_top = -1.0
+offset_right = -2.0
+offset_bottom = 2.0
+color = Color(0.14, 0.1, 0.08, 1)
+
+[node name="OjoDerecho" type="ColorRect" parent="RaizVisual/CabezaArtesano/RostroMirada"]
+offset_left = 2.0
+offset_top = -1.0
+offset_right = 5.0
+offset_bottom = 2.0
+color = Color(0.14, 0.1, 0.08, 1)
+
+[node name="DetectorInteraccion" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="DetectorInteraccion"]
+position = Vector2(0, 24)
+shape = SubResource("RectangleShape2D_interact")
+
+[node name="CamaraJugador" type="Camera2D" parent="."]
+zoom = Vector2(1.5, 1.5)
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0

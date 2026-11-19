@@ -1,0 +1,32 @@
+{
+  "assistant_name": "Jimin",
+  "user_name": "Máximo",
+  "active_provider": "gemini",
+  "active_model": "flash",
+  "require_wakeword": true,
+  "wakewords": ["jimin", "jimín", "yimin", "gimin", "ximin"],
+  "models": {
+    "flash": {
+      "model_id": "gemini-flash-lite-latest",
+      "name": "Google Gemini Flash (Ultra Rápido y Eficaz)",
+      "description": "Modelo oficial de Google para conversación fluida, ágil e interactiva de Jimin."
+    },
+    "deep": {
+      "model_id": "gemini-pro-latest",
+      "name": "Google Gemini Pro (Razonamiento y Código)",
+      "description": "Modelo insignia de Google para arquitectura, lógica compleja y debugging."
+    },
+    "vision": {
+      "model_id": "gemini-flash-lite-latest",
+      "name": "Google Gemini Vision Multimodal",
+      "description": "Capacidad visual de inspección de pantalla en tiempo real."
+    }
+  },
+  "audio": {
+    "energy_threshold": 300,
+    "pause_threshold": 0.65,
+    "non_speaking_duration": 0.35,
+    "language": "es-AR",
+    "voice_id": "es-ES-AlvaroNeural"
+  }
+}

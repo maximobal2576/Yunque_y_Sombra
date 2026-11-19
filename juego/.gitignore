@@ -1,0 +1,7 @@
+# Godot 4+ cache and local SSL keys
+.godot/
+build/web/*.pem
+__pycache__/
+*.pyc
+*.log
+

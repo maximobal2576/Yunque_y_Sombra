@@ -1,0 +1,87 @@
+================================================================================
+                    RESUMEN EJECUTIVO DE PRESENTACIÓN (PITCH DECK)
+                   PROYECTO: YUNQUE & SOMBRA / THE GUILD OF ASH
+                          (Documento de Venta & Visión)
+================================================================================
+
+1. TÍTULOS TENTATIVOS & IDENTIDAD DE MARCA
+--------------------------------------------------------------------------------
+- Nombre Clave de Producción: PROYECTO YUNQUE (Project Anvil).
+- Título Tentativo Principal (Hispanoamérica / España):
+  "Yunque & Sombra: La Herencia del Artesano"
+- Título Comercial Alternativo (Mercado Anglosajón / Steam Internacional):
+  "The Smith's Spark: Chronicle of Exile" (o "Anvil & Ember").
+- Logline / Slogan de Portada:
+  "De día forjas las herramientas de un pueblo que despierta; de noche desentierras la conspiración que condenó a tu sangre."
+
+
+2. ELEVATOR PITCH (EL CONCEPTO EN UN SOLO PÁRRAFO)
+--------------------------------------------------------------------------------
+Yunque & Sombra es un videojuego de simulación de oficio y misterio narrativo en 2D que fusiona la adictiva gestión táctil en primer plano de Papa's Freezeria y Potion Punch con la acogedora exploración comunitaria y minera cenital de Stardew Valley. El jugador toma las riendas del taller abandonado de su tío en una aldea medieval decadente, atendiendo el mostrador de 06:00 a 17:00 para fundir, martillar y templar pedidos a contrarreloj, mientras que al caer la noche desciende a galerías subterráneas y recorre las calles del pueblo para forjar lazos vecinales. Bajo un constante reloj de 24 horas y con el límite insalvable de la medianoche (00:00) para ir a dormir antes de sufrir robos y fatiga, el éxito del taller desata una creciente tensión política: el progreso despierta a la plebe y alarma a los señores feudales, arrastrando al artesano por el mismo peligroso camino que provocó la desaparición de su tío, hasta culminar en un impactante e inolvidable giro de destierro.
+
+
+3. PILARES FUNDAMENTALES DE JUGABILIDAD (EL CICLO DE 24 HORAS)
+--------------------------------------------------------------------------------
+El bucle jugable se divide rítmicamente en fases que equilibran tensión y relajación, guiadas por un HUD inferior persistente con reloj de 24h y medidor de energía:
+
+A. FASE DIURNA (06:00 - 17:00) | EL MOSTRADOR Y LA FORJA TÁCTIL
+   - Perspectiva: Primer plano / interacción manual detallada.
+   - Dinámica de Servicio: Los vecinos forman fila con pedidos expresados en bocadillos y barras de paciencia dinámicas. La gama evoluciona desde clavos y herraduras rurales hasta armaduras ceremoniales y joyería orfebre de gemas incrustadas.
+   - Estaciones Táctiles de Alta Retroalimentación (Juice):
+     1. Horno & Fuelle: Control de temperatura y vertido preciso en moldes de arcilla.
+     2. El Yunque Rítmico: Minijuego de golpeo por precisión y cadencia sobre el metal incandescente.
+     3. Tina de Templado & Pulido: Inmersión térmica (vapor acústico inmersivo), afilado en muela y engarce de empuñaduras.
+   - Puntuación & Cobro: Recompensas en oro, propinas por celeridad/calidad y reputación gremial.
+
+B. FASE NOCTURNA (17:00 A 00:00) | EXPLORACIÓN, MINERÍA Y VIDA DE PUEBLO
+   - Perspectiva: Top-Down 2D cenital (estilo clásico Pokémon / Stardew Valley).
+   - La Mina Subterránea Secreta: Acceso tras el taller hacia cavernas a oscuras donde la colocación estratégica de antorchas y el picado de vetas desbloquea carbón, cobre, hierro, oro y gemas raras (rubíes, zafiros, diamantes).
+   - Vida Social & Economía Circular: Recorrido libre por tabernas, bazares y hogares. Los aldeanos exhiben en sus salas los mismos objetos y utensilios que el jugador les fabricó.
+
+C. SISTEMA DE MEDIANOCHE (00:00) & MECÁNICA DE DESCANSO
+   - Límite de las 00:00: El jugador debe regresar a dormir a su casa antes de la medianoche.
+   - Descanso Voluntario (Botón 🛏️): Desencadena una cinemática de timelapse con el sol y la luna rotando sobre el pueblo, partículas de "zzzzz" brotando por el tejado y despertar a las 06:00 AM con 100% de energía.
+   - Desmayo Forzado: Si se desmaya dentro de casa, amanece con fatiga. Si se desmaya a la intemperie (calle o mina), sufre robo de oro/recursos y despierta con severa fatiga.
+
+
+4. LA TRAMA, ATMÓSFERA Y TENSIÓN PROGRESIVA
+--------------------------------------------------------------------------------
+- El Prólogo Emotivo: Una carta materna sincera despide al protagonista hacia un poblado remoto creyendo que aprenderá un oficio honesto de su tío, ignorando que el pariente no se marchó por voluntad propia.
+- El Secreto del Tío Herrero: El tío fue un visionario silenciado por la tiranía feudal. Diseñó acueductos, faroles eternos y aperos eficientes para emancipar a la aldea; los señores feudales comprendieron que una población autosuficiente deja de ser sumisa y lo hicieron desaparecer.
+- Narrativa Ambiental ("Las Hojas del Diario Perdido"): La historia no interrumpe el juego con cinemáticas densas; se reconstruye orgánicamente limpiando telarañas del techo, reparando vigas o hallando notas cinceladas en grietas de la mina.
+- La Tensión Progresiva (Efecto "Good Pizza, Great Pizza"):
+  * Días 1 al 4: Calidez campestre, gratitud de vecinos, satisfacción hogareña.
+  * Día 5 (Punto de Inflexión): Un emisario con heráldica feudal exige cadenas reforzadas y picos de asedio, dejando una velada advertencia sobre reuniones campesinas y ruidos molestos. Cada encargo posterior destila paranoia y control social.
+- El Clímax y Giro Final (El Destierro): Cuando el taller alcanza su máxima gloria y el pueblo florece, guardias de élite emboscan al jugador. La sentencia es contundente: "Cometiste el mismo error que tu tío... Un pueblo próspero es un pueblo que hace preguntas". El protagonista es noqueado, encapuchado y arrojado bajo una tormenta a un páramo desconocido y miserable sin pertenencias, cerrando con una moraleja audaz y dejando la puerta abierta a una secuela o expansión.
+
+
+5. CARACTERÍSTICAS CLAVE & INNOVACIONES MECÁNICAS (USPs)
+--------------------------------------------------------------------------------
+1. Mueblería de Juan & La Red de Confianza Comunitaria:
+   Adquirir mobiliario, bancos o cortinas no requiere transportes engorrosos: Juan se encarga personalmente de instalarlos en el taller esa misma noche. Cada mueble aporta buffs pasivos vitales (un banco cómodo en el zaguán amplía sustancialmente la barra de paciencia de los clientes matutinos). Además, el dinero gastado en la carpintería financia mejoras públicas visibles como la reconstrucción del puente del río.
+
+2. El Libro Brillante y la Limpieza Táctil de Recetas:
+   El árbol de tecnologías es un antiguo códice metalúrgico cubierto de grasa, cera y hollín. El jugador compra solventes en el bazar y limpia físicamente las páginas mediante un satisfactorio minijuego de fregado con esponja para revelar fórmulas avanzadas, notas marginales y secretos prohibidos.
+
+3. Metaprogresión Visual Reactiva del Poblado (3 Etapas):
+   El impacto de la herrería transforma el mapa:
+   - Etapa 1 (Decadencia y Barro): Calles anegadas, maderas podridas, chimeneas frías.
+   - Etapa 2 (Reconstrucción): Senderos de piedra, muelle habilitado, ventanas encendidas.
+   - Etapa 3 (Esplendor Comunitario): Calzadas adoquinadas, fuentes cristalinas, plazas vivas.
+
+
+6. PÚBLICO OBJETIVO Y REFERENCIAS DE ÉXITO
+--------------------------------------------------------------------------------
+- Público Objetivo Primario:
+  * Jugadores de "Cozy Games" y simuladores de gestión relajante (Stardew Valley, Animal Crossing, Slime Rancher, Dave the Diver).
+  * Aficionados a simuladores de oficios y gastronomía de alto ritmo con micropulsaciones de satisfacción (Papa's Series, Good Pizza Great Pizza, Cook Serve Delicious!, Potion Craft).
+- Público Objetivo Secundario:
+  * Jugadores atraídos por narrativas con giros oscuros, misterio y sátira sociopolítica (Papers Please, Graveyard Keeper, Cult of the Lamb, Beholder).
+- Ventajas Competitivas en el Mercado:
+  * Cubre el vacío existente entre el juego "cozy" tradicional y la intriga narrativa adulta.
+  * Altísimo potencial de viralidad en TikTok, YouTube y Twitch gracias al "juice" táctil de las estaciones de forja (sonidos ASMR de martilleo, siseo de vapor, limpieza de páginas) y el impacto del giro final en directos.
+  * Estructura modular ideal para lanzamientos en PC (Steam / Steam Deck), Nintendo Switch y adaptaciones móviles táctiles.
+
+================================================================================
+           DOCUMENTO CONFIDENCIAL - PROYECTO YUNQUE & SOMBRA (2026)
+================================================================================

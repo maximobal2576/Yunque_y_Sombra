@@ -1,0 +1,393 @@
+[gd_scene load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/workshop/AnvilTopDownStation.gd" id="1_anvil_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/anvil_topdown.png" id="2_anvil_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/workshop_room_bg.png" id="3_room_bg"]
+[ext_resource type="Shader" path="res://assets/shaders/vineta_fragua.gdshader" id="4_vineta_shader"]
+[ext_resource type="Shader" path="res://assets/shaders/metal_incandescente.gdshader" id="5_metal_shader"]
+[ext_resource type="Script" path="res://src/components/SacudidaTrauma.gd" id="6_trauma_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/items/blacksmith_hammer.png" id="7_hammer_tex"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vineta"]
+shader = ExtResource("4_vineta_shader")
+shader_parameter/color_vineta = Color(0.105, 0.078, 0.066, 1)
+shader_parameter/color_brasa = Color(0.48, 0.15, 0.07, 1)
+shader_parameter/intensidad = 0.82
+shader_parameter/radio_interior = 0.32
+shader_parameter/velocidad_parpadeo = 1.15
+
+[sub_resource type="Gradient" id="Gradient_brasas"]
+colors = PackedColorArray(0.96, 0.42, 0.08, 0.32, 0.43, 0.12, 0.08, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_brasas"]
+gradient = SubResource("Gradient_brasas")
+width = 512
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.95)
+fill_to = Vector2(0.5, 0.05)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_bar"]
+content_margin_left = 22.0
+content_margin_top = 8.0
+content_margin_right = 22.0
+content_margin_bottom = 8.0
+bg_color = Color(0.129412, 0.101961, 0.0862745, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_superficie"]
+
+[sub_resource type="Gradient" id="Gradient_calor"]
+colors = PackedColorArray(1, 0.58, 0.12, 0.48, 0.85, 0.25, 0.06, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_calor"]
+gradient = SubResource("Gradient_calor")
+width = 380
+height = 150
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_metal"]
+shader = ExtResource("5_metal_shader")
+shader_parameter/temperatura = 1085.0
+shader_parameter/semi_grosor_max = 18.0
+shader_parameter/semi_largo = 140.0
+shader_parameter/caida_borde = 125.0
+shader_parameter/intensidad_cascarilla = 0.42
+
+[sub_resource type="Gradient" id="Gradient_impacto"]
+colors = PackedColorArray(1, 0.96, 0.82, 0.95, 0.98, 0.56, 0.1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_impacto"]
+gradient = SubResource("Gradient_impacto")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox_martillo"]
+radius = 16.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.431373, 0.121569, 0.168627, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.709804, 0.603922, 0.415686, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.607843, 0.180392, 0.247059, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.847059, 0.772549, 0.647059, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="EstacionYunqueCenital" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_anvil_script")
+
+[node name="FondoTaller" type="TextureRect" parent="."]
+modulate = Color(0.62, 0.52, 0.46, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_room_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="LuzBrasas" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -320.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_brasas")
+expand_mode = 1
+
+[node name="VinetaFragua" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_vineta")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FondoBarraSuperior" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -390.0
+offset_top = 12.0
+offset_right = 390.0
+offset_bottom = 50.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bar")
+
+[node name="BarraSuperior" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 46.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="EtiquetaGolpes" type="Label" parent="BarraSuperior"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "🔨 Golpes: 0"
+
+[node name="EtiquetaTemperaturaPieza" type="Label" parent="BarraSuperior"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "🌡️ Pieza: 1085°C (Naranja-amarillo de forja)"
+
+[node name="EtiquetaPrecision" type="Label" parent="BarraSuperior"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.619608, 0.0431373, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ajuste a la Silueta: 25%"
+
+[node name="SuperficieYunque" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -140.0
+offset_right = 300.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_superficie")
+
+[node name="TexturaYunque" type="TextureRect" parent="SuperficieYunque"]
+layout_mode = 0
+offset_left = -165.0
+offset_top = -135.0
+offset_right = 735.0
+offset_bottom = 415.0
+mouse_filter = 2
+texture = ExtResource("2_anvil_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResplandorCalor" type="TextureRect" parent="SuperficieYunque"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 60.0
+offset_right = 500.0
+offset_bottom = 220.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_calor")
+expand_mode = 1
+
+[node name="GuiaSilueta" type="Line2D" parent="SuperficieYunque"]
+position = Vector2(300, 140)
+width = 2.5
+default_color = Color(0.847059, 0.772549, 0.647059, 0.85)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="LingoteDeformable" type="Polygon2D" parent="SuperficieYunque"]
+material = SubResource("ShaderMaterial_metal")
+position = Vector2(300, 140)
+color = Color(0.960784, 0.619608, 0.0431373, 1)
+
+[node name="AreaColisionMetal" type="Area2D" parent="SuperficieYunque"]
+position = Vector2(300, 140)
+collision_layer = 8
+collision_mask = 8
+
+[node name="PoligonoColisionMetal" type="CollisionPolygon2D" parent="SuperficieYunque/AreaColisionMetal"]
+
+[node name="DestelloImpacto" type="TextureRect" parent="SuperficieYunque"]
+modulate = Color(1, 0.92, 0.68, 0)
+layout_mode = 0
+offset_left = 236.0
+offset_top = 76.0
+offset_right = 364.0
+offset_bottom = 204.0
+pivot_offset = Vector2(64, 64)
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_impacto")
+expand_mode = 1
+
+[node name="ChispasForja" type="CPUParticles2D" parent="SuperficieYunque"]
+position = Vector2(300, 140)
+emitting = false
+amount = 24
+lifetime = 0.38
+one_shot = true
+explosiveness = 0.92
+direction = Vector2(0, -1)
+spread = 78.0
+gravity = Vector2(0, 540)
+initial_velocity_min = 140.0
+initial_velocity_max = 310.0
+scale_amount_min = 2.2
+scale_amount_max = 4.2
+color = Color(1, 0.82, 0.32, 1)
+
+[node name="MartilloForjador" type="Node2D" parent="SuperficieYunque"]
+position = Vector2(465, 62)
+z_index = 4
+
+[node name="EstelaVelocidad" type="Line2D" parent="SuperficieYunque/MartilloForjador"]
+width = 6.0
+default_color = Color(1, 0.82, 0.35, 0.45)
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="SombraMartillo" type="Polygon2D" parent="SuperficieYunque/MartilloForjador"]
+position = Vector2(6, 10)
+color = Color(0.05, 0.04, 0.03, 0.42)
+polygon = PackedVector2Array(-32, -14, 18, -14, 22, 14, -32, 14)
+
+[node name="SpriteMartillo" type="Sprite2D" parent="SuperficieYunque/MartilloForjador"]
+position = Vector2(18, -16)
+rotation = -0.35
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("7_hammer_tex")
+
+[node name="AreaHitboxMartillo" type="Area2D" parent="SuperficieYunque/MartilloForjador"]
+collision_layer = 8
+collision_mask = 8
+
+[node name="HitboxCabezaMartillo" type="CollisionShape2D" parent="SuperficieYunque/MartilloForjador/AreaHitboxMartillo"]
+shape = SubResource("CircleShape2D_hitbox_martillo")
+
+[node name="EtiquetaAgarreMartillo" type="Label" parent="SuperficieYunque/MartilloForjador"]
+offset_left = -75.0
+offset_top = 18.0
+offset_right = 95.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.95, 0.86, 0.55, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "🔨 [Arrastra el Martillo]"
+horizontal_alignment = 1
+
+[node name="AreaImpacto" type="Control" parent="SuperficieYunque"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 6
+
+[node name="SacudidaTrauma" type="Node" parent="."]
+script = ExtResource("6_trauma_script")
+ruta_objetivo = NodePath("../SuperficieYunque")
+desplazamiento_maximo = Vector2(7, 5)
+decaimiento = 2.6
+frecuencia_ruido = 24.0
+
+[node name="EtiquetaEstado" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -92.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "Agarra el martillo y golpea el lingote: más rápido = golpe fuerte; más lento = golpe suave de precisión."
+horizontal_alignment = 1
+
+[node name="BotonVolverAFragua" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -336.0
+offset_top = -54.0
+offset_right = -12.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "🔥 Volver a la Fragua (Recalentar)"
+
+[node name="BotonPasarACorte" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -54.0
+offset_right = 336.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+disabled = true
+text = "➡️ Pasar a Estación de Corte"

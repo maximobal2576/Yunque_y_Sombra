@@ -1,0 +1,99 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/ui/MainHUD.gd" id="1_hud_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
+bg_color = Color(0.129412, 0.101961, 0.0862745, 0.96)
+border_width_top = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1.0)
+content_margin_left = 16.0
+content_margin_top = 6.0
+content_margin_right = 16.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_bg"]
+bg_color = Color(0.2, 0.16, 0.14, 1.0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_fill"]
+bg_color = Color(0.709804, 0.603922, 0.415686, 1.0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="HUDPrincipal" type="CanvasLayer"]
+script = ExtResource("1_hud_script")
+
+[node name="BannerToast" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 24.0
+offset_right = 300.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "Aviso del taller"
+horizontal_alignment = 1
+
+[node name="BarraInferior" type="PanelContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="ContenedorFila" type="HBoxContainer" parent="BarraInferior"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="EtiquetaReloj" type="Label" parent="BarraInferior/ContenedorFila"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 13
+text = "📅 DÍA 1 | ⏰ 06:00 AM | [DIURNA]"
+
+[node name="ContenedorCentro" type="CenterContainer" parent="BarraInferior/ContenedorFila"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EtiquetaInteraccion" type="Label" parent="BarraInferior/ContenedorFila/ContenedorCentro"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.709804, 0.603922, 0.415686, 1.0)
+theme_override_font_sizes/font_size = 14
+text = "👉 [E] Interactuar"
+
+[node name="ContenedorEstadisticas" type="HBoxContainer" parent="BarraInferior/ContenedorFila"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BarraEstamina" type="ProgressBar" parent="BarraInferior/ContenedorFila/ContenedorEstadisticas"]
+custom_minimum_size = Vector2(110, 16)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_stamina_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stamina_fill")
+value = 100.0
+show_percentage = false
+
+[node name="EtiquetaEstamina" type="Label" parent="BarraInferior/ContenedorFila/ContenedorEstadisticas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 12
+text = "⚡ 100 / 100"
+
+[node name="EtiquetaMonedas" type="Label" parent="BarraInferior/ContenedorFila/ContenedorEstadisticas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1.0)
+theme_override_font_sizes/font_size = 13
+text = "🪙 50 Oro"

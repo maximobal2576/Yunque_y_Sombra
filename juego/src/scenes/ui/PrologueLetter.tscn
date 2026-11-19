@@ -1,0 +1,157 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/ui/PrologueLetter.gd" id="1_letter_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_parchment"]
+bg_color = Color(0.94902, 0.901961, 0.8, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.709804, 0.603922, 0.415686, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.270588, 0.070588, 0.105882, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.847059, 0.772549, 0.647059, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CartaPrologo" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_letter_script")
+
+[node name="FondoOscurecido" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0705882, 0.054902, 0.0470588, 0.88)
+
+[node name="ContenedorPergamino" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelPergamino" type="Panel" parent="ContenedorPergamino"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -250.0
+offset_right = 340.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_parchment")
+
+[node name="BordeInterior" type="ReferenceRect" parent="ContenedorPergamino/PanelPergamino"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.709804, 0.603922, 0.415686, 0.8)
+border_width = 1.5
+editor_only = false
+
+[node name="ContenedorVertical" type="VBoxContainer" parent="ContenedorPergamino/PanelPergamino"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = 28.0
+offset_right = -32.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="CabeceraCarta" type="VBoxContainer" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EtiquetaTitulo" type="Label" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical/CabeceraCarta"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.270588, 0.070588, 0.105882, 1)
+theme_override_font_sizes/font_size = 20
+text = "📜 CARTA DE TU MADRE"
+horizontal_alignment = 1
+
+[node name="EtiquetaSubtitulo" type="Label" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical/CabeceraCarta"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.431373, 0.121569, 0.168627, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "— Sellada con cera roja y entregada antes de tu partida —"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical"]
+layout_mode = 2
+
+[node name="EtiquetaTextoCarta" type="Label" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_constants/line_spacing = 6
+theme_override_font_sizes/font_size = 14
+text = "Hijo mío:
+
+Perdóname por enviarte a este rincón olvidado... Tu tío era el herrero más sabio del pueblo, pero hace tiempo que nadie sabe de él.
+
+He vendido lo poco que nos quedaba para que aprendas su oficio y encuentres tu propio camino.
+
+El pueblo es humilde y las calles están en sombras, pero en su taller encontrarás el yunque y el fuego.
+
+Cuídate de los guardias del feudo y no hagas preguntas indiscretas.
+
+Con amor, Tu Madre."
+autowrap_mode = 2
+
+[node name="BotonCerrarCarta" type="Button" parent="ContenedorPergamino/PanelPergamino/ContenedorVertical"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_colors/font_hover_color = Color(0.270588, 0.070588, 0.105882, 1)
+theme_override_colors/font_focus_color = Color(0.129412, 0.101961, 0.086275, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_hover")
+text = "Guardar Carta y Entrar al Pueblo  [ E / ESPACIO ]"

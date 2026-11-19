@@ -1,0 +1,392 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/workshop/QuenchStation.gd" id="1_quench_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/water_tub_topdown.png" id="2_tub_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/workshop/workshop_room_bg.png" id="3_room_bg"]
+[ext_resource type="Shader" path="res://assets/shaders/vineta_fragua.gdshader" id="4_vineta_shader"]
+[ext_resource type="Shader" path="res://assets/shaders/metal_incandescente.gdshader" id="5_metal_shader"]
+[ext_resource type="Script" path="res://src/components/SacudidaTrauma.gd" id="6_trauma_script"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vineta"]
+shader = ExtResource("4_vineta_shader")
+shader_parameter/color_vineta = Color(0.095, 0.075, 0.068, 1)
+shader_parameter/color_brasa = Color(0.38, 0.14, 0.08, 1)
+shader_parameter/intensidad = 0.82
+shader_parameter/radio_interior = 0.32
+shader_parameter/velocidad_parpadeo = 1.0
+
+[sub_resource type="Gradient" id="Gradient_brasas"]
+colors = PackedColorArray(0.92, 0.38, 0.08, 0.24, 0.43, 0.12, 0.08, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_brasas"]
+gradient = SubResource("Gradient_brasas")
+width = 512
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.95)
+fill_to = Vector2(0.5, 0.05)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_bar"]
+content_margin_left = 22.0
+content_margin_top = 8.0
+content_margin_right = 22.0
+content_margin_bottom = 8.0
+bg_color = Color(0.129412, 0.101961, 0.0862745, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tub"]
+bg_color = Color(0.129412, 0.101961, 0.0862745, 0.92)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.431373, 0.121569, 0.168627, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.65)
+shadow_size = 16
+
+[sub_resource type="Gradient" id="Gradient_hervor"]
+colors = PackedColorArray(1, 0.55, 0.12, 0.55, 0.18, 0.32, 0.48, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hervor"]
+gradient = SubResource("Gradient_hervor")
+width = 256
+height = 160
+fill = 1
+fill_from = Vector2(0.5, 0.35)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_metal_tina"]
+shader = ExtResource("5_metal_shader")
+shader_parameter/temperatura = 880.0
+shader_parameter/semi_grosor_max = 12.0
+shader_parameter/semi_largo = 55.0
+shader_parameter/caida_borde = 110.0
+shader_parameter/intensidad_cascarilla = 0.48
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.431373, 0.121569, 0.168627, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.709804, 0.603922, 0.415686, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.607843, 0.180392, 0.247059, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.847059, 0.772549, 0.647059, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="EstacionTinaTemplado" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_quench_script")
+
+[node name="FondoTaller" type="TextureRect" parent="."]
+modulate = Color(0.58, 0.5, 0.46, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_room_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="LuzBrasas" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -280.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_brasas")
+expand_mode = 1
+
+[node name="VinetaFragua" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_vineta")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FondoBarraSuperior" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -340.0
+offset_top = 12.0
+offset_right = 340.0
+offset_bottom = 50.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bar")
+
+[node name="BarraSuperior" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 46.0
+grow_horizontal = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="EtiquetaIndicadorTemperatura" type="Label" parent="BarraSuperior"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.960784, 0.619608, 0.0431373, 1)
+theme_override_font_sizes/font_size = 14
+text = "🌡️ Estado: Acero al Rojo Cereza (880°C)"
+
+[node name="PanelTina" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -160.0
+offset_right = 260.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tub")
+
+[node name="TituloTina" type="Label" parent="PanelTina"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 30.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.847059, 0.772549, 0.647059, 1)
+theme_override_font_sizes/font_size = 12
+text = "TINA DE TEMPLADO — CHOQUE TÉRMICO EN AGUA DE POZO (2.2s - 2.8s)"
+horizontal_alignment = 1
+
+[node name="TexturaTina" type="TextureRect" parent="PanelTina"]
+modulate = Color(0.85, 0.8, 0.75, 0.55)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_tub_tex")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RectanguloAgua" type="ColorRect" parent="PanelTina"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -180.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.09, 0.19, 0.29, 0.92)
+
+[node name="ResplandorInmersion" type="TextureRect" parent="PanelTina/RectanguloAgua"]
+modulate = Color(1, 0.55, 0.12, 0)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = -10.0
+offset_right = 140.0
+offset_bottom = 130.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_hervor")
+expand_mode = 1
+
+[node name="LineaAguaVisual" type="ColorRect" parent="PanelTina/RectanguloAgua"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 4.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.42, 0.65, 0.85, 0.85)
+
+[node name="BurbujasEbullicion" type="CPUParticles2D" parent="PanelTina/RectanguloAgua"]
+position = Vector2(254, 45)
+emitting = false
+amount = 26
+lifetime = 0.55
+direction = Vector2(0, -1)
+spread = 65.0
+gravity = Vector2(0, -180)
+initial_velocity_min = 35.0
+initial_velocity_max = 95.0
+scale_amount_min = 2.5
+scale_amount_max = 5.5
+color = Color(0.82, 0.92, 0.98, 0.75)
+
+[node name="ContenedorVapor" type="Control" parent="PanelTina"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EtiquetaTssss" type="Label" parent="PanelTina"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -24.0
+offset_right = 120.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.84, 1)
+theme_override_font_sizes/font_size = 24
+text = "🌊 ¡TSSSSSSS!"
+horizontal_alignment = 1
+
+[node name="ContenedorTenazas" type="Control" parent="PanelTina"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 50.0
+offset_right = 50.0
+offset_bottom = 130.0
+grow_horizontal = 2
+
+[node name="VisualTenazas" type="Node2D" parent="PanelTina/ContenedorTenazas"]
+position = Vector2(50, 20)
+
+[node name="BrazoIzquierdo" type="ColorRect" parent="PanelTina/ContenedorTenazas/VisualTenazas"]
+offset_left = -8.0
+offset_top = -78.0
+offset_right = -2.0
+offset_bottom = 16.0
+color = Color(0.22, 0.21, 0.2, 1)
+
+[node name="BrazoDerecho" type="ColorRect" parent="PanelTina/ContenedorTenazas/VisualTenazas"]
+offset_left = 2.0
+offset_top = -78.0
+offset_right = 8.0
+offset_bottom = 16.0
+color = Color(0.22, 0.21, 0.2, 1)
+
+[node name="RemachePivote" type="ColorRect" parent="PanelTina/ContenedorTenazas/VisualTenazas"]
+offset_left = -6.0
+offset_top = -12.0
+offset_right = 6.0
+offset_bottom = -2.0
+color = Color(0.45, 0.4, 0.35, 1)
+
+[node name="PiezaMetalica" type="Polygon2D" parent="PanelTina/ContenedorTenazas"]
+material = SubResource("ShaderMaterial_metal_tina")
+position = Vector2(50, 45)
+color = Color(0.960784, 0.619608, 0.0431373, 1)
+polygon = PackedVector2Array(-54, -11, 42, -7, 56, 0, 42, 7, -54, 11)
+
+[node name="SacudidaTrauma" type="Node" parent="."]
+script = ExtResource("6_trauma_script")
+ruta_objetivo = NodePath("../PanelTina")
+desplazamiento_maximo = Vector2(5, 4)
+decaimiento = 2.5
+frecuencia_ruido = 22.0
+
+[node name="EtiquetaEstado" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -90.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "Haz clic en las tenazas y sumerge la pieza en el agua hasta que vire a gris acero templado."
+horizontal_alignment = 1
+
+[node name="BotonIrAPulido" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -54.0
+offset_right = 160.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+disabled = true
+text = "➡️ Llevar a Estación de Pulido"
