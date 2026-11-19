@@ -190,10 +190,15 @@ func _apply_music_volume() -> void:
 		var offset_db: float = linear_to_db(maxf(music_volume, 0.0001))
 		music_player.volume_db = clampf(_music_volume_db + offset_db, MUTED_VOLUME_DB, 6.0)
 
+func _linear_to_offset_db(linear_val: float) -> float:
+	if linear_val <= 0.01:
+		return MUTED_VOLUME_DB
+	return linear_to_db(maxf(linear_val, 0.0001))
+
 func _compute_sfx_db(base_db: float) -> float:
 	if sfx_volume <= 0.01:
 		return MUTED_VOLUME_DB
-	var offset_db: float = linear_to_db(maxf(sfx_volume, 0.0001))
+	var offset_db: float = _linear_to_offset_db(sfx_volume)
 	return clampf(base_db + offset_db, MUTED_VOLUME_DB, 6.0)
 
 func set_sfx_volume(value: float) -> void:
@@ -254,27 +259,23 @@ func _generate_warm_hearth_ambience() -> AudioStreamWAV:
 	return wav
 
 func _generate_voice_blip_stream() -> AudioStreamWAV:
-	# Sintetiza un balbuceo de voz corto y cálido (~45 ms, frecuencia base ~220 Hz, envolvente suave sin clics)
+	# Sintetiza un balbuceo de voz corto y cálido (~45 ms, armónicos claros 220 Hz, 440 Hz y 660 Hz, amplitud 0.80)
 	var mix_rate: int = 22050
 	var duration_sec: float = 0.045
 	var total_samples: int = int(mix_rate * duration_sec)
 	var data := PackedByteArray()
 	data.resize(total_samples * 2)
-	var phase: float = 0.0
 	for i: int in range(total_samples):
 		var t: float = float(i) / float(mix_rate)
 		var norm_t: float = t / duration_sec
 		# Envolvente redondeada sin clics al inicio ni al final
 		var env: float = sin(PI * norm_t)
 		env = env * env
-		# Ligera inflexión vocal cálida alrededor de 220 Hz
-		var inst_freq: float = 214.0 + 14.0 * sin(PI * norm_t)
-		phase += TAU * inst_freq / float(mix_rate)
-		var val: float = (
-			0.62 * sin(phase)
-			+ 0.27 * sin(phase * 2.0)
-			+ 0.11 * sin(phase * 3.0)
-		) * env * 0.48
+		var inflexion: float = 0.18 * sin(PI * norm_t)
+		var h1: float = sin(TAU * 220.0 * t + inflexion)
+		var h2: float = sin(TAU * 440.0 * t + inflexion * 2.0)
+		var h3: float = sin(TAU * 660.0 * t + inflexion * 3.0)
+		var val: float = (0.56 * h1 + 0.28 * h2 + 0.16 * h3) * env * 0.80
 		var sample_int: int = clampi(int(round(val * 32767.0)), -32767, 32767)
 		data.encode_s16(i * 2, sample_int)
 	var wav := AudioStreamWAV.new()
@@ -292,13 +293,14 @@ func play_voice_blip(pitch_base: float = 1.0) -> void:
 	if player == null:
 		return
 	var idx: int = players_pool.find(player)
-	var base_db: float = -11.0
+	var base_db: float = -2.0
 	if idx != -1 and idx < _pool_base_volumes.size():
 		_pool_base_volumes[idx] = base_db
+	var vol_db: float = -2.0 + _linear_to_offset_db(sfx_volume * master_volume)
 	player.stream = audio_streams["voice_blip"] as AudioStream
-	player.volume_db = _compute_sfx_db(base_db)
+	player.volume_db = clampf(vol_db, MUTED_VOLUME_DB, 6.0)
 	player.pitch_scale = clampf(pitch_base * randf_range(0.93, 1.07), 0.6, 1.6)
-	if sfx_volume > 0.01:
+	if sfx_volume > 0.01 and master_volume > 0.01:
 		player.play()
 
 func _prepare_background_music_stream() -> AudioStream:

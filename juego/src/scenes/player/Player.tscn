@@ -104,6 +104,36 @@ offset_right = 5.0
 offset_bottom = 2.0
 color = Color(0.14, 0.1, 0.08, 1)
 
+[node name="MenaEnMano" type="Node2D" parent="RaizVisual"]
+visible = false
+position = Vector2(0, 6)
+z_index = 2
+
+[node name="SombraMena" type="Polygon2D" parent="RaizVisual/MenaEnMano"]
+position = Vector2(0, 3)
+color = Color(0.05, 0.04, 0.03, 0.58)
+polygon = PackedVector2Array(-9, -4, -5, -7, 5, -7, 9, -4, 8, 4, -8, 4)
+
+[node name="CuerpoMineral" type="Polygon2D" parent="RaizVisual/MenaEnMano"]
+color = Color(0.68, 0.72, 0.78, 1)
+polygon = PackedVector2Array(-9, -2, -5, -7, 3, -8, 9, -3, 8, 4, 2, 6, -6, 5)
+
+[node name="FacetaBrillo" type="Polygon2D" parent="RaizVisual/MenaEnMano"]
+color = Color(0.95, 0.96, 1, 0.42)
+polygon = PackedVector2Array(-6, -2, -3, -6, 3, -6, 5, -1, -1, 1)
+
+[node name="EtiquetaMenaMano" type="Label" parent="RaizVisual/MenaEnMano"]
+offset_left = -28.0
+offset_top = 5.0
+offset_right = 28.0
+offset_bottom = 19.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.78, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.04, 0.95)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 8
+text = "Mena x1"
+horizontal_alignment = 1
+
 [node name="DetectorInteraccion" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 4

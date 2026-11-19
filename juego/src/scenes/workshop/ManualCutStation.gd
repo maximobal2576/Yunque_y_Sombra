@@ -63,7 +63,7 @@ var progress_label: Label:
 var btn_to_quench: Button:
 	get: return boton_ir_a_tina
 
-const LARGO_MAXIMO_TRAZO: float = 220.0
+const LARGO_MAXIMO_TRAZO: float = 130.0
 
 # Estado de corte
 var is_dragging: bool = false
@@ -533,7 +533,7 @@ func _calcular_precision_polilinea(trazo_local: PackedVector2Array, g1: Vector2,
 		max_t = maxf(max_t, proy_t)
 
 	var dist_media: float = suma_dist / float(trazo_local.size())
-	var cobertura: float = clampf((max_t - min_t) / 0.72, 0.25, 1.0)
+	var cobertura: float = clampf((max_t - min_t) / 0.65, 0.25, 1.0)
 	var score_dist: float = clampf(1.0 - (dist_media / 26.0), 0.45, 1.0)
 	return clampf(score_dist * 0.62 + cobertura * 0.38, 0.50, 1.0)
 

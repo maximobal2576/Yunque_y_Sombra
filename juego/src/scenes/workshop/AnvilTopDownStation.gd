@@ -94,6 +94,14 @@ var golpes_en_frio: int = 0
 var metal_temperature_color: Color = Color(0.96, 0.62, 0.04)
 var _tiempo_brasas: float = 0.0
 var nombre_objeto_solicitado: String = "Clavo Forjado de Compuerta"
+var tipo_metal_actual: String = "hierro_dulce"
+var factor_maleabilidad_metal: float = 1.0
+
+const MALEABILIDAD_POR_METAL: Dictionary = {
+	"hierro_dulce": 1.00,
+	"acero_carbono": 0.78,
+	"bronce_cobre": 1.25
+}
 
 # Estado del Martillo Físico Único
 var _arrastrando_martillo: bool = false
@@ -120,6 +128,18 @@ func configurar_molde_encargo(nombre_item: String) -> void:
 		nombre_objeto_solicitado = nombre_item
 	_construir_silueta_objetivo()
 	_draw_target_guide()
+
+func configurar_maleabilidad_metal(tipo_metal: String) -> void:
+	tipo_metal_actual = tipo_metal if not tipo_metal.is_empty() else "hierro_dulce"
+	var mal: float = float(MALEABILIDAD_POR_METAL.get(tipo_metal_actual, 1.00))
+	if "DATOS_METALES" in GameManager:
+		var tabla_gm: Dictionary = GameManager.get("DATOS_METALES")
+		if tabla_gm.has(tipo_metal_actual):
+			var info_m: Dictionary = tabla_gm[tipo_metal_actual]
+			if info_m.has("maleabilidad"):
+				mal = float(info_m["maleabilidad"])
+	factor_maleabilidad_metal = clampf(mal, 0.50, 1.60)
+	_update_ui()
 
 func _process(delta: float) -> void:
 	if not visible or not is_visible_in_tree():
@@ -414,37 +434,7 @@ func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> v
 		tw_m.tween_property(sprite_martillo, "rotation", -0.22, 0.11).set_trans(Tween.TRANS_ELASTIC)
 		tw_m.parallel().tween_property(sprite_martillo, "scale", Vector2(0.42, 0.42), 0.11).set_trans(Tween.TRANS_ELASTIC)
 
-	var sesgo_arriba: float = clampf(1.0 - (click_rel_y / 32.0), 0.65, 1.35)
-	var sesgo_abajo: float = clampf(1.0 + (click_rel_y / 32.0), 0.65, 1.35)
-
-	# 1. ESTIRAMIENTO LONGITUDINAL (EJE X) Y MOLDEADO HACIA EL OBJETO SOLICITADO SEGÚN LA VELOCIDAD DEL MARTILLO:
-	for i in range(NUM_SLICES):
-		var sx: float = _get_x_for_slice(i)
-		var dist_x: float = absf(sx - click_rel_x)
-		var t_slice: float = float(i) / float(NUM_SLICES - 1)
-
-		var influencia_largo: float = exp(-pow(dist_x / (DEFORMATION_RADIUS * 1.45), 2.0))
-		var dir_x: float = signf(sx - click_rel_x)
-		if absf(sx - click_rel_x) < 6.0:
-			dir_x = -1.0 if t_slice < 0.35 else 1.0
-		var largo_actual: float = absf(sx)
-		var amortiguacion_x: float = 1.0 / (1.0 + pow(maxf(0.0, largo_actual - 138.0) / 55.0, 1.6))
-		slice_x[i] += dir_x * STRETCH_LONGITUDINAL * (0.45 + 0.55 * influencia_largo) * potencia_total * amortiguacion_x
-
-		if dist_x < DEFORMATION_RADIUS:
-			var influence: float = 0.5 * (1.0 + cos((dist_x / DEFORMATION_RADIUS) * PI))
-			var paso_moldeado: float = clampf(0.22 * influence * potencia_total, 0.015, 0.38)
-
-			# Guiar hacia la silueta del objeto pedido (cabeza ancha a la izquierda, vástago central y punta cónica a la derecha)
-			# dejando un pequeño labio excedente (+2.5px) en el vástago para las rebabas de la estación de corte
-			var margen_rebaba: float = 2.6 if (t_slice >= 0.20 and t_slice <= 0.78) else 0.6
-			var meta_up: float = (target_upper[i] - margen_rebaba) * sesgo_arriba
-			var meta_low: float = (target_lower[i] + margen_rebaba) * sesgo_abajo
-
-			# Golpes muy veloces (>0.95x) aportan una expansión adicional moderada y controlada
-			var empuje_velocidad: float = maxf(0.0, ultimo_factor_velocidad - 0.95) * DEFORMATION_AMOUNT * 0.28 * influence
-			upper_offsets[i] = lerpf(upper_offsets[i], meta_up, paso_moldeado) - empuje_velocidad * sesgo_arriba
-			lower_offsets[i] = lerpf(lower_offsets[i], meta_low, paso_moldeado) + empuje_velocidad * sesgo_abajo
+	_deform_polygon_at(click_rel_x, click_rel_y, potencia_total)
 
 	# 2. DIFUSIÓN PLÁSTICA SUAVE (conservando el escalón de la cabeza del clavo/perno)
 	_difundir_flujo_plastico()
@@ -478,6 +468,39 @@ func _strike_at_position(local_pos: Vector2, factor_velocidad: float = 1.0) -> v
 		AudioManager.play_sfx("temp_ready", 1.5, 0.02)
 
 	_update_ui()
+
+func _deform_polygon_at(click_rel_x: float, click_rel_y: float, potencia_total: float = 1.0) -> void:
+	var sesgo_arriba: float = clampf(1.0 - (click_rel_y / 32.0), 0.65, 1.35)
+	var sesgo_abajo: float = clampf(1.0 + (click_rel_y / 32.0), 0.65, 1.35)
+
+	# 1. ESTIRAMIENTO LONGITUDINAL (EJE X) Y MOLDEADO HACIA EL OBJETO SOLICITADO SEGÚN LA VELOCIDAD Y MALEABILIDAD DEL METAL:
+	for i in range(NUM_SLICES):
+		var sx: float = _get_x_for_slice(i)
+		var dist_x: float = absf(sx - click_rel_x)
+		var t_slice: float = float(i) / float(NUM_SLICES - 1)
+
+		var influencia_largo: float = exp(-pow(dist_x / (DEFORMATION_RADIUS * 1.45), 2.0))
+		var dir_x: float = signf(sx - click_rel_x)
+		if absf(sx - click_rel_x) < 6.0:
+			dir_x = -1.0 if t_slice < 0.35 else 1.0
+		var largo_actual: float = absf(sx)
+		var amortiguacion_x: float = 1.0 / (1.0 + pow(maxf(0.0, largo_actual - 138.0) / 55.0, 1.6))
+		slice_x[i] += dir_x * STRETCH_LONGITUDINAL * (0.45 + 0.55 * influencia_largo) * potencia_total * factor_maleabilidad_metal * amortiguacion_x
+
+		if dist_x < DEFORMATION_RADIUS:
+			var influence: float = 0.5 * (1.0 + cos((dist_x / DEFORMATION_RADIUS) * PI))
+			var paso_moldeado: float = clampf(0.22 * influence * potencia_total * factor_maleabilidad_metal, 0.015, 0.45)
+
+			# Guiar hacia la silueta del objeto pedido (cabeza ancha a la izquierda, vástago central y punta cónica a la derecha)
+			# dejando un pequeño labio excedente (+2.5px) en el vástago para las rebabas de la estación de corte
+			var margen_rebaba: float = 2.6 if (t_slice >= 0.20 and t_slice <= 0.78) else 0.6
+			var meta_up: float = (target_upper[i] - margen_rebaba) * sesgo_arriba
+			var meta_low: float = (target_lower[i] + margen_rebaba) * sesgo_abajo
+
+			# Golpes muy veloces (>0.95x) aportan una expansión adicional moderada y controlada
+			var empuje_velocidad: float = maxf(0.0, ultimo_factor_velocidad - 0.95) * DEFORMATION_AMOUNT * 0.28 * influence * factor_maleabilidad_metal
+			upper_offsets[i] = lerpf(upper_offsets[i], meta_up, paso_moldeado) - empuje_velocidad * sesgo_arriba
+			lower_offsets[i] = lerpf(lower_offsets[i], meta_low, paso_moldeado) + empuje_velocidad * sesgo_abajo
 
 func _difundir_flujo_plastico() -> void:
 	for i in range(1, NUM_SLICES):

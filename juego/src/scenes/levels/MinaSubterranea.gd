@@ -9,6 +9,7 @@ extends Node2D
 signal salida_mina_solicitada()
 signal hito_primer_hierro_desbloqueado()
 signal mineral_extraido(id_mineral: String, cantidad: int)
+signal inspeccion_barril_mina_solicitada()
 
 const LIMITES_CAMARA_MINA: Vector4 = Vector4(1780, 280, 2620, 920)
 const POSICION_APARICION_MINA: Vector2 = Vector2(2200, 800)
@@ -116,6 +117,8 @@ var _tween_penumbra: Tween = null
 var _tween_cinematica: Tween = null
 var _pulso_fuego: float = 0.0
 var _id_hit_stop: int = 0
+var barril_acopio_entrada: StaticBody2D = null
+var area_barril_acopio_entrada: Area2D = null
 
 func _ready() -> void:
 	_posicion_base_suelo = suelo_caverna.position
@@ -131,6 +134,7 @@ func _ready() -> void:
 	if area_salida_taller:
 		area_salida_taller.interacted.connect(_al_interactuar_escalera_salida)
 
+	_crear_barril_acopio_junto_a_escalera()
 	_inicializar_antorchas()
 	_inicializar_vetas()
 	_actualizar_iluminacion_caverna(true)
@@ -388,11 +392,30 @@ func _quebrar_veta(nombre_veta: String, nodo_veta: Node2D, datos: Dictionary) ->
 	var cantidad: int = int(datos["cantidad_recompensa"])
 	var nombre_legible: String = String(datos["nombre_legible"])
 
+	var barril_antes: int = 0
+	var tipo_barril: String = _mapear_mineral_a_tipo_barril(id_mineral)
+	if "menas_barril_mina" in GameManager and GameManager.menas_barril_mina is Dictionary:
+		barril_antes = int(GameManager.menas_barril_mina.get(tipo_barril, 0))
+
 	# Añadir al inventario de GameManager
-	if GameManager.inventory.has(id_mineral):
-		GameManager.inventory[id_mineral] = int(GameManager.inventory[id_mineral]) + cantidad
+	if GameManager.has_method("add_item"):
+		GameManager.call("add_item", id_mineral, cantidad)
 	else:
-		GameManager.inventory[id_mineral] = cantidad
+		if GameManager.inventory.has(id_mineral):
+			GameManager.inventory[id_mineral] = int(GameManager.inventory[id_mineral]) + cantidad
+		else:
+			GameManager.inventory[id_mineral] = cantidad
+
+	# Depositar en los barriles de la entrada de la mina sin duplicar si add_item ya lo hizo
+	var barril_despues: int = barril_antes
+	if "menas_barril_mina" in GameManager and GameManager.menas_barril_mina is Dictionary:
+		barril_despues = int(GameManager.menas_barril_mina.get(tipo_barril, 0))
+
+	if barril_despues == barril_antes:
+		if GameManager.has_method("agregar_mena_barril_mina"):
+			GameManager.call("agregar_mena_barril_mina", tipo_barril, cantidad)
+		elif "menas_barril_mina" in GameManager and GameManager.menas_barril_mina is Dictionary:
+			GameManager.menas_barril_mina[tipo_barril] = int(GameManager.menas_barril_mina.get(tipo_barril, 0)) + cantidad
 
 	if is_instance_valid(nodo_veta):
 		_actualizar_visual_veta(nodo_veta, true)
@@ -402,16 +425,25 @@ func _quebrar_veta(nombre_veta: String, nodo_veta: Node2D, datos: Dictionary) ->
 			area.set("prompt_text", "Veta de %s Agotada (Regenera al dormir)" % nombre_legible)
 
 	emit_signal("mineral_extraido", id_mineral, cantidad)
-	GameManager.post_notification("¡Veta quebrada! Obtuviste +%d %s (Total: %d)." % [
+	GameManager.post_notification("¡Veta quebrada! Obtuviste +%d %s (Total: %d). Mena en bruto guardada en los barriles a la entrada de la mina." % [
 		cantidad,
 		nombre_legible,
-		int(GameManager.inventory[id_mineral])
+		int(GameManager.inventory.get(id_mineral, cantidad))
 	])
 
 	# EL PRIMER HITO (GDD §3.2): Al quebrar la primera veta de hierro puro
 	if id_mineral == "mineral_hierro" and not primer_hierro_desbloqueado:
 		primer_hierro_desbloqueado = true
 		_disparar_cinematica_primer_hierro()
+
+func _mapear_mineral_a_tipo_barril(id_mineral: String) -> String:
+	match id_mineral:
+		"carbon", "acero_carbono":
+			return "acero_carbono"
+		"mineral_cobre", "bronce_cobre", "mineral_oro":
+			return "bronce_cobre"
+		"mineral_hierro", "hierro_dulce", "mineral_plata", _:
+			return "hierro_dulce"
 
 func _actualizar_visual_veta(nodo_veta: Node2D, agotada: bool) -> void:
 	var cuerpo_roca: Polygon2D = nodo_veta.get_node_or_null("CuerpoRoca") as Polygon2D
@@ -536,13 +568,100 @@ func cerrar_cinematica_primer_hierro() -> void:
 	GameManager.post_notification("Has archivado la nota grabada del Diario del Tío Rodrik.")
 
 # ==============================================================================
-# ESCALERA DE SALIDA AL TALLER / ACCESO MINA
+# ESCALERA DE SALIDA AL TALLER / ACCESO MINA Y BARRIL DE ACOPIO
 # ==============================================================================
+
+func _crear_barril_acopio_junto_a_escalera() -> void:
+	if not is_instance_valid(escalera_salida_taller):
+		return
+	var existente: Node = escalera_salida_taller.get_node_or_null("BarrilAcopioEntradaMina")
+	if is_instance_valid(existente):
+		return
+
+	barril_acopio_entrada = StaticBody2D.new()
+	barril_acopio_entrada.name = "BarrilAcopioEntradaMina"
+	barril_acopio_entrada.position = Vector2(72.0, -6.0)
+	barril_acopio_entrada.collision_layer = 1
+	barril_acopio_entrada.collision_mask = 0
+	escalera_salida_taller.add_child(barril_acopio_entrada)
+
+	var colision_barril: CollisionShape2D = CollisionShape2D.new()
+	colision_barril.name = "ColisionBarrilEntrada"
+	var forma_solida: RectangleShape2D = RectangleShape2D.new()
+	forma_solida.size = Vector2(36.0, 26.0)
+	colision_barril.shape = forma_solida
+	barril_acopio_entrada.add_child(colision_barril)
+
+	var cuerpo_madera: Polygon2D = Polygon2D.new()
+	cuerpo_madera.name = "CuerpoMaderaBarril"
+	cuerpo_madera.color = Color(0.28, 0.18, 0.12, 1.0)
+	cuerpo_madera.polygon = PackedVector2Array([Vector2(-18.0, -12.0), Vector2(18.0, -12.0), Vector2(20.0, 12.0), Vector2(-20.0, 12.0)])
+	barril_acopio_entrada.add_child(cuerpo_madera)
+
+	var aro_hierro_sup: ColorRect = ColorRect.new()
+	aro_hierro_sup.name = "AroHierroSuperior"
+	aro_hierro_sup.offset_left = -19.0
+	aro_hierro_sup.offset_top = -8.0
+	aro_hierro_sup.offset_right = 19.0
+	aro_hierro_sup.offset_bottom = -5.0
+	aro_hierro_sup.color = Color(0.32, 0.35, 0.38, 1.0)
+	barril_acopio_entrada.add_child(aro_hierro_sup)
+
+	var aro_hierro_inf: ColorRect = ColorRect.new()
+	aro_hierro_inf.name = "AroHierroInferior"
+	aro_hierro_inf.offset_left = -19.0
+	aro_hierro_inf.offset_top = 5.0
+	aro_hierro_inf.offset_right = 19.0
+	aro_hierro_inf.offset_bottom = 8.0
+	aro_hierro_inf.color = Color(0.32, 0.35, 0.38, 1.0)
+	barril_acopio_entrada.add_child(aro_hierro_inf)
+
+	var menas_visibles: Polygon2D = Polygon2D.new()
+	menas_visibles.name = "MenasAsomadas"
+	menas_visibles.color = Color(0.66, 0.70, 0.76, 1.0)
+	menas_visibles.polygon = PackedVector2Array([Vector2(-12.0, -10.0), Vector2(-4.0, -15.0), Vector2(6.0, -14.0), Vector2(13.0, -9.0), Vector2(4.0, -6.0), Vector2(-8.0, -6.0)])
+	barril_acopio_entrada.add_child(menas_visibles)
+
+	var etiqueta_barril: Label = Label.new()
+	etiqueta_barril.name = "EtiquetaBarrilMina"
+	etiqueta_barril.offset_left = -48.0
+	etiqueta_barril.offset_top = 13.0
+	etiqueta_barril.offset_right = 48.0
+	etiqueta_barril.offset_bottom = 27.0
+	etiqueta_barril.add_theme_font_size_override("font_size", 8)
+	etiqueta_barril.add_theme_color_override("font_color", Color(0.92, 0.84, 0.68, 1.0))
+	etiqueta_barril.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_barril.text = "Barril de Menas"
+	barril_acopio_entrada.add_child(etiqueta_barril)
+
+	var script_interactivo: Script = load("res://src/scenes/objects/InteractableArea.gd") as Script
+	area_barril_acopio_entrada = Area2D.new()
+	area_barril_acopio_entrada.name = "AreaInteractiva"
+	if script_interactivo:
+		area_barril_acopio_entrada.set_script(script_interactivo)
+	area_barril_acopio_entrada.set("prompt_text", "Inspeccionar Barril de Menas en Bruto")
+	barril_acopio_entrada.add_child(area_barril_acopio_entrada)
+
+	var colision_interaccion: CollisionShape2D = CollisionShape2D.new()
+	colision_interaccion.name = "ColisionInteraccion"
+	var forma_interaccion: RectangleShape2D = RectangleShape2D.new()
+	forma_interaccion.size = Vector2(56.0, 48.0)
+	colision_interaccion.shape = forma_interaccion
+	area_barril_acopio_entrada.add_child(colision_interaccion)
+
+	if area_barril_acopio_entrada.has_signal("interacted"):
+		area_barril_acopio_entrada.connect("interacted", Callable(self, "_al_interactuar_barril_acopio_entrada"))
+
+func _al_interactuar_barril_acopio_entrada() -> void:
+	if cinematica_activa:
+		return
+	_aplicar_squash_and_stretch(barril_acopio_entrada, Vector2(1.18, 0.84))
+	emit_signal("inspeccion_barril_mina_solicitada")
 
 func _al_interactuar_escalera_salida() -> void:
 	if cinematica_activa:
 		return
-	GameManager.post_notification("Asciendes por la escalera de madera hacia la trampilla trasera del taller...")
+	GameManager.post_notification("Asciendes por la escalera de madera hacia la trampilla trasera del taller. Revisa los barriles de acopio en Acceso a la Mina para cargar hasta 3 menas.")
 	emit_signal("salida_mina_solicitada")
 
 # ==============================================================================

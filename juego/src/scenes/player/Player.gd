@@ -10,6 +10,11 @@ signal interact_focus_changed(target_text: String)
 @export var friction: float = 2600.0
 @export var turn_boost: float = 4000.0
 
+const SPEED: float = 190.0
+const COLOR_MENA_HIERRO_DULCE: Color = Color(0.72, 0.76, 0.82, 1.0)
+const COLOR_MENA_ACERO_CARBONO: Color = Color(0.28, 0.30, 0.34, 1.0)
+const COLOR_MENA_BRONCE_COBRE: Color = Color(0.84, 0.56, 0.28, 1.0)
+
 @onready var detector_interaccion: Area2D = get_node_or_null("DetectorInteraccion") if has_node("DetectorInteraccion") else get_node_or_null("InteractDetector")
 @onready var raiz_visual: Node2D = get_node_or_null("RaizVisual") if has_node("RaizVisual") else get_node_or_null("VisualRoot")
 @onready var camara_jugador: Camera2D = get_node_or_null("CamaraJugador") if has_node("CamaraJugador") else get_node_or_null("Camera2D")
@@ -18,6 +23,9 @@ signal interact_focus_changed(target_text: String)
 @onready var brazo_izquierdo: Node2D = raiz_visual.get_node_or_null("BrazoIzquierdo") if raiz_visual else null
 @onready var brazo_derecho: Node2D = raiz_visual.get_node_or_null("BrazoDerecho") if raiz_visual else null
 @onready var rostro_mirada: Node2D = raiz_visual.get_node_or_null("CabezaArtesano/RostroMirada") if raiz_visual else null
+@onready var mena_en_mano: Node2D = raiz_visual.get_node_or_null("MenaEnMano") if raiz_visual else null
+@onready var cuerpo_mineral_mano: Polygon2D = mena_en_mano.get_node_or_null("CuerpoMineral") as Polygon2D if mena_en_mano else null
+@onready var etiqueta_mena_mano: Label = mena_en_mano.get_node_or_null("EtiquetaMenaMano") as Label if mena_en_mano else null
 
 # Alias de compatibilidad hacia atrás
 var interact_detector: Area2D:
@@ -37,6 +45,11 @@ func _ready() -> void:
 		detector_interaccion.area_exited.connect(_on_interact_area_exited)
 
 func _physics_process(delta: float) -> void:
+	var cantidad_mena: int = int(GameManager.menas_en_mano_cantidad) if "menas_en_mano_cantidad" in GameManager else 0
+	var lleva_mena: bool = ("menas_en_mano_cantidad" in GameManager and cantidad_mena > 0)
+	var tipo_mena: String = String(GameManager.menas_en_mano_tipo) if "menas_en_mano_tipo" in GameManager else "hierro_dulce"
+	_actualizar_visual_mena_en_mano(lleva_mena, tipo_mena, cantidad_mena)
+
 	# Si estamos forjando o descansando, congelar movimiento
 	if GameManager.current_state != GameManager.State.OVERWORLD:
 		velocity = Vector2.ZERO
@@ -47,6 +60,8 @@ func _physics_process(delta: float) -> void:
 		Input.get_axis("move_left", "move_right"),
 		Input.get_axis("move_up", "move_down")
 	).normalized()
+
+	var velocidad_efectiva: float = SPEED * 0.55 if lleva_mena else SPEED
 
 	# Game Feel: Aceleración y Turn-Around Boost
 	if input_vector != Vector2.ZERO:
@@ -59,13 +74,32 @@ func _physics_process(delta: float) -> void:
 		if dot_prod < -0.2:
 			applied_accel = turn_boost
 
-		velocity = velocity.move_toward(input_vector * max_speed, applied_accel * delta)
+		velocity = velocity.move_toward(input_vector * velocidad_efectiva, applied_accel * delta)
 		_apply_walk_juice(delta)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		_reset_walk_juice(delta)
 
 	move_and_slide()
+
+func _actualizar_visual_mena_en_mano(lleva_mena: bool, tipo_mena: String, cantidad_mena: int) -> void:
+	if not is_instance_valid(mena_en_mano):
+		return
+	if not lleva_mena:
+		mena_en_mano.visible = false
+		return
+
+	mena_en_mano.visible = true
+	if is_instance_valid(cuerpo_mineral_mano):
+		match tipo_mena:
+			"acero_carbono", "carbon":
+				cuerpo_mineral_mano.color = COLOR_MENA_ACERO_CARBONO
+			"bronce_cobre", "mineral_cobre":
+				cuerpo_mineral_mano.color = COLOR_MENA_BRONCE_COBRE
+			"hierro_dulce", "mineral_hierro", _:
+				cuerpo_mineral_mano.color = COLOR_MENA_HIERRO_DULCE
+	if is_instance_valid(etiqueta_mena_mano):
+		etiqueta_mena_mano.text = "Mena x%d" % cantidad_mena
 
 func _unhandled_input(event: InputEvent) -> void:
 	if GameManager.current_state != GameManager.State.OVERWORLD:

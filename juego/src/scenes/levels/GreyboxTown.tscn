@@ -55,6 +55,12 @@ size = Vector2(60, 26)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf_area"]
 size = Vector2(76, 48)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_barriles_acopio_body"]
+size = Vector2(54, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_barriles_acopio_area"]
+size = Vector2(74, 52)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger_door_s"]
 size = Vector2(70, 20)
 
@@ -749,6 +755,82 @@ prompt_text = "Picos mellados y herramientas mineras antiguas"
 
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/EstanteriaHerramientas/AreaInteractiva" unique_id=1713972352]
 shape = SubResource("RectangleShape2D_shelf_area")
+
+[node name="BarrilesAcopioMina" type="StaticBody2D" parent="InteriorCasa/AccesoMina"]
+z_index = 1
+position = Vector2(745, 232)
+collision_mask = 0
+
+[node name="SombraBarriles" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+position = Vector2(0, 4)
+color = Color(0.04, 0.03, 0.03, 0.55)
+polygon = PackedVector2Array(-30, -10, 30, -10, 32, 14, -32, 14)
+
+[node name="BarrilIzquierdoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+position = Vector2(-14, 0)
+color = Color(0.28, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-12, -13, 12, -13, 13, 13, -13, 13)
+
+[node name="AroHierroIzqSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+offset_left = -13.0
+offset_top = -8.0
+offset_right = 13.0
+offset_bottom = -5.0
+color = Color(0.31, 0.33, 0.36, 1)
+
+[node name="AroHierroIzqInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+offset_left = -13.0
+offset_top = 5.0
+offset_right = 13.0
+offset_bottom = 8.0
+color = Color(0.31, 0.33, 0.36, 1)
+
+[node name="MenaBrutaIzquierda" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+color = Color(0.68, 0.72, 0.78, 1)
+polygon = PackedVector2Array(-9, -11, -3, -16, 5, -15, 9, -10, 3, -8, -6, -8)
+
+[node name="BarrilDerechoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+position = Vector2(14, 2)
+color = Color(0.25, 0.16, 0.11, 1)
+polygon = PackedVector2Array(-12, -13, 12, -13, 13, 13, -13, 13)
+
+[node name="AroHierroDerSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+offset_left = -13.0
+offset_top = -8.0
+offset_right = 13.0
+offset_bottom = -5.0
+color = Color(0.31, 0.33, 0.36, 1)
+
+[node name="AroHierroDerInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+offset_left = -13.0
+offset_top = 5.0
+offset_right = 13.0
+offset_bottom = 8.0
+color = Color(0.31, 0.33, 0.36, 1)
+
+[node name="MenaBrutaDerecha" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+color = Color(0.78, 0.48, 0.28, 1)
+polygon = PackedVector2Array(-8, -11, -2, -15, 6, -15, 9, -10, 2, -8, -5, -8)
+
+[node name="EtiquetaBarriles" type="Label" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+offset_left = -52.0
+offset_top = 15.0
+offset_right = 52.0
+offset_bottom = 29.0
+theme_override_colors/font_color = Color(0.92, 0.84, 0.68, 1)
+theme_override_font_sizes/font_size = 8
+text = "Barriles de Menas"
+horizontal_alignment = 1
+
+[node name="ColisionBarrilesAcopio" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+shape = SubResource("RectangleShape2D_barriles_acopio_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Barril de Menas en Bruto"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_barriles_acopio_area")
 
 [node name="Pasillo" type="Node2D" parent="InteriorCasa" unique_id=481261187]
 

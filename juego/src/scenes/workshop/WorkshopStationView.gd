@@ -67,6 +67,7 @@ var _chispas_horno: CPUParticles2D = null
 
 var tiene_lingote_en_horno: bool = false
 var metal_seleccionado_id: String = "hierro_dulce"
+var modo_fundicion_mena_activa: bool = false
 var _arrastrando_lingote_barril: bool = false
 var _metal_en_arrastre: String = ""
 
@@ -164,6 +165,39 @@ func _ready() -> void:
 	layer = 12
 	_configurar_atmosfera_fragua()
 	_connect_signals()
+	_actualizar_etiquetas_stock_barriles()
+
+func obtener_temp_optima_min() -> float:
+	if GameManager and GameManager.DATOS_METALES.has(metal_seleccionado_id):
+		return float(GameManager.DATOS_METALES[metal_seleccionado_id].get("temp_forja_min", TEMP_OPTIMAL_MIN))
+	return TEMP_OPTIMAL_MIN
+
+func obtener_temp_optima_max() -> float:
+	if GameManager and GameManager.DATOS_METALES.has(metal_seleccionado_id):
+		return float(GameManager.DATOS_METALES[metal_seleccionado_id].get("temp_forja_max", TEMP_OPTIMAL_MAX))
+	return TEMP_OPTIMAL_MAX
+
+func obtener_temp_fusion_metal() -> float:
+	if GameManager and GameManager.DATOS_METALES.has(metal_seleccionado_id):
+		return float(GameManager.DATOS_METALES[metal_seleccionado_id].get("temp_fusion", 1200.0))
+	return 1200.0
+
+func _actualizar_etiquetas_stock_barriles() -> void:
+	if not GameManager:
+		return
+	var stock_h: int = int(GameManager.stock_barriles_fragua.get("hierro_dulce", 0))
+	var stock_a: int = int(GameManager.stock_barriles_fragua.get("acero_carbono", 0))
+	var stock_b: int = int(GameManager.stock_barriles_fragua.get("bronce_cobre", 0))
+
+	if barril_hierro_dulce and barril_hierro_dulce.has_node("EtiquetaBarril"):
+		var lbl: Label = barril_hierro_dulce.get_node("EtiquetaBarril") as Label
+		lbl.text = "HIERRO DULCE (%d/3)\n1000°-1160°C\nClavos y herrajes" % stock_h
+	if barril_acero_carbono and barril_acero_carbono.has_node("EtiquetaBarril"):
+		var lbl: Label = barril_acero_carbono.get_node("EtiquetaBarril") as Label
+		lbl.text = "ACERO CARBONO (%d/3)\n920°-1040°C\nHerramientas y hojas" % stock_a
+	if barril_bronce_cobre and barril_bronce_cobre.has_node("EtiquetaBarril"):
+		var lbl: Label = barril_bronce_cobre.get_node("EtiquetaBarril") as Label
+		lbl.text = "BRONCE COBRE (%d/3)\n750°-880°C\nOrnamentos y pomos" % stock_b
 
 func _configurar_atmosfera_fragua() -> void:
 	if horno_fragua:
@@ -247,8 +281,20 @@ func _connect_signals() -> void:
 	btn_craft_again.pressed.connect(reset_recipe)
 	btn_ticket_exit.pressed.connect(close_station)
 
+	if GameManager and GameManager.has_signal("stock_barriles_cambiado"):
+		if not GameManager.is_connected("stock_barriles_cambiado", _actualizar_etiquetas_stock_barriles):
+			GameManager.stock_barriles_cambiado.connect(_actualizar_etiquetas_stock_barriles)
+
 func _on_barril_gui_input(event: InputEvent, metal_id: String) -> void:
+	if modo_fundicion_mena_activa:
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var stock: int = int(GameManager.stock_barriles_fragua.get(metal_id, 0)) if GameManager else 3
+		if stock <= 0:
+			AudioManager.play_sfx("temp_overheat", 0.8, 0.05)
+			etiqueta_estado_fragua.text = "¡Sin stock de %s en el barril (0/3)! Extrae mena en la mina y fúndela." % CATALOGO_METALES.get(metal_id, {}).get("nombre", metal_id)
+			etiqueta_estado_fragua.modulate = Color(0.95, 0.42, 0.35)
+			return
 		_arrastrando_lingote_barril = true
 		_metal_en_arrastre = metal_id
 		AudioManager.play_sfx("place_item", -3.0, 0.08)
@@ -256,7 +302,10 @@ func _on_barril_gui_input(event: InputEvent, metal_id: String) -> void:
 			lingote_arrastrado.visible = true
 			lingote_arrastrado.color = CATALOGO_METALES[metal_id]["color_frio"]
 			lingote_arrastrado.global_position = estacion_fragua.get_global_mouse_position()
-		etiqueta_estado_fragua.text = "Arrastra el lingote de %s hasta la boca del horno y suéltalo entre las brasas." % CATALOGO_METALES[metal_id]["nombre"]
+		etiqueta_estado_fragua.text = "Arrastra el lingote de %s (%d/3) hasta la boca del horno y suéltalo entre las brasas." % [
+			CATALOGO_METALES[metal_id]["nombre"],
+			stock
+		]
 		etiqueta_estado_fragua.modulate = Color(0.96, 0.82, 0.35)
 
 func _input(event: InputEvent) -> void:
@@ -276,8 +325,18 @@ func _input(event: InputEvent) -> void:
 
 ## Introduce físicamente el lingote seleccionado dentro de la cavidad de brasas del horno
 func colocar_lingote_en_horno(metal_id: String = "hierro_dulce") -> void:
+	if modo_fundicion_mena_activa:
+		return
 	if not CATALOGO_METALES.has(metal_id):
 		metal_id = "hierro_dulce"
+	if GameManager:
+		var consumido: bool = GameManager.consumir_lingote_barril_fragua(metal_id)
+		if not consumido:
+			var stock: int = int(GameManager.stock_barriles_fragua.get(metal_id, 0))
+			if stock <= 0:
+				etiqueta_estado_fragua.text = "¡Barril de %s agotado (0/3)! Trae menas de la mina para fundir." % CATALOGO_METALES[metal_id]["nombre"]
+				etiqueta_estado_fragua.modulate = Color(0.95, 0.42, 0.35)
+				return
 	metal_seleccionado_id = metal_id
 	tiene_lingote_en_horno = true
 	AudioManager.play_sfx("place_item", 0.5, 0.06)
@@ -293,6 +352,7 @@ func colocar_lingote_en_horno(metal_id: String = "hierro_dulce") -> void:
 		tw.tween_property(lingote_en_brasas, "scale", Vector2.ONE, 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	_resaltar_barril_activo(metal_id)
+	_actualizar_etiquetas_stock_barriles()
 	_update_forge_ui()
 
 func _resaltar_barril_activo(metal_id: String) -> void:
@@ -328,7 +388,33 @@ func open_station() -> void:
 	visible = true
 	GameManager.change_state(GameManager.State.WORKSHOP_STATION)
 	AudioManager.start_forge_ambience()
-	reset_recipe()
+	_actualizar_etiquetas_stock_barriles()
+	if GameManager and GameManager.menas_en_mano_cantidad > 0:
+		_iniciar_fundicion_menas_en_mano()
+	else:
+		reset_recipe()
+
+func _iniciar_fundicion_menas_en_mano() -> void:
+	_reiniciar_estaciones_para_nuevo_encargo()
+	modo_fundicion_mena_activa = true
+	var metal_id: String = GameManager.menas_en_mano_tipo if GameManager else "hierro_dulce"
+	if not CATALOGO_METALES.has(metal_id):
+		metal_id = "hierro_dulce"
+	metal_seleccionado_id = metal_id
+	tiene_lingote_en_horno = true
+	temperature = TEMP_AMBIENTE_FRAGUA
+	_temperatura_visual = TEMP_AMBIENTE_FRAGUA
+	is_forge_settled = false
+	if lingote_arrastrado:
+		lingote_arrastrado.visible = false
+	if lingote_en_brasas:
+		lingote_en_brasas.visible = true
+	if indicador_boca_horno:
+		indicador_boca_horno.visible = false
+	btn_llevar_al_yunque.disabled = true
+	_resaltar_barril_activo(metal_id)
+	_switch_tab(StationTab.FORGE)
+	_update_forge_ui()
 
 func close_station() -> void:
 	visible = false
@@ -357,6 +443,7 @@ func _reiniciar_estaciones_para_nuevo_encargo() -> void:
 	temperature = TEMP_AMBIENTE_FRAGUA
 	_temperatura_visual = TEMP_AMBIENTE_FRAGUA
 	is_forge_settled = false
+	modo_fundicion_mena_activa = false
 	_estaba_en_zona_optima = false
 	_estaba_sobrecalentado = false
 	_recalentando_en_fragua = false
@@ -371,7 +458,9 @@ func _reiniciar_estaciones_para_nuevo_encargo() -> void:
 	_resaltar_barril_activo("")
 
 	btn_llevar_al_yunque.disabled = false
-	etiqueta_estado_fragua.text = "Coloca un lingote de los barriles en las brasas y acciona el fuelle hasta alcanzar entre 1000°C y 1150°C."
+	var t_min: float = obtener_temp_optima_min()
+	var t_max: float = obtener_temp_optima_max()
+	etiqueta_estado_fragua.text = "Coloca un lingote de los barriles en las brasas y acciona el fuelle hasta alcanzar entre %.0f°C y %.0f°C." % [t_min, t_max]
 	etiqueta_estado_fragua.modulate = Color(0.95, 0.9, 0.8)
 	_update_forge_ui()
 
@@ -400,15 +489,20 @@ func _switch_tab(tab: StationTab) -> void:
 func _on_order_accepted(order_info: Dictionary) -> void:
 	_reiniciar_estaciones_para_nuevo_encargo()
 	var nombre_item: String = str(order_info.get("item_name", "Clavo Forjado de Compuerta"))
+	var metal_requerido: String = str(order_info.get("required_metal", "hierro_dulce"))
+	if CATALOGO_METALES.has(metal_requerido):
+		metal_seleccionado_id = metal_requerido
 	if estacion_yunque and estacion_yunque.has_method("configurar_molde_encargo"):
 		estacion_yunque.configurar_molde_encargo(nombre_item)
+	if estacion_yunque and estacion_yunque.has_method("configurar_maleabilidad_metal"):
+		estacion_yunque.configurar_maleabilidad_metal(metal_seleccionado_id)
 	_switch_tab(StationTab.FORGE)
 
 func _on_bellows_pressed() -> void:
 	if is_forge_settled:
 		return
 	# Si aún no había lingote en el horno (ej. ejecución rápida o test), introducir el lingote del encargo activo
-	if not tiene_lingote_en_horno:
+	if not tiene_lingote_en_horno and not modo_fundicion_mena_activa:
 		var metal_pedido: String = "hierro_dulce"
 		if vista_mostrador and not vista_mostrador.active_order.is_empty():
 			metal_pedido = str(vista_mostrador.active_order.get("required_metal", "hierro_dulce"))
@@ -420,6 +514,26 @@ func _on_bellows_pressed() -> void:
 
 	temperature = minf(TEMP_MANOMETRO_MAX, temperature + AUMENTO_POR_FUELLE)
 	_temperatura_visual = lerpf(_temperatura_visual, temperature, 0.65)
+
+	if modo_fundicion_mena_activa:
+		var t_fus: float = obtener_temp_fusion_metal()
+		if temperature >= (t_fus - 15.0):
+			modo_fundicion_mena_activa = false
+			var cant: int = GameManager.completar_fundicion_menas_en_mano()
+			AudioManager.play_sfx("step_complete", 2.0, 0.02)
+			AudioManager.play_sfx("temp_ready", 1.5, 0.03)
+			btn_llevar_al_yunque.disabled = false
+			tiene_lingote_en_horno = false
+			if lingote_en_brasas:
+				lingote_en_brasas.visible = false
+			if indicador_boca_horno:
+				indicador_boca_horno.visible = true
+			_actualizar_etiquetas_stock_barriles()
+			etiqueta_estado_fragua.text = "¡MENA FUNDIDA CON ÉXITO A %.0f°C! Se obtuvieron %d lingotes nuevos para los barriles." % [temperature, cant]
+			etiqueta_estado_fragua.modulate = Color(0.96, 0.82, 0.35)
+			_update_forge_ui()
+			return
+
 	_update_forge_ui()
 
 	if icono_fuelle:
@@ -434,8 +548,10 @@ func _on_bellows_pressed() -> void:
 		fire_tween.tween_property(resplandor_fuego, "modulate:a", 1.0, 0.3)
 
 func _update_forge_ui() -> void:
-	var ahora_en_optima: bool = tiene_lingote_en_horno and temperature >= TEMP_OPTIMAL_MIN and temperature <= TEMP_OPTIMAL_MAX
-	var ahora_sobrecalentado: bool = tiene_lingote_en_horno and temperature > TEMP_OPTIMAL_MAX
+	var t_min: float = obtener_temp_optima_min()
+	var t_max: float = obtener_temp_optima_max()
+	var ahora_en_optima: bool = tiene_lingote_en_horno and not modo_fundicion_mena_activa and temperature >= t_min and temperature <= t_max
+	var ahora_sobrecalentado: bool = tiene_lingote_en_horno and not modo_fundicion_mena_activa and temperature > t_max
 
 	if ahora_en_optima and not _estaba_en_zona_optima:
 		AudioManager.play_sfx("temp_ready", 1.5, 0.03)
@@ -499,7 +615,16 @@ func _update_forge_ui() -> void:
 	if not tiene_lingote_en_horno:
 		etiqueta_estado_fragua.text = "Elige uno de los 3 barriles de metal a la izquierda y arrastra un lingote dentro del horno."
 		etiqueta_estado_fragua.modulate = Color(0.95, 0.86, 0.55)
-	elif temperature >= TEMP_OPTIMAL_MIN and temperature <= TEMP_OPTIMAL_MAX:
+	elif modo_fundicion_mena_activa:
+		var t_fus: float = obtener_temp_fusion_metal()
+		etiqueta_estado_fragua.text = "Fundiendo mena de %s (%d en crisol). Atiza fuelle hasta punto de fusión (%.0f°C). Actual: %.0f°C" % [
+			nombre_metal,
+			GameManager.menas_en_mano_cantidad,
+			t_fus,
+			temperature
+		]
+		etiqueta_estado_fragua.modulate = Color(1.0, 0.65, 0.25)
+	elif temperature >= t_min and temperature <= t_max:
 		etiqueta_estado_fragua.text = "¡CALDEO ÓPTIMO DE %s (%.0f°C)! Lingote incandescente entre las brasas. ¡Llévalo al yunque!" % [
 			nombre_metal.to_upper(),
 			temperature
@@ -508,14 +633,16 @@ func _update_forge_ui() -> void:
 	elif temperature > TEMP_QUEMADO:
 		etiqueta_estado_fragua.text = "¡METAL QUEMADO (%.0f°C)! Chispas blancas: el carbono arde. Deja enfriar de inmediato." % temperature
 		etiqueta_estado_fragua.modulate = Color(0.95, 0.42, 0.35)
-	elif temperature > TEMP_OPTIMAL_MAX:
-		etiqueta_estado_fragua.text = "¡SOBRECALENTADO (%.0f°C)! Blanco de soldadura; deja que baje a 1150°C." % temperature
+	elif temperature > t_max:
+		etiqueta_estado_fragua.text = "¡SOBRECALENTADO (%.0f°C)! Blanco de soldadura; deja que baje a %.0f°C." % [temperature, t_max]
 		etiqueta_estado_fragua.modulate = Color(0.95, 0.55, 0.32)
 	else:
-		etiqueta_estado_fragua.text = "%s dentro del horno (%.0f°C - %s). Atiza el fuelle [ESPACIO] hasta 1000°C - 1150°C." % [
+		etiqueta_estado_fragua.text = "%s dentro del horno (%.0f°C - %s). Atiza el fuelle [ESPACIO] hasta %.0f°C - %.0f°C." % [
 			nombre_metal,
 			temperature,
-			EscalaTermica.nombre_tramo(temperature)
+			EscalaTermica.nombre_tramo(temperature),
+			t_min,
+			t_max
 		]
 		etiqueta_estado_fragua.modulate = Color(0.85, 0.80, 0.72)
 
@@ -530,35 +657,45 @@ func _on_anvil_reheat_requested(temp_actual: float) -> void:
 	is_forge_settled = false
 	temperature = clampf(temp_actual, TEMP_AMBIENTE_FRAGUA, TEMP_MANOMETRO_MAX)
 	_temperatura_visual = temperature
-	_estaba_en_zona_optima = (temperature >= TEMP_OPTIMAL_MIN and temperature <= TEMP_OPTIMAL_MAX)
-	_estaba_sobrecalentado = (temperature > TEMP_OPTIMAL_MAX)
+	var t_min: float = obtener_temp_optima_min()
+	var t_max: float = obtener_temp_optima_max()
+	_estaba_en_zona_optima = (temperature >= t_min and temperature <= t_max)
+	_estaba_sobrecalentado = (temperature > t_max)
 	_update_forge_ui()
-	etiqueta_estado_fragua.text = "Recalentando pieza en las brasas (%.0f°C): atiza el fuelle hasta 1000°C - 1150°C." % temperature
+	etiqueta_estado_fragua.text = "Recalentando pieza en las brasas (%.0f°C): atiza el fuelle hasta %.0f°C - %.0f°C." % [temperature, t_min, t_max]
 	_switch_tab(StationTab.FORGE)
 
 func _on_to_anvil_pressed() -> void:
+	if modo_fundicion_mena_activa:
+		return
 	if not tiene_lingote_en_horno:
 		colocar_lingote_en_horno(metal_seleccionado_id)
 	is_forge_settled = true
-	if temperature >= TEMP_OPTIMAL_MIN and temperature <= TEMP_OPTIMAL_MAX:
+	var t_min: float = obtener_temp_optima_min()
+	var t_max: float = obtener_temp_optima_max()
+	if temperature >= t_min and temperature <= t_max:
 		score_forge = 1.0
-	elif temperature < TEMP_OPTIMAL_MIN:
+	elif temperature < t_min:
 		score_forge = clampf(
-			(temperature - TEMP_AMBIENTE_FRAGUA) / (TEMP_OPTIMAL_MIN - TEMP_AMBIENTE_FRAGUA),
+			(temperature - TEMP_AMBIENTE_FRAGUA) / (t_min - TEMP_AMBIENTE_FRAGUA),
 			0.15,
 			0.80
 		)
 	else:
-		score_forge = clampf(1.0 - ((temperature - TEMP_OPTIMAL_MAX) / 220.0), 0.25, 0.75)
+		score_forge = clampf(1.0 - ((temperature - t_max) / 220.0), 0.25, 0.75)
 
 	AudioManager.play_sfx("step_complete", 0.5, 0.03)
 	AudioManager.play_sfx("place_item", 0.0, 0.05)
+
+	if estacion_yunque and estacion_yunque.has_method("configurar_maleabilidad_metal"):
+		estacion_yunque.configurar_maleabilidad_metal(metal_seleccionado_id)
 
 	if _recalentando_en_fragua and estacion_yunque.has_method("recalentar_pieza"):
 		_recalentando_en_fragua = false
 		estacion_yunque.recalentar_pieza(temperature, lingote_fragua.color)
 	else:
 		estacion_yunque.reset_station(lingote_fragua.color, temperature)
+	_switch_tab(StationTab.ANVIL)
 	_switch_tab(StationTab.ANVIL)
 
 func _on_anvil_completed(score: float, shape: PackedVector2Array) -> void:

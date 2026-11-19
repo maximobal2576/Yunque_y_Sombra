@@ -48,6 +48,8 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var area_mostrador: Area2D = $InteriorCasa/Pasillo/Mostrador/AreaInteractiva
 @onready var area_mina: Area2D = $InteriorCasa/AccesoMina/EntradaMina/AreaInteractiva
 @onready var area_herramientas_mina: Area2D = $InteriorCasa/AccesoMina/EstanteriaHerramientas/AreaInteractiva
+@onready var barriles_acopio_mina: StaticBody2D = $InteriorCasa/AccesoMina/BarrilesAcopioMina
+@onready var area_barriles_acopio_mina: Area2D = $InteriorCasa/AccesoMina/BarrilesAcopioMina/AreaInteractiva
 
 # Interactables del exterior (Centro del pueblo) en Español
 @onready var area_farol: Area2D = $PuebloExterior/FarolCentral/AreaInteractiva
@@ -123,6 +125,31 @@ const SPAWN_MINE_ACCESS_RETURN: Vector2 = Vector2(640, 210)
 var _is_transitioning: bool = false
 var _active_tween: Tween = null
 
+# Panel de Inventario del Barril de Menas en Bruto (Layer 22, nodos 100% en español, cero emojis)
+var capa_inventario_barril_mina: CanvasLayer = null
+var panel_inventario_barril: PanelContainer = null
+var etiqueta_manos_actuales: Label = null
+var etiquetas_cantidad_barril: Dictionary = {}
+var botones_retiro_barril: Dictionary = {}
+
+const CATALOGO_MENAS_BARRIL: Array[Dictionary] = [
+	{
+		"id": "hierro_dulce",
+		"nombre": "Hierro Dulce",
+		"color": Color(0.72, 0.76, 0.82, 1.0)
+	},
+	{
+		"id": "acero_carbono",
+		"nombre": "Acero al Carbono",
+		"color": Color(0.36, 0.38, 0.42, 1.0)
+	},
+	{
+		"id": "bronce_cobre",
+		"nombre": "Bronce de Forja",
+		"color": Color(0.84, 0.56, 0.28, 1.0)
+	}
+]
+
 func _ready() -> void:
 	if pueblo_exterior:
 		pueblo_exterior.visible = true
@@ -164,8 +191,11 @@ func _ready() -> void:
 	_conectar_eventos_taller_a_tutorial()
 
 	# Conectar señales de la mina subterránea
-	if is_instance_valid(mina_subterranea) and mina_subterranea.has_signal("salida_mina_solicitada"):
-		mina_subterranea.salida_mina_solicitada.connect(_on_mine_exit_requested)
+	if is_instance_valid(mina_subterranea):
+		if mina_subterranea.has_signal("salida_mina_solicitada"):
+			mina_subterranea.salida_mina_solicitada.connect(_on_mine_exit_requested)
+		if mina_subterranea.has_signal("inspeccion_barril_mina_solicitada"):
+			mina_subterranea.inspeccion_barril_mina_solicitada.connect(_on_barriles_acopio_mina_interacted)
 
 	# Conectar estaciones y objetos interactivos
 	area_cama.interacted.connect(_on_bed_interacted)
@@ -173,8 +203,12 @@ func _ready() -> void:
 	area_mostrador.interacted.connect(_on_counter_interacted)
 	area_mina.interacted.connect(_on_mine_interacted)
 	area_herramientas_mina.interacted.connect(_on_mine_tools_interacted)
+	if is_instance_valid(area_barriles_acopio_mina):
+		area_barriles_acopio_mina.interacted.connect(_on_barriles_acopio_mina_interacted)
 	area_farol.interacted.connect(_on_lamp_interacted)
 	area_cartel_guia.interacted.connect(_on_signpost_interacted)
+
+	_construir_capa_inventario_barril_mina()
 
 	# Mensaje de bienvenida inicial si ya no estamos en prologo
 	if GameManager.current_state != GameManager.State.PROLOGUE:
@@ -294,7 +328,230 @@ func _teleport_player(target_pos: Vector2) -> void:
 # ==============================================================================
 
 func _on_bed_interacted() -> void:
+	if GameManager.has_method("registrar_sueno_completado"):
+		GameManager.registrar_sueno_completado()
 	TimeManager.sleep_voluntarily()
+
+func _on_barriles_acopio_mina_interacted() -> void:
+	abrir_inventario_barril_mina()
+
+func _construir_capa_inventario_barril_mina() -> void:
+	if is_instance_valid(capa_inventario_barril_mina):
+		return
+
+	capa_inventario_barril_mina = CanvasLayer.new()
+	capa_inventario_barril_mina.name = "CapaInventarioBarrilMina"
+	capa_inventario_barril_mina.layer = 22
+	capa_inventario_barril_mina.visible = false
+	add_child(capa_inventario_barril_mina)
+
+	var fondo_oscuro: ColorRect = ColorRect.new()
+	fondo_oscuro.name = "FondoOscuroBarril"
+	fondo_oscuro.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fondo_oscuro.color = Color(0.06, 0.05, 0.04, 0.82)
+	capa_inventario_barril_mina.add_child(fondo_oscuro)
+
+	var contenedor_centrado: CenterContainer = CenterContainer.new()
+	contenedor_centrado.name = "ContenedorCentradoBarril"
+	contenedor_centrado.set_anchors_preset(Control.PRESET_FULL_RECT)
+	capa_inventario_barril_mina.add_child(contenedor_centrado)
+
+	panel_inventario_barril = PanelContainer.new()
+	panel_inventario_barril.name = "PanelInventarioBarril"
+	panel_inventario_barril.custom_minimum_size = Vector2(640.0, 410.0)
+	var estilo_panel: StyleBoxFlat = StyleBoxFlat.new()
+	estilo_panel.bg_color = Color(0.13, 0.10, 0.09, 0.98)
+	estilo_panel.border_width_left = 3
+	estilo_panel.border_width_top = 3
+	estilo_panel.border_width_right = 3
+	estilo_panel.border_width_bottom = 3
+	estilo_panel.border_color = Color(0.71, 0.60, 0.42, 1.0)
+	estilo_panel.corner_radius_top_left = 6
+	estilo_panel.corner_radius_top_right = 6
+	estilo_panel.corner_radius_bottom_right = 6
+	estilo_panel.corner_radius_bottom_left = 6
+	panel_inventario_barril.add_theme_stylebox_override("panel", estilo_panel)
+	contenedor_centrado.add_child(panel_inventario_barril)
+
+	var margen_interno: MarginContainer = MarginContainer.new()
+	margen_interno.name = "MargenInternoBarril"
+	margen_interno.add_theme_constant_override("margin_left", 24)
+	margen_interno.add_theme_constant_override("margin_top", 20)
+	margen_interno.add_theme_constant_override("margin_right", 24)
+	margen_interno.add_theme_constant_override("margin_bottom", 20)
+	panel_inventario_barril.add_child(margen_interno)
+
+	var columna_principal: VBoxContainer = VBoxContainer.new()
+	columna_principal.name = "ColumnaPrincipalBarril"
+	columna_principal.add_theme_constant_override("separation", 14)
+	margen_interno.add_child(columna_principal)
+
+	var etiqueta_titulo: Label = Label.new()
+	etiqueta_titulo.name = "EtiquetaTituloBarril"
+	etiqueta_titulo.text = "BARRILES DE ACOPIO: MENAS EN BRUTO"
+	etiqueta_titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_titulo.add_theme_font_size_override("font_size", 18)
+	etiqueta_titulo.add_theme_color_override("font_color", Color(0.95, 0.90, 0.82, 1.0))
+	columna_principal.add_child(etiqueta_titulo)
+
+	var etiqueta_subtitulo: Label = Label.new()
+	etiqueta_subtitulo.name = "EtiquetaSubtituloBarril"
+	etiqueta_subtitulo.text = "Elige de 1 a 3 menas del mismo tipo para cargar en tus manos hacia la Fragua del taller."
+	etiqueta_subtitulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_subtitulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	etiqueta_subtitulo.add_theme_font_size_override("font_size", 12)
+	etiqueta_subtitulo.add_theme_color_override("font_color", Color(0.86, 0.78, 0.66, 1.0))
+	columna_principal.add_child(etiqueta_subtitulo)
+
+	etiqueta_manos_actuales = Label.new()
+	etiqueta_manos_actuales.name = "EtiquetaManosActuales"
+	etiqueta_manos_actuales.text = "En tus manos: Ninguna mena cargada"
+	etiqueta_manos_actuales.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_manos_actuales.add_theme_font_size_override("font_size", 13)
+	etiqueta_manos_actuales.add_theme_color_override("font_color", Color(0.91, 0.56, 0.22, 1.0))
+	columna_principal.add_child(etiqueta_manos_actuales)
+
+	var separador_superior: HSeparator = HSeparator.new()
+	separador_superior.name = "SeparadorSuperiorBarril"
+	columna_principal.add_child(separador_superior)
+
+	var lista_tipos: VBoxContainer = VBoxContainer.new()
+	lista_tipos.name = "ListaTiposMenas"
+	lista_tipos.add_theme_constant_override("separation", 12)
+	columna_principal.add_child(lista_tipos)
+
+	for info_mena: Dictionary in CATALOGO_MENAS_BARRIL:
+		var tipo_id: String = String(info_mena["id"])
+		var nombre_mena: String = String(info_mena["nombre"])
+		var color_mena: Color = info_mena["color"] as Color
+
+		var fila_mena: HBoxContainer = HBoxContainer.new()
+		fila_mena.name = "FilaMena_" + tipo_id
+		fila_mena.add_theme_constant_override("separation", 10)
+		lista_tipos.add_child(fila_mena)
+
+		var muestra_color: ColorRect = ColorRect.new()
+		muestra_color.name = "MuestraColorMena"
+		muestra_color.custom_minimum_size = Vector2(20.0, 28.0)
+		muestra_color.color = color_mena
+		fila_mena.add_child(muestra_color)
+
+		var etiqueta_nombre: Label = Label.new()
+		etiqueta_nombre.name = "EtiquetaNombreMena"
+		etiqueta_nombre.custom_minimum_size = Vector2(150.0, 0.0)
+		etiqueta_nombre.text = nombre_mena
+		etiqueta_nombre.add_theme_font_size_override("font_size", 14)
+		etiqueta_nombre.add_theme_color_override("font_color", Color(0.95, 0.90, 0.82, 1.0))
+		fila_mena.add_child(etiqueta_nombre)
+
+		var etiqueta_stock: Label = Label.new()
+		etiqueta_stock.name = "EtiquetaStockMena"
+		etiqueta_stock.custom_minimum_size = Vector2(120.0, 0.0)
+		etiqueta_stock.text = "En barril: 0"
+		etiqueta_stock.add_theme_font_size_override("font_size", 13)
+		etiqueta_stock.add_theme_color_override("font_color", Color(0.88, 0.82, 0.70, 1.0))
+		fila_mena.add_child(etiqueta_stock)
+		etiquetas_cantidad_barril[tipo_id] = etiqueta_stock
+
+		var botones_tipo: Array[Button] = []
+		for cantidad_retiro: int in [1, 2, 3]:
+			var boton_tomar: Button = Button.new()
+			boton_tomar.name = "BotonTomar%d_%s" % [cantidad_retiro, tipo_id]
+			boton_tomar.custom_minimum_size = Vector2(96.0, 34.0)
+			boton_tomar.text = "Tomar %d" % cantidad_retiro if cantidad_retiro < 3 else "Tomar 3 (Máx)"
+			boton_tomar.add_theme_font_size_override("font_size", 12)
+			boton_tomar.pressed.connect(func() -> void: _retirar_menas_desde_panel(tipo_id, cantidad_retiro))
+			fila_mena.add_child(boton_tomar)
+			botones_tipo.append(boton_tomar)
+
+		botones_retiro_barril[tipo_id] = botones_tipo
+
+	var separador_inferior: HSeparator = HSeparator.new()
+	separador_inferior.name = "SeparadorInferiorBarril"
+	columna_principal.add_child(separador_inferior)
+
+	var boton_cerrar: Button = Button.new()
+	boton_cerrar.name = "BotonCerrarInventarioBarril"
+	boton_cerrar.custom_minimum_size = Vector2(220.0, 38.0)
+	boton_cerrar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	boton_cerrar.text = "Cerrar Barril"
+	boton_cerrar.pressed.connect(cerrar_inventario_barril_mina)
+	columna_principal.add_child(boton_cerrar)
+
+func abrir_inventario_barril_mina() -> void:
+	if not is_instance_valid(capa_inventario_barril_mina):
+		_construir_capa_inventario_barril_mina()
+	_actualizar_panel_inventario_barril_mina()
+	capa_inventario_barril_mina.visible = true
+	AudioManager.play_sfx("place_item", 0.0, 0.05)
+
+func cerrar_inventario_barril_mina() -> void:
+	if is_instance_valid(capa_inventario_barril_mina):
+		capa_inventario_barril_mina.visible = false
+
+func _obtener_stock_barril_mina(tipo_id: String) -> int:
+	if "menas_barril_mina" in GameManager and GameManager.menas_barril_mina is Dictionary:
+		return int(GameManager.menas_barril_mina.get(tipo_id, 0))
+	match tipo_id:
+		"acero_carbono":
+			return int(GameManager.inventory.get("carbon", 0))
+		"bronce_cobre":
+			return int(GameManager.inventory.get("mineral_cobre", 0))
+		"hierro_dulce", _:
+			return int(GameManager.inventory.get("mineral_hierro", 0))
+
+func _actualizar_panel_inventario_barril_mina() -> void:
+	if is_instance_valid(etiqueta_manos_actuales):
+		var cant_mano: int = int(GameManager.menas_en_mano_cantidad) if "menas_en_mano_cantidad" in GameManager else 0
+		var tipo_mano: String = String(GameManager.menas_en_mano_tipo) if "menas_en_mano_tipo" in GameManager else ""
+		if cant_mano > 0:
+			var nombre_legible: String = "Hierro Dulce"
+			for item: Dictionary in CATALOGO_MENAS_BARRIL:
+				if String(item["id"]) == tipo_mano:
+					nombre_legible = String(item["nombre"])
+					break
+			etiqueta_manos_actuales.text = "En tus manos: %d x %s (Máx. 3)" % [cant_mano, nombre_legible]
+		else:
+			etiqueta_manos_actuales.text = "En tus manos: Ninguna mena cargada (Máx. 3)"
+
+	for info_mena: Dictionary in CATALOGO_MENAS_BARRIL:
+		var tipo_id: String = String(info_mena["id"])
+		var disponible: int = _obtener_stock_barril_mina(tipo_id)
+		if etiquetas_cantidad_barril.has(tipo_id):
+			var etq: Label = etiquetas_cantidad_barril[tipo_id] as Label
+			if is_instance_valid(etq):
+				etq.text = "En barril: %d" % disponible
+		if botones_retiro_barril.has(tipo_id):
+			var lista_btn: Array = botones_retiro_barril[tipo_id] as Array
+			for idx: int in range(lista_btn.size()):
+				var cant_req: int = idx + 1
+				var btn: Button = lista_btn[idx] as Button
+				if is_instance_valid(btn):
+					btn.disabled = (disponible < cant_req)
+
+func _retirar_menas_desde_panel(tipo: String, cantidad: int) -> void:
+	var cantidad_acotada: int = clampi(cantidad, 1, 3)
+	var retiradas: int = cantidad_acotada
+
+	if GameManager.has_method("retirar_menas_barril_a_mano"):
+		var resultado: Variant = GameManager.call("retirar_menas_barril_a_mano", tipo, cantidad_acotada)
+		if typeof(resultado) == TYPE_INT and int(resultado) > 0:
+			retiradas = int(resultado)
+		elif "menas_en_mano_cantidad" in GameManager and int(GameManager.menas_en_mano_cantidad) > 0:
+			retiradas = int(GameManager.menas_en_mano_cantidad)
+	else:
+		var disponible: int = _obtener_stock_barril_mina(tipo)
+		retiradas = clampi(min(cantidad_acotada, disponible), 1, 3)
+		if "menas_barril_mina" in GameManager and GameManager.menas_barril_mina is Dictionary:
+			GameManager.menas_barril_mina[tipo] = maxi(0, int(GameManager.menas_barril_mina.get(tipo, 0)) - retiradas)
+		if "menas_en_mano_tipo" in GameManager:
+			GameManager.set("menas_en_mano_tipo", tipo)
+		if "menas_en_mano_cantidad" in GameManager:
+			GameManager.set("menas_en_mano_cantidad", retiradas)
+
+	cerrar_inventario_barril_mina()
+	AudioManager.play_sfx("place_item", 0.5, 0.05)
+	GameManager.post_notification("Cargaste %d mena(s) en tus manos. Camina hacia la Fragua del taller para fundirlas." % retiradas)
 
 func _on_wardrobe_interacted() -> void:
 	GameManager.post_notification("Armario de roble carcomido: Ropas raídas de trabajo y delantales con olor a hollín de tu tío.")

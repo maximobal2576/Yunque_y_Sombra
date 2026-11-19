@@ -92,6 +92,8 @@ var btn_to_forge: Button:
 	get: return boton_ir_a_forja
 
 const POSICION_PIEZA_EN_BANDEJA: Vector2 = Vector2(190.0, 92.0)
+const VELOCIDAD_REVELADO_RECETA: float = 0.42
+const MAX_PEDIDOS_DIA_1: int = 3
 
 var customers: Array[Dictionary] = [
 	{
@@ -105,7 +107,7 @@ var customers: Array[Dictionary] = [
 		"item_name": "Clavo Forjado de Compuerta",
 		"required_metal": "hierro_dulce",
 		"description": "Clavo de hierro dulce con cabeza ancha y espiga cónica para roble pesado.",
-		"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1150°C\n• Yunque: Cabeza ancha + espiga\n• Corte: Cizallar 3 rebabas\n• Temple y Pulido: Acero limpio",
+		"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Cabeza ancha + espiga\n• Corte: Cizallar 3 rebabas\n• Temple y Pulido: Acero limpio",
 		"base_reward": 25
 	},
 	{
@@ -119,7 +121,7 @@ var customers: Array[Dictionary] = [
 		"item_name": "Perno Rústico de Molino",
 		"required_metal": "acero_carbono",
 		"description": "Perno de acero al carbono capaz de resistir la vibración de la rueda hidráulica.",
-		"specs": "• Barril: Acero al Carbono\n• Fragua: 1000°C - 1150°C\n• Yunque: Expansión simétrica\n• Corte: Sin rebabas\n• Temple y Pulido: Acero tenaz",
+		"specs": "• Barril: Acero al Carbono\n• Fragua: 900°C - 1030°C (Fusión 1130°C)\n• Yunque: Expansión firme (Duro)\n• Corte: Sin rebabas\n• Temple y Pulido: Acero tenaz",
 		"base_reward": 20
 	},
 	{
@@ -133,12 +135,15 @@ var customers: Array[Dictionary] = [
 		"item_name": "Perno de Bronce de Caravana",
 		"required_metal": "bronce_cobre",
 		"description": "Pasador de bronce forjado resistente a la intemperie para el eje del carromato.",
-		"specs": "• Barril: Bronce de Forja\n• Fragua: 1000°C - 1150°C\n• Yunque: Cabeza firme + espiga\n• Corte: Sin rebabas\n• Temple y Pulido: Brillo dorado",
+		"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Alta maleabilidad\n• Corte: Sin rebabas\n• Temple y Pulido: Brillo dorado",
 		"base_reward": 30
 	}
 ]
 
 var current_customer_index: int = 0
+var pedidos_entregados_hoy: int = 0
+var clientes_atendidos_indices: Array[int] = []
+var _cliente_presente_en_ventanilla: bool = false
 var active_order: Dictionary = {}
 var has_active_order: bool = false
 var has_finished_piece: bool = false
@@ -163,6 +168,7 @@ func _ready() -> void:
 	btn_to_forge.pressed.connect(_on_go_to_forge_pressed)
 	btn_deliver_item.pressed.connect(_on_deliver_item_pressed)
 	bandeja_entrega.gui_input.connect(_on_bandeja_entrega_gui_input)
+	visibility_changed.connect(_on_visibility_changed)
 	if caja_dialogo:
 		caja_dialogo.gui_input.connect(_on_caja_dialogo_gui_input)
 
@@ -177,16 +183,72 @@ func _ready() -> void:
 	if indicador_entrega_cliente:
 		indicador_entrega_cliente.visible = false
 
-	bell_label.text = "Toca la campana"
+	bell_label.text = "Aguardando llegada de ciudadano..."
 	_actualizar_busto_cliente("sargento")
+	call_deferred("_verificar_llegada_si_visible")
+
+func _on_visibility_changed() -> void:
+	if is_inside_tree() and is_visible_in_tree():
+		_verificar_llegada_automatica_ciudadano()
+
+func _verificar_llegada_si_visible() -> void:
+	if is_inside_tree() and is_visible_in_tree():
+		_verificar_llegada_automatica_ciudadano()
+
+func reiniciar_jornada_mostrador() -> void:
+	pedidos_entregados_hoy = 0
+	clientes_atendidos_indices.clear()
+	_cliente_presente_en_ventanilla = false
+	has_active_order = false
+	has_finished_piece = false
+	_convocando_cliente = false
+	current_customer_index = 0
+	order_sheet.visible = false
+	delivery_tray.visible = false
+	btn_to_forge.visible = false
+	dialogue_box.visible = false
+	customer_container.modulate.a = 0.0
+	bell_button.disabled = false
+	bell_label.text = "Aguardando llegada de ciudadano..."
 
 func reset_if_stuck() -> void:
 	if _convocando_cliente:
 		return
+	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+		bell_button.disabled = true
+		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		return
+	if _cliente_presente_en_ventanilla:
+		bell_button.disabled = true
+		if order_sheet.visible and btn_accept_order.disabled and not delivery_tray.visible:
+			btn_to_forge.visible = true
+		elif not order_sheet.visible and not delivery_tray.visible and not has_active_order and not has_finished_piece:
+			# Si la llegada previa fue interrumpida al cerrar la vista, mostrar al cliente que ya tocó la campana
+			var customer: Dictionary = customers[current_customer_index]
+			active_order = customer
+			var visual_id: String = str(customer.get("visual_id", "sargento"))
+			customer_portrait.texture = customer["portrait"]
+			_actualizar_busto_cliente(visual_id)
+			customer_name_label.text = customer["name"]
+			customer_status_label.text = customer["faction"]
+			customer_container.modulate.a = 1.0
+			dialogue_box.visible = true
+			dialogue_text.text = str(customer.get("dialogue_intro", ""))
+			dialogue_text.visible_characters = -1
+			order_title_label.text = "COMANDA: %s" % customer["item_name"]
+			order_desc_label.text = customer["description"]
+			order_specs_label.text = customer["specs"]
+			order_reward_label.text = "Paga ofrecida: %d Monedas de Oro" % customer["base_reward"]
+			btn_accept_order.disabled = false
+			btn_accept_order.text = "Aceptar Encargo y Forjar"
+			_completar_revelado_comanda_inmediato()
+			bell_label.text = "El ciudadano ya tocó la campana y aguarda en ventanilla."
+		return
 	if not order_sheet.visible and not delivery_tray.visible:
 		has_active_order = false
 		has_finished_piece = false
-		bell_label.text = "Toca la campana"
+		if is_inside_tree() and is_visible_in_tree():
+			_verificar_llegada_automatica_ciudadano()
 	elif order_sheet.visible and btn_accept_order.disabled and not delivery_tray.visible:
 		btn_to_forge.visible = true
 
@@ -333,32 +395,73 @@ func _cursor_sobre_zona_cliente(pos_global: Vector2) -> bool:
 	# También aceptar si el jugador arrastra la pieza hacia la mitad superior de la ventanilla
 	return pos_global.y < 430.0
 
-func _on_bell_clicked() -> void:
+func _seleccionar_siguiente_cliente_no_atendido() -> int:
+	for i in range(customers.size()):
+		var candidato: int = (current_customer_index + i) % customers.size()
+		if not clientes_atendidos_indices.has(candidato):
+			return candidato
+	return -1
+
+func _hacer_sonar_campana_por_ciudadano() -> void:
 	AudioManager.play_bell()
-	var bell_tween: Tween = create_tween()
-	bell_tween.tween_property(bell_button, "scale", Vector2(1.2, 0.85), 0.06)
-	bell_tween.tween_property(bell_button, "scale", Vector2(0.9, 1.15), 0.08)
-	bell_tween.tween_property(bell_button, "scale", Vector2.ONE, 0.1).set_trans(Tween.TRANS_ELASTIC)
+	if bell_button:
+		var bell_tween: Tween = create_tween()
+		bell_tween.tween_property(bell_button, "scale", Vector2(1.2, 0.85), 0.06)
+		bell_tween.tween_property(bell_button, "scale", Vector2(0.9, 1.15), 0.08)
+		bell_tween.tween_property(bell_button, "scale", Vector2.ONE, 0.1).set_trans(Tween.TRANS_ELASTIC)
 
-	bell_ring_fx.visible = true
-	bell_ring_fx.modulate.a = 1.0
-	bell_ring_fx.position.y = -30.0
-	var fx_tween: Tween = create_tween().set_parallel(true)
-	fx_tween.tween_property(bell_ring_fx, "position:y", -55.0, 0.45)
-	fx_tween.tween_property(bell_ring_fx, "modulate:a", 0.0, 0.45)
-	fx_tween.chain().tween_callback(func(): bell_ring_fx.visible = false)
+	if bell_ring_fx:
+		bell_ring_fx.visible = true
+		bell_ring_fx.modulate.a = 1.0
+		bell_ring_fx.position.y = -30.0
+		var fx_tween: Tween = create_tween().set_parallel(true)
+		fx_tween.tween_property(bell_ring_fx, "position:y", -55.0, 0.45)
+		fx_tween.tween_property(bell_ring_fx, "modulate:a", 0.0, 0.45)
+		fx_tween.chain().tween_callback(func(): bell_ring_fx.visible = false)
 
-	if _convocando_cliente:
+func _verificar_llegada_automatica_ciudadano() -> void:
+	if not is_inside_tree():
 		return
-	if (not has_active_order and not has_finished_piece) or (not order_sheet.visible and not delivery_tray.visible):
-		has_active_order = false
-		has_finished_piece = false
-		_summon_customer()
+	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+		bell_button.disabled = true
+		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		return
+	if _cliente_presente_en_ventanilla or has_active_order or has_finished_piece or _convocando_cliente:
+		return
+
+	var siguiente_idx: int = _seleccionar_siguiente_cliente_no_atendido()
+	if siguiente_idx == -1:
+		pedidos_entregados_hoy = MAX_PEDIDOS_DIA_1
+		bell_button.disabled = true
+		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		return
+
+	current_customer_index = siguiente_idx
+	_cliente_presente_en_ventanilla = true
+	bell_button.disabled = true
+	bell_label.text = "El ciudadano acaba de tocar la campana al llegar a la ventanilla."
+	_hacer_sonar_campana_por_ciudadano()
+	_summon_customer()
+
+func _on_bell_clicked() -> void:
+	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+		bell_button.disabled = true
+		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		return
+	if _cliente_presente_en_ventanilla or has_active_order or has_finished_piece or _convocando_cliente:
+		bell_button.disabled = true
+		bell_label.text = "El ciudadano ya tocó la campana y aguarda en ventanilla."
+		return
+
+	# Solo si aún no había llegado el ciudadano (ej. llamada directa desde batería de pruebas)
+	_verificar_llegada_automatica_ciudadano()
 
 func _summon_customer() -> void:
 	if _convocando_cliente:
 		return
 	_convocando_cliente = true
+	_cliente_presente_en_ventanilla = true
+	bell_button.disabled = true
 	var es_headless: bool = DisplayServer.get_name() == "headless"
 	var customer: Dictionary = customers[current_customer_index]
 	active_order = customer
@@ -408,7 +511,7 @@ func _summon_customer() -> void:
 		_convocando_cliente = false
 		return
 
-	bell_label.text = "Cliente en ventanilla: Revisa la comanda y acéptala"
+	bell_label.text = "El ciudadano ya tocó la campana y aguarda en ventanilla."
 	_convocando_cliente = false
 
 func _reproducir_dialogo_cliente(texto: String, visual_id: String, duracion_total: float) -> void:
@@ -471,8 +574,9 @@ func _desplegar_y_revelar_comanda(customer: Dictionary, es_headless: bool) -> vo
 	order_sheet.pivot_offset = order_sheet.size * 0.5
 	order_sheet.scale = Vector2(0.86, 1.12)
 
-	var dur_entrada_papel: float = 0.04 if es_headless else 0.24
-	var dur_campo: float = 0.03 if es_headless else 0.21
+	var velocidad_efectiva: float = 9.5 if es_headless else VELOCIDAD_REVELADO_RECETA
+	var dur_entrada_papel: float = 0.04 if es_headless else 0.34
+	var dur_campo: float = 0.03 if es_headless else (0.30 / maxf(velocidad_efectiva, 0.1))
 
 	_revelando_comanda = true
 	if _tween_comanda_texto and _tween_comanda_texto.is_valid():
@@ -605,6 +709,12 @@ func _on_deliver_item_pressed() -> void:
 	if final_reward < 5:
 		final_reward = 5
 
+	if not clientes_atendidos_indices.has(current_customer_index):
+		clientes_atendidos_indices.append(current_customer_index)
+	pedidos_entregados_hoy += 1
+	if GameManager.has_method("registrar_pedido_completado"):
+		GameManager.call("registrar_pedido_completado")
+
 	dialogue_box.visible = true
 	var item_name: String = str(customer.get("item_name", "Clavo Forjado"))
 	var visual_id: String = str(customer.get("visual_id", "sargento"))
@@ -638,5 +748,23 @@ func _on_deliver_item_pressed() -> void:
 	has_active_order = false
 	has_finished_piece = false
 	_convocando_cliente = false
-	current_customer_index = (current_customer_index + 1) % customers.size()
-	bell_label.text = "Toca la campana"
+	_cliente_presente_en_ventanilla = false
+
+	var siguiente_idx: int = _seleccionar_siguiente_cliente_no_atendido()
+	if pedidos_entregados_hoy < MAX_PEDIDOS_DIA_1 and siguiente_idx != -1:
+		current_customer_index = siguiente_idx
+		bell_button.disabled = true
+		bell_label.text = "Aguardando llegada del siguiente ciudadano (%d de %d)..." % [pedidos_entregados_hoy + 1, MAX_PEDIDOS_DIA_1]
+		var espera_siguiente: float = 0.05 if es_headless else 1.2
+		await get_tree().create_timer(espera_siguiente).timeout
+		if not is_inside_tree():
+			return
+		if is_visible_in_tree():
+			_verificar_llegada_automatica_ciudadano()
+	else:
+		pedidos_entregados_hoy = MAX_PEDIDOS_DIA_1
+		bell_button.disabled = true
+		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		dialogue_box.visible = true
+		dialogue_text.text = "Has completado los 3 encargos del día. El taller cierra la ventanilla por hoy."
+		dialogue_text.visible_characters = -1
