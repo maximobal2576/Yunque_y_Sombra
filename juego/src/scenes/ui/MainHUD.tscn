@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/scenes/ui/MainHUD.gd" id="1_hud_script"]
 
@@ -25,8 +25,195 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_audio_btn"]
+bg_color = Color(0.129412, 0.101961, 0.0862745, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.709804, 0.603922, 0.415686, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_audio_btn_hover"]
+bg_color = Color(0.2, 0.152941, 0.12549, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.960784, 0.760784, 0.258824, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_top = 4.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_audio_panel"]
+bg_color = Color(0.117647, 0.0901961, 0.0745098, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.709804, 0.603922, 0.415686, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_fill"]
+bg_color = Color(0.709804, 0.603922, 0.415686, 1.0)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+
 [node name="HUDPrincipal" type="CanvasLayer"]
 script = ExtResource("1_hud_script")
+
+[node name="BarraSuperior" type="HBoxContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 40.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="BotonMenuAudio" type="Button" parent="BarraSuperior"]
+custom_minimum_size = Vector2(96, 28)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_colors/font_hover_color = Color(0.960784, 0.760784, 0.258824, 1.0)
+theme_override_colors/font_pressed_color = Color(0.960784, 0.760784, 0.258824, 1.0)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_audio_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_audio_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_audio_btn_hover")
+text = "Audio [V]"
+
+[node name="PanelMenuAudio" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 286.0
+offset_bottom = 264.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_audio_panel")
+
+[node name="ContenedorAudio" type="VBoxContainer" parent="PanelMenuAudio"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EtiquetaTituloAudio" type="Label" parent="PanelMenuAudio/ContenedorAudio"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.760784, 0.258824, 1.0)
+theme_override_font_sizes/font_size = 13
+text = "Acústica del Taller"
+horizontal_alignment = 1
+
+[node name="FilaVolumenGeneral" type="VBoxContainer" parent="PanelMenuAudio/ContenedorAudio"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EtiquetaVolumenGeneral" type="Label" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenGeneral"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 12
+text = "Volumen General"
+
+[node name="SliderVolumenGeneral" type="HSlider" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenGeneral"]
+custom_minimum_size = Vector2(220, 16)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="FilaVolumenMusica" type="VBoxContainer" parent="PanelMenuAudio/ContenedorAudio"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EtiquetaVolumenMusica" type="Label" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenMusica"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 12
+text = "Música de Fondo"
+
+[node name="SliderVolumenMusica" type="HSlider" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenMusica"]
+custom_minimum_size = Vector2(220, 16)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.85
+
+[node name="FilaVolumenEfectos" type="VBoxContainer" parent="PanelMenuAudio/ContenedorAudio"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EtiquetaVolumenEfectos" type="Label" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenEfectos"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 12
+text = "Efectos y Herrería"
+
+[node name="SliderVolumenEfectos" type="HSlider" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenEfectos"]
+custom_minimum_size = Vector2(220, 16)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.9
+
+[node name="FilaVolumenAmbiente" type="VBoxContainer" parent="PanelMenuAudio/ContenedorAudio"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EtiquetaVolumenAmbiente" type="Label" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenAmbiente"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.901961, 0.8, 1.0)
+theme_override_font_sizes/font_size = 12
+text = "Brasas del Taller"
+
+[node name="SliderVolumenAmbiente" type="HSlider" parent="PanelMenuAudio/ContenedorAudio/FilaVolumenAmbiente"]
+custom_minimum_size = Vector2(220, 16)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.45
 
 [node name="BannerToast" type="Label" parent="."]
 anchors_preset = 5

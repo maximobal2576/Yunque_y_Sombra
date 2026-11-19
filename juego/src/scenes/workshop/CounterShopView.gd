@@ -382,6 +382,9 @@ func _summon_customer() -> void:
 	enter_tween.tween_property(customer_container, "modulate:a", 1.0, dur_llegada)
 
 	await enter_tween.finished
+	if not is_inside_tree():
+		_convocando_cliente = false
+		return
 
 	# 2. Mostrar diálogo primero con efecto letra por letra, movimiento de boca y balbuceo
 	dialogue_box.visible = true
@@ -389,12 +392,21 @@ func _summon_customer() -> void:
 	var texto_intro: String = str(customer.get("dialogue_intro", ""))
 	var dur_dialogo: float = 0.14 if es_headless else clampf(float(texto_intro.length()) / 45.0, 1.2, 3.8)
 	await _reproducir_dialogo_cliente(texto_intro, visual_id, dur_dialogo)
+	if not is_inside_tree():
+		_convocando_cliente = false
+		return
 
 	if not es_headless and not _saltar_escritura_dialogo:
 		await get_tree().create_timer(0.25).timeout
+		if not is_inside_tree():
+			_convocando_cliente = false
+			return
 
 	# 3. Recién cuando termina el comentario, se despliega la comanda y su contenido aparece de a poco
 	await _desplegar_y_revelar_comanda(customer, es_headless)
+	if not is_inside_tree():
+		_convocando_cliente = false
+		return
 
 	bell_label.text = "Cliente en ventanilla: Revisa la comanda y acéptala"
 	_convocando_cliente = false
@@ -415,7 +427,11 @@ func _reproducir_dialogo_cliente(texto: String, visual_id: String, duracion_tota
 	var tiempo_transcurrido: float = 0.0
 
 	while tiempo_transcurrido < duracion_total and not _saltar_escritura_dialogo:
+		if not is_inside_tree():
+			return
 		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 		tiempo_transcurrido += get_process_delta_time()
 		var progreso: float = clampf(tiempo_transcurrido / maxf(duracion_total, 0.01), 0.0, 1.0)
 		var chars_visibles: int = int(round(progreso * float(total_chars)))
@@ -605,6 +621,8 @@ func _on_deliver_item_pressed() -> void:
 	var es_headless: bool = DisplayServer.get_name() == "headless"
 	var dur_respuesta: float = 0.14 if es_headless else clampf(float(respuesta_final.length()) / 48.0, 1.1, 2.8)
 	await _reproducir_dialogo_cliente(respuesta_final, visual_id, dur_respuesta)
+	if not is_inside_tree():
+		return
 
 	var dur_salida: float = 0.22 if es_headless else 0.5
 	var center_x: float = (size.x - customer_container.size.x) * 0.5 if size.x > 0 else 540.0
@@ -614,6 +632,8 @@ func _on_deliver_item_pressed() -> void:
 	exit_tween.tween_property(delivery_tray, "modulate:a", 0.0, dur_salida * 0.8)
 
 	await exit_tween.finished
+	if not is_inside_tree():
+		return
 	delivery_tray.visible = false
 	has_active_order = false
 	has_finished_piece = false

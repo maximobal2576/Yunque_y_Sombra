@@ -13,6 +13,10 @@ signal mineral_extraido(id_mineral: String, cantidad: int)
 const LIMITES_CAMARA_MINA: Vector4 = Vector4(1780, 280, 2620, 920)
 const POSICION_APARICION_MINA: Vector2 = Vector2(2200, 800)
 const COSTO_ESTAMINA_GOLPE: float = 3.0
+const TIEMPO_GRACIA_HITO: float = 1.6
+
+const TEXTO_DESCRIPCION_HITO_CORTO: String = "La roca cede y revela Hierro Puro junto a una nota oculta de tu tío Rodrik:"
+const TEXTO_NOTA_DIARIO_TIO_CORTO: String = "«Los Señores Feudales mintieron: esta colina no es estéril, oculta el hierro más puro de la comarca. Forja en secreto y que sus emisarios no oigan tu pico.» — Tío Rodrik"
 
 # Nodos principales del árbol en español
 @onready var suelo_caverna: Node2D = $SueloCaverna
@@ -27,7 +31,10 @@ const COSTO_ESTAMINA_GOLPE: float = 3.0
 @onready var fondo_oscuro_cinematica: ColorRect = $CinematicaPrimerHierro/FondoOscuroCinematica
 @onready var contenedor_modal_hito: Control = $CinematicaPrimerHierro/ContenedorModalHito
 @onready var panel_pergamino_hito: Panel = $CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito
+@onready var etiqueta_descripcion_hito: Label = $CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/EtiquetaDescripcionHito
+@onready var etiqueta_nota_diario_tio: Label = $CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/EtiquetaNotaDiarioTio
 @onready var boton_cerrar_cinematica: Button = $CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/BotonCerrarCinematica
+@onready var boton_continuar_hito: Button = $CinematicaPrimerHierro/ContenedorModalHito/PanelPergaminoHito/ContenedorVertical/BotonCerrarCinematica
 
 # Soportes de antorchas
 @onready var soporte_antorcha_1: Node2D = $ContenedorAntorchas/SoporteAntorcha1
@@ -97,21 +104,29 @@ var definicion_vetas: Dictionary = {
 var estado_vetas: Dictionary = {}
 var primer_hierro_desbloqueado: bool = false
 var cinematica_activa: bool = false
+var _tiempo_gracia_restante: float = 0.0
+var _esperando_soltar_tecla_e: bool = false
 
-# Variables de Game Feel (Trauma Shake cuadrático)
+# Variables de Game Feel (Trauma Shake cuadrático y Hit-Stop seguro)
 var _trauma_mina: float = 0.0
+var _reloj_shake: float = 0.0
 var _posicion_base_suelo: Vector2 = Vector2.ZERO
 var _tweens_vetas: Dictionary = {}
 var _tween_penumbra: Tween = null
 var _tween_cinematica: Tween = null
 var _pulso_fuego: float = 0.0
+var _id_hit_stop: int = 0
 
 func _ready() -> void:
 	_posicion_base_suelo = suelo_caverna.position
+	if is_instance_valid(etiqueta_descripcion_hito):
+		etiqueta_descripcion_hito.text = TEXTO_DESCRIPCION_HITO_CORTO
+	if is_instance_valid(etiqueta_nota_diario_tio):
+		etiqueta_nota_diario_tio.text = TEXTO_NOTA_DIARIO_TIO_CORTO
 	if cinematica_primer_hierro:
 		cinematica_primer_hierro.visible = false
-	if boton_cerrar_cinematica:
-		boton_cerrar_cinematica.pressed.connect(cerrar_cinematica_primer_hierro)
+	if boton_continuar_hito:
+		boton_continuar_hito.pressed.connect(_al_presionar_boton_continuar_hito)
 
 	if area_salida_taller:
 		area_salida_taller.interacted.connect(_al_interactuar_escalera_salida)
@@ -129,12 +144,73 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_procesar_trauma_shake(delta)
 	_procesar_parpadeo_antorchas(delta)
+	_procesar_gracia_cinematica(delta)
+
+func _procesar_gracia_cinematica(delta: float) -> void:
+	if not cinematica_activa:
+		return
+	var delta_real: float = delta / maxf(Engine.time_scale, 0.0001)
+	if _tiempo_gracia_restante > 0.0:
+		_tiempo_gracia_restante = maxf(_tiempo_gracia_restante - delta_real, 0.0)
+		if _tiempo_gracia_restante <= 0.0:
+			_tiempo_gracia_restante = 0.0
+			if not Input.is_action_pressed("interact") and not Input.is_physical_key_pressed(KEY_E):
+				_esperando_soltar_tecla_e = false
+			if is_instance_valid(boton_continuar_hito):
+				boton_continuar_hito.disabled = false
+				boton_continuar_hito.text = "[E] Guardar nota en el diario"
+
+func _input(event: InputEvent) -> void:
+	if not cinematica_activa:
+		return
+	_procesar_evento_cinematica(event, true)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not cinematica_activa:
 		return
-	if event.is_action_pressed("interact") or event.is_action_pressed("action") or event.is_action_pressed("cancel_escape"):
-		cerrar_cinematica_primer_hierro()
+	_procesar_evento_cinematica(event, false)
+
+func _procesar_evento_cinematica(event: InputEvent, desde_input_temprano: bool) -> void:
+	if event is InputEventKey:
+		var evento_tecla: InputEventKey = event as InputEventKey
+		if not evento_tecla.pressed:
+			if evento_tecla.keycode == KEY_E or evento_tecla.physical_keycode == KEY_E or event.is_action_released("interact"):
+				_esperando_soltar_tecla_e = false
+			get_viewport().set_input_as_handled()
+			return
+	elif event.is_action_released("interact"):
+		_esperando_soltar_tecla_e = false
+		get_viewport().set_input_as_handled()
+		return
+
+	if _tiempo_gracia_restante > 0.0:
+		if event is InputEventKey or event is InputEventMouseButton or event is InputEventAction:
+			get_viewport().set_input_as_handled()
+		return
+
+	var es_tecla_e: bool = false
+	if event is InputEventKey:
+		var tecla_presionada: InputEventKey = event as InputEventKey
+		if tecla_presionada.pressed and not tecla_presionada.echo:
+			if tecla_presionada.keycode == KEY_E or tecla_presionada.physical_keycode == KEY_E:
+				es_tecla_e = true
+
+	var es_accion_cierre: bool = (not event.is_echo()) and (
+		event.is_action_pressed("interact")
+		or event.is_action_pressed("ui_accept")
+		or event.is_action_pressed("cancel_escape")
+	)
+
+	if es_tecla_e or es_accion_cierre:
+		if not event.is_echo():
+			_esperando_soltar_tecla_e = false
+		if not _esperando_soltar_tecla_e:
+			get_viewport().set_input_as_handled()
+			cerrar_cinematica_primer_hierro()
+			return
+
+	# Evitar que entradas del jugador sigan picando o moviendo detrás de la cinemática
+	if not desde_input_temprano or event is InputEventKey:
 		get_viewport().set_input_as_handled()
 
 # ==============================================================================
@@ -335,7 +411,7 @@ func _quebrar_veta(nombre_veta: String, nodo_veta: Node2D, datos: Dictionary) ->
 	# EL PRIMER HITO (GDD §3.2): Al quebrar la primera veta de hierro puro
 	if id_mineral == "mineral_hierro" and not primer_hierro_desbloqueado:
 		primer_hierro_desbloqueado = true
-		desplegar_cinematica_primer_hierro()
+		_disparar_cinematica_primer_hierro()
 
 func _actualizar_visual_veta(nodo_veta: Node2D, agotada: bool) -> void:
 	var cuerpo_roca: Polygon2D = nodo_veta.get_node_or_null("CuerpoRoca") as Polygon2D
@@ -383,11 +459,25 @@ func _al_iniciar_nuevo_dia(_nuevo_dia: int = 1) -> void:
 # CINEMÁTICA DEL PRIMER HITO METALÚRGICO Y NOTA DEL TÍO (GDD §2.3 y §3.2)
 # ==============================================================================
 
+func _disparar_cinematica_primer_hierro() -> void:
+	desplegar_cinematica_primer_hierro()
+
 func desplegar_cinematica_primer_hierro() -> void:
 	if not is_instance_valid(cinematica_primer_hierro):
 		return
 
 	cinematica_activa = true
+	_tiempo_gracia_restante = TIEMPO_GRACIA_HITO
+	_esperando_soltar_tecla_e = true
+
+	if is_instance_valid(etiqueta_descripcion_hito):
+		etiqueta_descripcion_hito.text = TEXTO_DESCRIPCION_HITO_CORTO
+	if is_instance_valid(etiqueta_nota_diario_tio):
+		etiqueta_nota_diario_tio.text = TEXTO_NOTA_DIARIO_TIO_CORTO
+	if is_instance_valid(boton_continuar_hito):
+		boton_continuar_hito.disabled = true
+		boton_continuar_hito.text = "Espera un instante..."
+
 	cinematica_primer_hierro.visible = true
 	AudioManager.play_bell()
 
@@ -401,7 +491,7 @@ func desplegar_cinematica_primer_hierro() -> void:
 	if _tween_cinematica and _tween_cinematica.is_valid():
 		_tween_cinematica.kill()
 
-	_tween_cinematica = create_tween().set_parallel(true)
+	_tween_cinematica = create_tween().set_parallel(true).set_ignore_time_scale(true)
 	if fondo_oscuro_cinematica:
 		_tween_cinematica.tween_property(fondo_oscuro_cinematica, "modulate:a", 1.0, 0.35)
 	if contenedor_modal_hito:
@@ -416,15 +506,22 @@ func desplegar_cinematica_primer_hierro() -> void:
 
 	emit_signal("hito_primer_hierro_desbloqueado")
 
+func _al_presionar_boton_continuar_hito() -> void:
+	if _tiempo_gracia_restante > 0.0:
+		return
+	cerrar_cinematica_primer_hierro()
+
 func cerrar_cinematica_primer_hierro() -> void:
 	if not cinematica_activa:
 		return
 	cinematica_activa = false
+	_tiempo_gracia_restante = 0.0
+	_esperando_soltar_tecla_e = false
 
 	if _tween_cinematica and _tween_cinematica.is_valid():
 		_tween_cinematica.kill()
 
-	_tween_cinematica = create_tween().set_parallel(true)
+	_tween_cinematica = create_tween().set_parallel(true).set_ignore_time_scale(true)
 	if fondo_oscuro_cinematica:
 		_tween_cinematica.tween_property(fondo_oscuro_cinematica, "modulate:a", 0.0, 0.22)
 	if contenedor_modal_hito:
@@ -432,6 +529,8 @@ func cerrar_cinematica_primer_hierro() -> void:
 		_tween_cinematica.tween_property(contenedor_modal_hito, "scale", Vector2(0.94, 0.94), 0.22)
 
 	await _tween_cinematica.finished
+	if not is_inside_tree():
+		return
 	if is_instance_valid(cinematica_primer_hierro):
 		cinematica_primer_hierro.visible = false
 	GameManager.post_notification("Has archivado la nota grabada del Diario del Tío Rodrik.")
@@ -455,11 +554,13 @@ func agregar_trauma_mina(cantidad: float) -> void:
 
 func _procesar_trauma_shake(delta: float) -> void:
 	if _trauma_mina > 0.0:
-		_trauma_mina = maxf(_trauma_mina - 2.8 * delta, 0.0)
+		var delta_real: float = delta / maxf(Engine.time_scale, 0.0001)
+		_trauma_mina = maxf(_trauma_mina - 2.8 * delta_real, 0.0)
 		var factor_cuadratico: float = _trauma_mina * _trauma_mina
+		_reloj_shake += delta_real * 30.0
 		var desplazamiento := Vector2(
-			10.0 * factor_cuadratico * randf_range(-1.0, 1.0),
-			8.0 * factor_cuadratico * randf_range(-1.0, 1.0)
+			10.0 * factor_cuadratico * sin(_reloj_shake * 1.7),
+			8.0 * factor_cuadratico * sin(_reloj_shake * 2.3)
 		)
 		suelo_caverna.position = _posicion_base_suelo + desplazamiento
 	else:
@@ -485,6 +586,9 @@ func _aplicar_squash_and_stretch_veta(clave: String, objetivo: Node2D, deformaci
 	tw.tween_property(objetivo, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _ejecutar_hitstop(duracion_segundos: float = 0.045) -> void:
+	_id_hit_stop += 1
+	var mi_id: int = _id_hit_stop
 	Engine.time_scale = 0.08
-	await get_tree().create_timer(duracion_segundos * 0.08, true, false, true).timeout
-	Engine.time_scale = 1.0
+	await get_tree().create_timer(duracion_segundos, true, false, true).timeout
+	if mi_id == _id_hit_stop:
+		Engine.time_scale = 1.0
