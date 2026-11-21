@@ -52,9 +52,15 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var barriles_acopio_mina: StaticBody2D = $InteriorCasa/AccesoMina/BarrilesAcopioMina
 @onready var area_barriles_acopio_mina: Area2D = $InteriorCasa/AccesoMina/BarrilesAcopioMina/AreaInteractiva
 
-# Interactables del exterior (Centro del pueblo) en Español
+# Interactables del exterior (Centro del pueblo y alrededores según boceto)
 @onready var area_farol: Area2D = $PuebloExterior/FarolCentral/AreaInteractiva
 @onready var area_cartel_guia: Area2D = $PuebloExterior/CartelGuia/AreaInteractiva
+@onready var area_fuente_plaza: Area2D = $PuebloExterior/FuenteCentralPlaza/AreaInteractiva
+@onready var area_kiosco_movil: Area2D = $PuebloExterior/KioscoMovil/AreaInteractiva
+@onready var area_taberna: Area2D = $PuebloExterior/TabernaDelValle/AreaInteractiva
+@onready var area_fermin_muebles: Area2D = $PuebloExterior/FerminMuebles/AreaInteractiva
+@onready var area_corral_ganado: Area2D = $PuebloExterior/CorralesGanado/CorralOeste/AreaInteractiva
+@onready var area_camino_gobierno: Area2D = $PuebloExterior/CaminoCasaGobierno/PortonFeudal/AreaInteractiva
 
 # Alias de compatibilidad hacia atrás para QA y tests existentes
 var exterior_town: Node2D:
@@ -209,6 +215,18 @@ func _ready() -> void:
 		area_barriles_acopio_mina.interacted.connect(_on_barriles_acopio_mina_interacted)
 	area_farol.interacted.connect(_on_lamp_interacted)
 	area_cartel_guia.interacted.connect(_on_signpost_interacted)
+	if is_instance_valid(area_fuente_plaza):
+		area_fuente_plaza.interacted.connect(_on_fuente_plaza_interacted)
+	if is_instance_valid(area_kiosco_movil):
+		area_kiosco_movil.interacted.connect(_on_kiosco_movil_interacted)
+	if is_instance_valid(area_taberna):
+		area_taberna.interacted.connect(_on_taberna_interacted)
+	if is_instance_valid(area_fermin_muebles):
+		area_fermin_muebles.interacted.connect(_on_fermin_muebles_interacted)
+	if is_instance_valid(area_corral_ganado):
+		area_corral_ganado.interacted.connect(_on_corral_ganado_interacted)
+	if is_instance_valid(area_camino_gobierno):
+		area_camino_gobierno.interacted.connect(_on_camino_gobierno_interacted)
 
 	_construir_capa_inventario_barril_mina()
 
@@ -615,3 +633,21 @@ func _on_lamp_interacted() -> void:
 
 func _on_signpost_interacted() -> void:
 	GameManager.post_notification("Cartel de madera desgastado: Norte - Herrería y Taller de Rodrik (cubierto de hiedra y telarañas).")
+
+func _on_fuente_plaza_interacted() -> void:
+	GameManager.post_notification("Fuente del Pueblo: El agua fresca de manantial calma la sed del valle.")
+
+func _on_kiosco_movil_interacted() -> void:
+	GameManager.post_notification("Buhonero Ambulante: «¡Traigo especias, ungüentos y baratijas sobre ruedas! Vuelve cuando tengas más oro.»")
+
+func _on_taberna_interacted() -> void:
+	GameManager.post_notification("Taberna de Greta: Se escuchan risas campesinas y aroma a estofado de carnero e hidromiel.")
+
+func _on_fermin_muebles_interacted() -> void:
+	GameManager.post_notification("Fermín Muebles: «¡Si necesitas mangos de fresno o tablones secos para tu taller, aquí tienes lo mejor!»")
+
+func _on_corral_ganado_interacted() -> void:
+	GameManager.post_notification("Corral Comunal: Los bueyes y ovejas descansan rumiando paja seca al abrigo de la tarde.")
+
+func _on_camino_gobierno_interacted() -> void:
+	GameManager.post_notification("Guardia Feudal: «¡Alto, herrero! El paso a la Casa de Gobierno está cerrado a los campesinos.»")

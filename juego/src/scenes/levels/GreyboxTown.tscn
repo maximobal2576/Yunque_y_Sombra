@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://dmjs2y5sfufh"]
+﻿[gd_scene format=3 uid="uid://dmjs2y5sfufh"]
 
 [ext_resource type="Script" uid="uid://bb2o8txx4rtpt" path="res://src/scenes/levels/GreyboxTown.gd" id="1_town_script"]
 [ext_resource type="PackedScene" path="res://src/scenes/player/Player.tscn" id="2_player_scene"]
@@ -31,6 +31,42 @@ size = Vector2(24, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_sign_area"]
 size = Vector2(48, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kiosco_body"]
+size = Vector2(58, 42)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kiosco_area"]
+size = Vector2(74, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_taberna_body"]
+size = Vector2(136, 76)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_taberna_area"]
+size = Vector2(50, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fermin_body"]
+size = Vector2(126, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fermin_area"]
+size = Vector2(50, 40)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fuente_body"]
+radius = 22.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fuente_area"]
+radius = 38.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_porton_body"]
+size = Vector2(96, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_porton_area"]
+size = Vector2(96, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_corral_area"]
+size = Vector2(52, 42)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house_body"]
+size = Vector2(104, 64)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_facade_wing"]
 size = Vector2(130, 60)
@@ -304,108 +340,357 @@ shape = SubResource("RectangleShape2D_ext_north_wing")
 position = Vector2(975, 640)
 shape = SubResource("RectangleShape2D_ext_north_wing")
 
-[node name="CasasEnRuinas" type="Node2D" parent="PuebloExterior" unique_id=1083366537]
+[node name="FuenteCentralPlaza" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 2
+position = Vector2(725, 885)
+collision_mask = 0
+
+[node name="SombraFuente" type="Polygon2D" parent="PuebloExterior/FuenteCentralPlaza"]
+position = Vector2(3, 4)
+color = Color(0.06, 0.04, 0.03, 0.5)
+polygon = PackedVector2Array(-28, -14, 0, -26, 28, -14, 32, 10, 0, 24, -32, 10)
+
+[node name="BrocalExterior" type="Polygon2D" parent="PuebloExterior/FuenteCentralPlaza"]
+color = Color(0.38, 0.34, 0.3, 1)
+polygon = PackedVector2Array(-26, -13, 0, -24, 26, -13, 30, 8, 0, 22, -30, 8)
+
+[node name="BordeAgua" type="Polygon2D" parent="PuebloExterior/FuenteCentralPlaza"]
+color = Color(0.18, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -9, 0, -17, 18, -9, 21, 6, 0, 15, -21, 6)
+
+[node name="PilarCentral" type="Polygon2D" parent="PuebloExterior/FuenteCentralPlaza"]
+color = Color(0.5, 0.45, 0.4, 1)
+polygon = PackedVector2Array(-6, -6, 6, -6, 6, 4, -6, 4)
+
+[node name="CanoBronce" type="Polygon2D" parent="PuebloExterior/FuenteCentralPlaza"]
+color = Color(0.85, 0.65, 0.3, 1)
+polygon = PackedVector2Array(-2, -14, 2, -14, 3, -6, -3, -6)
+
+[node name="ColisionFuente" type="CollisionShape2D" parent="PuebloExterior/FuenteCentralPlaza"]
+shape = SubResource("CircleShape2D_fuente_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/FuenteCentralPlaza"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Fuente de la Plaza [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/FuenteCentralPlaza/AreaInteractiva"]
+shape = SubResource("CircleShape2D_fuente_area")
+
+[node name="KioscoMovil" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 2
+position = Vector2(535, 875)
+collision_mask = 0
+
+[node name="SombraCarromato" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+position = Vector2(3, 18)
+color = Color(0.06, 0.04, 0.03, 0.55)
+polygon = PackedVector2Array(-32, 0, 0, -8, 32, 0, 36, 12, 0, 18, -36, 12)
+
+[node name="ChasisMadera" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+color = Color(0.25, 0.16, 0.11, 1)
+polygon = PackedVector2Array(-28, -12, 28, -12, 30, 14, -30, 14)
+
+[node name="RuedaIzquierda" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+position = Vector2(-28, 6)
+color = Color(0.18, 0.12, 0.08, 1)
+polygon = PackedVector2Array(-5, -16, 5, -16, 6, 16, -6, 16)
+
+[node name="RuedaDerecha" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+position = Vector2(28, 6)
+color = Color(0.18, 0.12, 0.08, 1)
+polygon = PackedVector2Array(-5, -16, 5, -16, 6, 16, -6, 16)
+
+[node name="MostradorTablones" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+color = Color(0.42, 0.28, 0.18, 1)
+polygon = PackedVector2Array(-26, 6, 26, 6, 26, 16, -26, 16)
+
+[node name="CajasCarga" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+color = Color(0.55, 0.38, 0.24, 1)
+polygon = PackedVector2Array(-22, -8, -6, -8, -6, 4, -22, 4)
+
+[node name="ToldoLonaFranjas" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+color = Color(0.72, 0.28, 0.2, 0.95)
+polygon = PackedVector2Array(-30, -28, 30, -28, 34, -10, -34, -10)
+
+[node name="FranjaLonaClara" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+color = Color(0.88, 0.82, 0.68, 0.95)
+polygon = PackedVector2Array(-10, -28, 10, -28, 12, -10, -12, -10)
+
+[node name="FarolitoPuesto" type="Polygon2D" parent="PuebloExterior/KioscoMovil"]
+position = Vector2(32, -12)
+color = Color(0.98, 0.78, 0.25, 1)
+polygon = PackedVector2Array(-3, -5, 3, -5, 4, 3, -4, 3)
+
+[node name="RotuloPuesto" type="Label" parent="PuebloExterior/KioscoMovil"]
+offset_left = -60.0
+offset_top = -42.0
+offset_right = 60.0
+offset_bottom = -26.0
+theme_override_colors/font_color = Color(0.96, 0.88, 0.7, 1)
+theme_override_font_sizes/font_size = 8
+text = "KIOSCO MÓVIL (BUHONERO)"
+horizontal_alignment = 1
+
+[node name="ColisionKiosco" type="CollisionShape2D" parent="PuebloExterior/KioscoMovil"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_kiosco_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/KioscoMovil"]
+script = ExtResource("6_interact_script")
+prompt_text = "Comerciar con el Buhonero Ambulante [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/KioscoMovil/AreaInteractiva"]
+position = Vector2(0, 8)
+shape = SubResource("RectangleShape2D_kiosco_area")
+
+[node name="TabernaDelValle" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 2
+position = Vector2(360, 810)
+collision_mask = 0
+
+[node name="SombraTaberna" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+position = Vector2(5, 8)
+color = Color(0.06, 0.04, 0.03, 0.5)
+polygon = PackedVector2Array(-72, -40, 72, -40, 78, 44, -78, 44)
+
+[node name="MamposteriaPiedra" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+color = Color(0.24, 0.2, 0.17, 1)
+polygon = PackedVector2Array(-68, -38, 68, -38, 68, 38, -68, 38)
+
+[node name="TechoTejaRoja" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+color = Color(0.44, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-74, -46, 74, -46, 70, -22, -70, -22)
+
+[node name="PorcheMadera" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+color = Color(0.32, 0.22, 0.14, 1)
+polygon = PackedVector2Array(-24, 28, 54, 28, 56, 42, -26, 42)
+
+[node name="Barril1" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+position = Vector2(-46, 26)
+color = Color(0.38, 0.25, 0.15, 1)
+polygon = PackedVector2Array(-8, -10, 8, -10, 9, 10, -9, 10)
+
+[node name="Barril2" type="Polygon2D" parent="PuebloExterior/TabernaDelValle"]
+position = Vector2(-28, 26)
+color = Color(0.34, 0.22, 0.13, 1)
+polygon = PackedVector2Array(-7, -9, 7, -9, 8, 9, -8, 9)
+
+[node name="CartelJarra" type="Label" parent="PuebloExterior/TabernaDelValle"]
+offset_left = -60.0
+offset_top = -20.0
+offset_right = 60.0
+offset_bottom = -2.0
+theme_override_colors/font_color = Color(0.95, 0.84, 0.48, 1)
+theme_override_font_sizes/font_size = 10
+text = "🍺 TABERNA DE GRETA"
+horizontal_alignment = 1
+
+[node name="ColisionTaberna" type="CollisionShape2D" parent="PuebloExterior/TabernaDelValle"]
+shape = SubResource("RectangleShape2D_taberna_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/TabernaDelValle"]
+position = Vector2(16, 40)
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Taberna de Greta [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/TabernaDelValle/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_taberna_area")
+
+[node name="FerminMuebles" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 2
+position = Vector2(900, 920)
+collision_mask = 0
+
+[node name="SombraTaller" type="Polygon2D" parent="PuebloExterior/FerminMuebles"]
+position = Vector2(5, 6)
+color = Color(0.06, 0.04, 0.03, 0.5)
+polygon = PackedVector2Array(-66, -36, 66, -36, 70, 38, -70, 38)
+
+[node name="CuerpoTaller" type="Polygon2D" parent="PuebloExterior/FerminMuebles"]
+color = Color(0.26, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-63, -35, 63, -35, 63, 35, -63, 35)
+
+[node name="TejadoMadera" type="Polygon2D" parent="PuebloExterior/FerminMuebles"]
+color = Color(0.38, 0.25, 0.16, 1)
+polygon = PackedVector2Array(-68, -42, 68, -42, 65, -18, -65, -18)
+
+[node name="PilaTablones" type="Polygon2D" parent="PuebloExterior/FerminMuebles"]
+position = Vector2(-44, 22)
+color = Color(0.62, 0.44, 0.26, 1)
+polygon = PackedVector2Array(-14, -8, 14, -8, 14, 12, -14, 12)
+
+[node name="RuedasMaderaPared" type="Polygon2D" parent="PuebloExterior/FerminMuebles"]
+position = Vector2(48, 20)
+color = Color(0.32, 0.2, 0.12, 1)
+polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[node name="CartelRotulo" type="Label" parent="PuebloExterior/FerminMuebles"]
+offset_left = -70.0
+offset_top = -18.0
+offset_right = 70.0
+offset_bottom = -2.0
+theme_override_colors/font_color = Color(0.92, 0.85, 0.65, 1)
+theme_override_font_sizes/font_size = 9
+text = "FERMÍN MUEBLES"
+horizontal_alignment = 1
+
+[node name="ColisionFermin" type="CollisionShape2D" parent="PuebloExterior/FerminMuebles"]
+shape = SubResource("RectangleShape2D_fermin_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/FerminMuebles"]
+position = Vector2(0, 36)
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Taller de Fermín Muebles [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/FerminMuebles/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_fermin_area")
+
+[node name="CorralesGanado" type="Node2D" parent="PuebloExterior"]
 z_index = 2
 
-[node name="CasaOeste1" type="ColorRect" parent="PuebloExterior/CasasEnRuinas" unique_id=607910623]
-offset_left = 160.0
-offset_top = 690.0
-offset_right = 280.0
-offset_bottom = 850.0
-color = Color(0.12549, 0.0980392, 0.0823529, 1)
+[node name="CorralOeste" type="StaticBody2D" parent="PuebloExterior/CorralesGanado"]
+position = Vector2(300, 960)
+collision_mask = 0
 
-[node name="Techo" type="ColorRect" parent="PuebloExterior/CasasEnRuinas/CasaOeste1" unique_id=1675773187]
-layout_mode = 0
-offset_top = -10.0
-offset_right = 120.0
-offset_bottom = 10.0
-color = Color(0.0862745, 0.0666667, 0.054902, 1)
+[node name="CercadoPiedraSeca" type="Line2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+points = PackedVector2Array(-65, -45, 65, -45, 65, 45, -65, 45, -65, -45)
+width = 4.0
+default_color = Color(0.36, 0.32, 0.28, 1)
 
-[node name="Etiqueta" type="Label" parent="PuebloExterior/CasasEnRuinas/CasaOeste1" unique_id=353312209]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 30.0
-offset_right = 110.0
-offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
-theme_override_font_sizes/font_size = 10
-text = "Casa derruida
-(Vigas podridas)"
+[node name="SueloBarroCorral" type="Polygon2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+color = Color(0.2, 0.16, 0.12, 0.6)
+polygon = PackedVector2Array(-62, -42, 62, -42, 62, 42, -62, 42)
 
-[node name="CasaOeste2" type="ColorRect" parent="PuebloExterior/CasasEnRuinas" unique_id=1284710891]
-offset_left = 160.0
-offset_top = 880.0
-offset_right = 280.0
-offset_bottom = 1060.0
-color = Color(0.113725, 0.0862745, 0.0705882, 1)
+[node name="ComederoHeno" type="Polygon2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+position = Vector2(-35, -20)
+color = Color(0.55, 0.48, 0.22, 1)
+polygon = PackedVector2Array(-10, -6, 10, -6, 12, 6, -12, 6)
 
-[node name="Techo" type="ColorRect" parent="PuebloExterior/CasasEnRuinas/CasaOeste2" unique_id=77905768]
-layout_mode = 0
-offset_top = -10.0
-offset_right = 120.0
-offset_bottom = 10.0
-color = Color(0.0784314, 0.0588235, 0.0470588, 1)
+[node name="Vaca1" type="Polygon2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+position = Vector2(12, -10)
+color = Color(0.28, 0.22, 0.18, 1)
+polygon = PackedVector2Array(-14, -8, 14, -8, 16, 8, -16, 8)
 
-[node name="Etiqueta" type="Label" parent="PuebloExterior/CasasEnRuinas/CasaOeste2" unique_id=537772013]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 30.0
-offset_right = 110.0
-offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
-theme_override_font_sizes/font_size = 10
-text = "Almacén viejo
-(Techo hundido)"
+[node name="VacaMancha" type="Polygon2D" parent="PuebloExterior/CorralesGanado/CorralOeste/Vaca1"]
+color = Color(0.85, 0.8, 0.72, 1)
+polygon = PackedVector2Array(-4, -6, 6, -6, 4, 4, -6, 2)
 
-[node name="CasaEste1" type="ColorRect" parent="PuebloExterior/CasasEnRuinas" unique_id=1742989167]
-offset_left = 1000.0
-offset_top = 690.0
-offset_right = 1120.0
-offset_bottom = 850.0
-color = Color(0.12549, 0.0980392, 0.0823529, 1)
+[node name="Oveja1" type="Polygon2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+position = Vector2(-15, 18)
+color = Color(0.78, 0.75, 0.68, 1)
+polygon = PackedVector2Array(-8, -5, 8, -5, 9, 6, -9, 6)
 
-[node name="Techo" type="ColorRect" parent="PuebloExterior/CasasEnRuinas/CasaEste1" unique_id=970118242]
-layout_mode = 0
-offset_top = -10.0
-offset_right = 120.0
-offset_bottom = 10.0
-color = Color(0.0862745, 0.0666667, 0.054902, 1)
+[node name="EtiquetaCorral" type="Label" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+offset_left = -50.0
+offset_top = -60.0
+offset_right = 50.0
+offset_bottom = -46.0
+theme_override_colors/font_color = Color(0.8, 0.75, 0.6, 1)
+theme_override_font_sizes/font_size = 8
+text = "Corral Comunal"
+horizontal_alignment = 1
 
-[node name="Etiqueta" type="Label" parent="PuebloExterior/CasasEnRuinas/CasaEste1" unique_id=134035193]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 30.0
-offset_right = 110.0
-offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
-theme_override_font_sizes/font_size = 10
-text = "Taller en ruinas
-(Tablas quemadas)"
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/CorralesGanado/CorralOeste"]
+position = Vector2(65, 0)
+script = ExtResource("6_interact_script")
+prompt_text = "Mirar Ganado Comunal [E]"
 
-[node name="CasaEste2" type="ColorRect" parent="PuebloExterior/CasasEnRuinas" unique_id=1022151522]
-offset_left = 1000.0
-offset_top = 880.0
-offset_right = 1120.0
-offset_bottom = 1060.0
-color = Color(0.113725, 0.0862745, 0.0705882, 1)
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/CorralesGanado/CorralOeste/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_corral_area")
 
-[node name="Techo" type="ColorRect" parent="PuebloExterior/CasasEnRuinas/CasaEste2" unique_id=628994874]
-layout_mode = 0
-offset_top = -10.0
-offset_right = 120.0
-offset_bottom = 10.0
-color = Color(0.0784314, 0.0588235, 0.0470588, 1)
+[node name="CaminoCasaGobierno" type="Node2D" parent="PuebloExterior"]
+z_index = 2
 
-[node name="Etiqueta" type="Label" parent="PuebloExterior/CasasEnRuinas/CasaEste2" unique_id=1781775225]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 30.0
-offset_right = 110.0
-offset_bottom = 70.0
-theme_override_colors/font_color = Color(0.78, 0.7, 0.58, 1)
-theme_override_font_sizes/font_size = 10
-text = "Choza solitaria
-(Ventanas tapiadas)"
+[node name="SenderoCurvo" type="Line2D" parent="PuebloExterior/CaminoCasaGobierno"]
+points = PackedVector2Array(560, 680, 480, 655, 410, 640, 340, 620)
+width = 24.0
+default_color = Color(0.3, 0.24, 0.18, 0.75)
+
+[node name="CactusSaguaro1" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno"]
+position = Vector2(510, 645)
+color = Color(0.24, 0.38, 0.22, 1)
+polygon = PackedVector2Array(-4, 16, 4, 16, 4, -22, -4, -22)
+
+[node name="BrazoSaguaro1" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno/CactusSaguaro1"]
+color = Color(0.22, 0.35, 0.2, 1)
+polygon = PackedVector2Array(4, -8, 12, -8, 12, -18, 8, -18, 8, -4, 4, -4)
+
+[node name="CactusSaguaro2" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno"]
+position = Vector2(430, 620)
+color = Color(0.24, 0.38, 0.22, 1)
+polygon = PackedVector2Array(-3, 14, 3, 14, 3, -18, -3, -18)
+
+[node name="PortonFeudal" type="StaticBody2D" parent="PuebloExterior/CaminoCasaGobierno"]
+position = Vector2(340, 620)
+collision_mask = 0
+
+[node name="PilarIzquierdo" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+position = Vector2(-42, 0)
+color = Color(0.35, 0.32, 0.28, 1)
+polygon = PackedVector2Array(-8, -16, 8, -16, 8, 16, -8, 16)
+
+[node name="PilarDerecho" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+position = Vector2(42, 0)
+color = Color(0.35, 0.32, 0.28, 1)
+polygon = PackedVector2Array(-8, -16, 8, -16, 8, 16, -8, 16)
+
+[node name="RejaHierro" type="Polygon2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+color = Color(0.18, 0.2, 0.22, 0.95)
+polygon = PackedVector2Array(-34, -12, 34, -12, 34, 12, -34, 12)
+
+[node name="CartelGobierno" type="Label" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+offset_left = -75.0
+offset_top = -34.0
+offset_right = 75.0
+offset_bottom = -16.0
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_font_sizes/font_size = 8
+text = "CAMINO A CASA DE GOBIERNO"
+horizontal_alignment = 1
+
+[node name="ColisionPorton" type="CollisionShape2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+shape = SubResource("RectangleShape2D_porton_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal"]
+position = Vector2(0, 16)
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Camino a Casa de Gobierno [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/CaminoCasaGobierno/PortonFeudal/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_porton_area")
+
+[node name="CasasPueblo" type="Node2D" parent="PuebloExterior"]
+z_index = 2
+
+[node name="CasaCampesinaNorte" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
+position = Vector2(480, 720)
+collision_mask = 0
+
+[node name="MurosAdobe" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNorte"]
+color = Color(0.28, 0.22, 0.17, 1)
+polygon = PackedVector2Array(-48, -30, 48, -30, 48, 30, -48, 30)
+
+[node name="TechoPaja" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNorte"]
+color = Color(0.48, 0.42, 0.24, 1)
+polygon = PackedVector2Array(-54, -36, 54, -36, 50, -14, -50, -14)
+
+[node name="Colision" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNorte"]
+shape = SubResource("RectangleShape2D_house_body")
+
+[node name="AlmacenComunal" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
+position = Vector2(800, 720)
+collision_mask = 0
+
+[node name="MurosPiedra" type="Polygon2D" parent="PuebloExterior/CasasPueblo/AlmacenComunal"]
+color = Color(0.24, 0.2, 0.18, 1)
+polygon = PackedVector2Array(-48, -30, 48, -30, 48, 30, -48, 30)
+
+[node name="TechoTejas" type="Polygon2D" parent="PuebloExterior/CasasPueblo/AlmacenComunal"]
+color = Color(0.42, 0.18, 0.16, 1)
+polygon = PackedVector2Array(-52, -36, 52, -36, 48, -14, -48, -14)
+
+[node name="Colision" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/AlmacenComunal"]
+shape = SubResource("RectangleShape2D_house_body")
 
 [node name="FarolCentral" type="StaticBody2D" parent="PuebloExterior" unique_id=380809503]
 z_index = 2
@@ -565,6 +850,26 @@ collision_mask = 0
 
 [node name="ColisionAlaDerecha" type="CollisionShape2D" parent="PuebloExterior/FachadaCasaTio/ColisionDerecha" unique_id=1784100990]
 shape = SubResource("RectangleShape2D_facade_wing")
+
+[node name="HornoAbovedadoExterior" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
+position = Vector2(210, 10)
+color = Color(0.34, 0.25, 0.18, 1)
+polygon = PackedVector2Array(-24, 25, -24, -8, -14, -28, 14, -28, 24, -8, 24, 25)
+
+[node name="BocaHornoFuego" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio/HornoAbovedadoExterior"]
+position = Vector2(0, 10)
+color = Color(0.92, 0.48, 0.16, 0.9)
+polygon = PackedVector2Array(-10, 12, -10, -5, 0, -11, 10, -5, 10, 12)
+
+[node name="ChimeneaHorno" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio/HornoAbovedadoExterior"]
+position = Vector2(0, -32)
+color = Color(0.26, 0.18, 0.14, 1)
+polygon = PackedVector2Array(-5, 6, 5, 6, 5, -14, -5, -14)
+
+[node name="CercaLaderaMadera" type="Line2D" parent="PuebloExterior/FachadaCasaTio"]
+points = PackedVector2Array(190, 42, 230, -10, 245, -45)
+width = 3.0
+default_color = Color(0.38, 0.28, 0.18, 0.85)
 
 [node name="PuertaCasa" type="Node2D" parent="PuebloExterior/FachadaCasaTio" unique_id=1918033691]
 position = Vector2(0, 35)
