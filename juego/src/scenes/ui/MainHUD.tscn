@@ -4,12 +4,19 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
 bg_color = Color(0.129412, 0.101961, 0.0862745, 0.96)
+border_width_left = 2
 border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(0.431373, 0.121569, 0.168627, 1.0)
-content_margin_left = 16.0
-content_margin_top = 6.0
-content_margin_right = 16.0
-content_margin_bottom = 6.0
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_bg"]
 bg_color = Color(0.2, 0.16, 0.14, 1.0)
@@ -235,7 +242,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -48.0
+offset_left = 20.0
+offset_top = -70.0
+offset_right = -20.0
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud")

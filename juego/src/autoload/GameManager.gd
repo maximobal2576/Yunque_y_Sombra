@@ -15,6 +15,8 @@ signal menas_en_mano_cambiado(tipo: String, cantidad: int)
 signal pedido_diario_completado(total_hoy: int)
 signal sueno_completado()
 signal mena_fundida_en_fragua(tipo: String, cantidad: int)
+signal hito_desbloqueado(clave_hito: String, titulo: String, descripcion: String)
+signal objeto_comprado(clave_objeto: String)
 
 enum State {
 	PROLOGUE,          # Vista inicial de la carta de la madre (Onboarding GDD 2.1)
@@ -84,6 +86,22 @@ var perdidas_oro_hoy: int = 0
 var pedidos_ayer: int = 0
 var ganancias_ayer: int = 0
 var perdidas_ayer: int = 0
+
+# Sistema de Hitos de Progresión y Desbloqueo por Objetos (Event-Driven)
+var hitos_desbloqueados: Dictionary = {
+	"hito_0_primer_encargo": false,
+	"hito_0_primera_mina": false,
+	"hito_1_crisol_bronce": false,
+	"hito_2_pico_reforzado": false,
+	"hito_2_derrumbe_mina_roto": false,
+	"hito_2_diario_encontrado": false,
+	"hito_3_piedra_afilar": false,
+	"hito_3_daga_sargento_entregada": false,
+	"hito_4_fuelle_doble": false,
+	"hito_4_llave_yunque_forjada": false,
+	"hito_4_climax_activado": false
+}
+var objetos_comprados: Array[String] = []
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -241,3 +259,43 @@ func post_notification(msg: String) -> void:
 func exit_workshop() -> void:
 	change_state(State.OVERWORLD)
 	workshop_exited.emit()
+
+# --- MÉTODOS DE PROGRESIÓN REACTIVA POR HITOS Y OBJETOS ---
+func desbloquear_hito(clave_hito: String, titulo: String = "", descripcion: String = "") -> bool:
+	if not hitos_desbloqueados.has(clave_hito):
+		hitos_desbloqueados[clave_hito] = true
+		hito_desbloqueado.emit(clave_hito, titulo, descripcion)
+		if not titulo.is_empty():
+			post_notification("¡Hito Desbloqueado: %s!" % titulo)
+		return true
+	if not bool(hitos_desbloqueados[clave_hito]):
+		hitos_desbloqueados[clave_hito] = true
+		hito_desbloqueado.emit(clave_hito, titulo, descripcion)
+		if not titulo.is_empty():
+			post_notification("¡Hito Desbloqueado: %s!" % titulo)
+		return true
+	return false
+
+func tiene_hito(clave_hito: String) -> bool:
+	return bool(hitos_desbloqueados.get(clave_hito, false))
+
+func registrar_compra_objeto(clave_objeto: String, titulo: String = "") -> void:
+	if not objetos_comprados.has(clave_objeto):
+		objetos_comprados.append(clave_objeto)
+		objeto_comprado.emit(clave_objeto)
+		if not titulo.is_empty():
+			post_notification("Adquiriste: %s" % titulo)
+		verificar_disparadores_hitos()
+
+func tiene_objeto(clave_objeto: String) -> bool:
+	return objetos_comprados.has(clave_objeto)
+
+func verificar_disparadores_hitos() -> void:
+	if tiene_objeto("crisol_bronce") and not tiene_hito("hito_1_crisol_bronce"):
+		desbloquear_hito("hito_1_crisol_bronce", "El Crisol de Bronce", "Has desbloqueado las aleaciones de bronce y nuevos pedidos del valle.")
+	if tiene_objeto("pico_reforzado") and not tiene_hito("hito_2_pico_reforzado"):
+		desbloquear_hito("hito_2_pico_reforzado", "Pico Reforzado", "Ahora puedes quebrar derrumbes antiguos en la mina subterránea.")
+	if tiene_objeto("piedra_afilar") and not tiene_hito("hito_3_piedra_afilar"):
+		desbloquear_hito("hito_3_piedra_afilar", "Bisel y Afilado", "Puedes forjar hojas afiladas de precisión para la guardia.")
+	if tiene_objeto("fuelle_doble") and not tiene_hito("hito_4_fuelle_doble"):
+		desbloquear_hito("hito_4_fuelle_doble", "Fuelle de Doble Cámara", "La fragua alcanza los 1300°C. Estás listo para el secreto final.")
