@@ -41,6 +41,7 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var detector_zona_mina: Area2D = $DetectoresZona/DetectorZonaMina
 
 # Máscaras oscurecedoras de oclusión (Nieblas) en Español
+@onready var nieblas_oclusion: Node2D = $NieblasOclusion
 @onready var niebla_exterior: ColorRect = $NieblasOclusion/NieblaExterior
 @onready var niebla_pasillo: ColorRect = $NieblasOclusion/NieblaPasillo
 @onready var niebla_dormitorio: ColorRect = $NieblasOclusion/NieblaDormitorio
@@ -130,7 +131,7 @@ var signpost_area: Area2D:
 # Coordenadas exactas de spawn y teletransporte
 const SPAWN_EXTERIOR_TOWN: Vector2 = Vector2(640, 900)
 const SPAWN_HOUSE_HALLWAY: Vector2 = Vector2(640, 480)
-const SPAWN_FRONT_OF_HOUSE: Vector2 = Vector2(640, 740)
+const SPAWN_FRONT_OF_HOUSE: Vector2 = Vector2(1040, 360)
 const SPAWN_WORKSHOP_THRESHOLD: Vector2 = Vector2(510, 410)
 const SPAWN_MINE_ACCESS_RETURN: Vector2 = Vector2(640, 210)
 const SPAWN_BEDROOM: Vector2 = Vector2(1010, 380)
@@ -317,6 +318,32 @@ func set_active_zone(new_zone: Zone, immediate: bool = false) -> void:
 	_active_tween.tween_property(niebla_pasillo, "modulate:a", 0.0 if new_zone == Zone.PASILLO else 1.0, dur)
 	_active_tween.tween_property(niebla_dormitorio, "modulate:a", 0.0 if new_zone == Zone.DORMITORIO else 1.0, dur)
 	_active_tween.tween_property(niebla_mina, "modulate:a", 0.0 if new_zone == Zone.MINA else 1.0, dur)
+	if is_instance_valid(nieblas_oclusion):
+		nieblas_oclusion.visible = (new_zone != Zone.EXTERIOR)
+
+	if is_instance_valid(detector_zona_pasillo):
+		detector_zona_pasillo.monitoring = (new_zone != Zone.EXTERIOR)
+	if is_instance_valid(detector_zona_dormitorio):
+		detector_zona_dormitorio.monitoring = (new_zone != Zone.EXTERIOR)
+	if is_instance_valid(detector_zona_mina):
+		detector_zona_mina.monitoring = (new_zone != Zone.EXTERIOR)
+	if is_instance_valid(detector_zona_exterior):
+		detector_zona_exterior.monitoring = (new_zone == Zone.EXTERIOR)
+
+	if new_zone == Zone.EXTERIOR:
+		if is_instance_valid(pueblo_exterior):
+			pueblo_exterior.visible = true
+			pueblo_exterior.process_mode = Node.PROCESS_MODE_INHERIT
+		if is_instance_valid(interior_casa):
+			interior_casa.visible = false
+			interior_casa.process_mode = Node.PROCESS_MODE_DISABLED
+	else:
+		if is_instance_valid(pueblo_exterior):
+			pueblo_exterior.visible = false
+			pueblo_exterior.process_mode = Node.PROCESS_MODE_DISABLED
+		if is_instance_valid(interior_casa):
+			interior_casa.visible = true
+			interior_casa.process_mode = Node.PROCESS_MODE_INHERIT
 
 	# Delimitar la cámara al espacio activo para que jamás muestre el vacío negro exterior
 	if jugador and jugador.has_method("set_camera_bounds"):
@@ -324,7 +351,7 @@ func set_active_zone(new_zone: Zone, immediate: bool = false) -> void:
 			Zone.EXTERIOR:
 				if "zona_actual" in GameManager:
 					GameManager.zona_actual = "exterior"
-				jugador.set_camera_bounds(120, 590, 1160, 1150)
+				jugador.set_camera_bounds(0, 0, 1400, 1500)
 			Zone.PASILLO:
 				if "zona_actual" in GameManager:
 					GameManager.zona_actual = "interior"

@@ -164,7 +164,13 @@ func _ready() -> void:
 			GameManager.connect("menas_en_mano_cambiado", _on_menas_en_mano_cambiado)
 		if GameManager.has_signal("mena_fundida_en_fragua") and not GameManager.is_connected("mena_fundida_en_fragua", _on_mena_fundida_en_fragua):
 			GameManager.connect("mena_fundida_en_fragua", _on_mena_fundida_en_fragua)
+		if GameManager.has_signal("state_changed") and not GameManager.is_connected("state_changed", _on_game_manager_state_changed):
+			GameManager.connect("state_changed", _on_game_manager_state_changed)
 
+	if is_instance_valid(GameManager) and GameManager.current_state == GameManager.State.PROLOGUE:
+		visible = false
+	else:
+		visible = true
 	_actualizar_vista_paso(paso_actual, false)
 	_resolver_referencias_escena()
 
@@ -292,6 +298,10 @@ func _iniciar_transicion_parte_2() -> void:
 	_parte_2_iniciada = true
 	paso_actual = PRIMER_PASO_PARTE_2
 	parte_1_ocultada_temporalmente = true
+	if is_instance_valid(GameManager) and GameManager.current_state == GameManager.State.PROLOGUE:
+		visible = false
+	else:
+		visible = true
 	_actualizar_vista_paso(paso_actual, false)
 	parte_1_completada.emit()
 	paso_cambiado.emit(paso_actual)
@@ -318,6 +328,10 @@ func _reanudar_visualmente_parte_2() -> void:
 		return
 	parte_1_ocultada_temporalmente = false
 	visible = true
+	if is_instance_valid(GameManager) and GameManager.current_state == GameManager.State.PROLOGUE:
+		visible = false
+	else:
+		visible = true
 	_actualizar_vista_paso(paso_actual, false)
 	_reproducir_sonido_paso()
 	_aplicar_pulso_elastico()
@@ -517,6 +531,9 @@ func _on_mostrador_item_delivered(_calidad: float, _recompensa: int) -> void:
 		_registrar_entrega_pedido()
 
 func _verificar_estado_juego() -> void:
+	if is_instance_valid(GameManager) and GameManager.current_state == GameManager.State.PROLOGUE:
+		visible = false
+		return
 	if not tutorial_activo or tutorial_finalizado:
 		return
 
@@ -683,3 +700,9 @@ func _on_menas_en_mano_cambiado(_tipo: String, cantidad: int) -> void:
 
 func _on_mena_fundida_en_fragua(_tipo: String, _cantidad: int) -> void:
 	notificar_evento("fundicion_mena_completada")
+
+func _on_game_manager_state_changed(nuevo_estado: int) -> void:
+	if nuevo_estado == GameManager.State.PROLOGUE:
+		visible = false
+	elif tutorial_activo and not tutorial_finalizado:
+		visible = true

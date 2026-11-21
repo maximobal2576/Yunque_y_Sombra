@@ -22,11 +22,24 @@ func _run_capture_sequence() -> void:
 	
 	# Cerrar carta y ver el pueblo
 	var prologue = town_instance.prologue_letter if "prologue_letter" in town_instance else town_instance.get_node_or_null("CartaPrologo")
-	if prologue:
+	if prologue and prologue.has_method("close_letter"):
+		prologue.close_letter()
+	elif prologue:
 		prologue.visible = false
+	
+	if "telon_negro_inicial" in town_instance and is_instance_valid(town_instance.telon_negro_inicial):
+		town_instance.telon_negro_inicial.visible = false
+	
 	var gm = root_node.get_node_or_null("/root/GameManager")
 	if gm:
 		gm.change_state(gm.State.OVERWORLD)
+	
+	if "jugador" in town_instance and is_instance_valid(town_instance.jugador):
+		town_instance.jugador.visible = true
+		town_instance.jugador.modulate.a = 1.0
+		town_instance.jugador.global_position = town_instance.SPAWN_EXTERIOR_TOWN
+	
+	await create_timer(0.2).timeout
 	await process_frame
 	await process_frame
 	_save_screen("screenshots/02_pueblo_exterior.png")
