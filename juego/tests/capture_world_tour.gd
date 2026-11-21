@@ -1,9 +1,9 @@
 # capture_world_tour.gd
-# Captura de pantalla de las diferentes zonas del mundo abierto
+# Captura de pantalla de las diferentes zonas del mundo abierto, casas estructuradas, nuevos lugares y fauna
 extends SceneTree
 
 func _init() -> void:
-	print("[TOUR] Iniciando tour visual del pueblo y la herrería...")
+	print("[TOUR] Iniciando tour visual completo del pueblo, arquitectura y fauna...")
 	DirAccess.make_dir_absolute("res://screenshots")
 	call_deferred("_run_tour")
 
@@ -25,7 +25,7 @@ func _run_tour() -> void:
 	town.jugador.visible = true
 	town.jugador.modulate.a = 1.0
 
-	# Foto 1: Plaza Central (sur)
+	# Foto 1: Plaza Central con Gallina y Kiosco
 	town.jugador.global_position = Vector2(640, 900)
 	town._reset_camera()
 	await process_frame
@@ -33,15 +33,15 @@ func _run_tour() -> void:
 	await create_timer(0.2).timeout
 	_save_screen("screenshots/tour_01_plaza_central.png")
 
-	# Foto 2: Camino Central con Casas Campesinas y Tienda Móvil
-	town.jugador.global_position = Vector2(640, 640)
+	# Foto 2: Calle Central con Casas Campesinas Estructuradas
+	town.jugador.global_position = Vector2(640, 600)
 	town._reset_camera()
 	await process_frame
 	await process_frame
 	await create_timer(0.2).timeout
 	_save_screen("screenshots/tour_02_calle_central.png")
 
-	# Foto 3: La Herrería Abandonada en la ladera (noreste) con Prompt de entrada
+	# Foto 3: La Herrería en la ladera SIN valla al frente (porche abierto con escalones y yunque)
 	town.jugador.global_position = Vector2(1040, 335)
 	Input.action_press("move_up")
 	for f in range(4):
@@ -54,37 +54,39 @@ func _run_tour() -> void:
 	await process_frame
 	_save_screen("screenshots/tour_03_herreria_ladera.png")
 
-	# Foto 4: Camino noroeste hacia la Casa de Gobierno (Portón Feudal)
-	town.jugador.global_position = Vector2(360, 655)
-	Input.action_press("move_up")
-	for f in range(4):
-		await physics_frame
-	Input.action_release("move_up")
-	for f in range(2):
-		await physics_frame
-	town._reset_camera()
-	await process_frame
-	await process_frame
-	_save_screen("screenshots/tour_04_porton_feudal.png")
-
-	# Foto 5: Mansión de Gobierno en la meseta noroeste
-	town.jugador.global_position = Vector2(230, 240)
+	# Foto 4: Granero Comunal y Senda Feudal
+	town.jugador.global_position = Vector2(360, 480)
 	town._reset_camera()
 	await process_frame
 	await process_frame
 	await create_timer(0.2).timeout
-	_save_screen("screenshots/tour_05_casa_gobierno_mansion.png")
+	_save_screen("screenshots/tour_04_granero_comunal.png")
 
-	# Foto 6: Interior de la Casa del Tío (aislado y separado)
-	town.set_active_zone(town.Zone.PASILLO, true)
-	town.jugador.global_position = town.SPAWN_HOUSE_HALLWAY
+	# Foto 5: Corrales de Ganado con Buey y Ovejas animadas
+	town.jugador.global_position = Vector2(360, 1030)
 	town._reset_camera()
 	await process_frame
 	await process_frame
 	await create_timer(0.2).timeout
-	_save_screen("screenshots/tour_06_interior_casa.png")
+	_save_screen("screenshots/tour_05_corral_fauna.png")
 
-	print("[TOUR] ¡Todas las capturas del tour guardadas con éxito!")
+	# Foto 6: Taller del Cantero (bloques de piedra y mazas)
+	town.jugador.global_position = Vector2(1030, 710)
+	town._reset_camera()
+	await process_frame
+	await process_frame
+	await create_timer(0.2).timeout
+	_save_screen("screenshots/tour_06_cantero_taller.png")
+
+	# Foto 7: Huerta Comunal con Espantapájaros y Perro en la Taberna
+	town.jugador.global_position = Vector2(340, 750)
+	town._reset_camera()
+	await process_frame
+	await process_frame
+	await create_timer(0.2).timeout
+	_save_screen("screenshots/tour_07_huerta_comunal.png")
+
+	print("[TOUR] ¡Todas las capturas del nuevo tour guardadas con éxito!")
 	quit(0)
 
 func _save_screen(rel_path: String) -> void:

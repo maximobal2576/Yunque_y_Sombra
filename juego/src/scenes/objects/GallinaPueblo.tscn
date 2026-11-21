@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://c_gallina_pueblo_01"]
+
+[ext_resource type="Script" path="res://src/scenes/objects/AnimalPueblo.gd" id="1_animal_script"]
+
+[node name="GallinaPueblo" type="Node2D"]
+script = ExtResource("1_animal_script")
+tipo_animal = 5
+velocidad_respiracion = 3.5
+amplitud_respiracion = 0.05
+permite_deambular = true
+
+[node name="SombraSuelo" type="Polygon2D" parent="."]
+color = Color(0.18, 0.14, 0.11, 0.30)
+polygon = PackedVector2Array(-8, 2, -3, 5, 6, 5, 9, 2, 5, -1, -4, -1)
+
+[node name="Patas" type="Line2D" parent="."]
+points = PackedVector2Array(-3, 0, -3, 4, 3, 0, 3, 4)
+width = 1.5
+default_color = Color(0.85, 0.65, 0.20, 1)
+
+[node name="Cuerpo" type="Polygon2D" parent="."]
+color = Color(0.88, 0.84, 0.78, 1)
+polygon = PackedVector2Array(-7, -6, 5, -6, 8, -2, 6, 3, -6, 3, -8, -1)
+
+[node name="Ala" type="Polygon2D" parent="Cuerpo"]
+position = Vector2(-1, -2)
+color = Color(0.76, 0.70, 0.62, 1)
+polygon = PackedVector2Array(-4, -3, 4, -3, 3, 2, -3, 2)
+
+[node name="ColaPlumas" type="Polygon2D" parent="Cuerpo"]
+position = Vector2(-7, -4)
+color = Color(0.70, 0.64, 0.56, 1)
+polygon = PackedVector2Array(0, 0, -4, -6, -1, -7, 2, -2)
+
+[node name="Cabeza" type="Node2D" parent="."]
+position = Vector2(6, -6)
+
+[node name="Cuello" type="Polygon2D" parent="Cabeza"]
+color = Color(0.90, 0.86, 0.80, 1)
+polygon = PackedVector2Array(-2, 2, 2, 2, 3, -4, -1, -4)
+
+[node name="Pico" type="Polygon2D" parent="Cabeza"]
+position = Vector2(3, -2)
+color = Color(0.92, 0.72, 0.22, 1)
+polygon = PackedVector2Array(0, -1, 4, 0, 0, 2)
+
+[node name="Cresta" type="Polygon2D" parent="Cabeza"]
+position = Vector2(0, -5)
+color = Color(0.82, 0.22, 0.20, 1)
+polygon = PackedVector2Array(-1, 0, 2, -3, 3, 0)

@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://c_buey_pueblo_01"]
+
+[ext_resource type="Script" path="res://src/scenes/objects/AnimalPueblo.gd" id="1_animal_script"]
+
+[node name="BueyPueblo" type="Node2D"]
+script = ExtResource("1_animal_script")
+tipo_animal = 0
+velocidad_respiracion = 1.8
+amplitud_respiracion = 0.03
+
+[node name="SombraSuelo" type="Polygon2D" parent="."]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-28, 4, -12, 12, 24, 12, 34, 4, 24, -4, -12, -4)
+
+[node name="PatasTraseras" type="Line2D" parent="."]
+points = PackedVector2Array(-18, 0, -18, 10, -8, 0, -8, 10)
+width = 4.0
+default_color = Color(0.28, 0.19, 0.14, 1)
+
+[node name="PatasDelanteras" type="Line2D" parent="."]
+points = PackedVector2Array(14, 0, 14, 10, 22, 0, 22, 10)
+width = 4.0
+default_color = Color(0.28, 0.19, 0.14, 1)
+
+[node name="Cuerpo" type="Polygon2D" parent="."]
+color = Color(0.42, 0.30, 0.22, 1)
+polygon = PackedVector2Array(-22, -14, 18, -14, 24, -6, 22, 5, -20, 5, -24, -4)
+
+[node name="LomoSombreado" type="Polygon2D" parent="Cuerpo"]
+color = Color(0.32, 0.22, 0.16, 1)
+polygon = PackedVector2Array(-20, -14, 16, -14, 20, -7, -18, -7)
+
+[node name="Cola" type="Node2D" parent="."]
+position = Vector2(-22, -6)
+
+[node name="Line2D" type="Line2D" parent="Cola"]
+points = PackedVector2Array(0, 0, -6, 8, -5, 15)
+width = 2.0
+default_color = Color(0.30, 0.20, 0.14, 1)
+
+[node name="Mechon" type="Polygon2D" parent="Cola"]
+position = Vector2(-5, 15)
+color = Color(0.18, 0.12, 0.08, 1)
+polygon = PackedVector2Array(-2, -1, 2, -1, 1, 5, -1, 5)
+
+[node name="Cabeza" type="Node2D" parent="."]
+position = Vector2(22, -8)
+
+[node name="Polygon2D" type="Polygon2D" parent="Cabeza"]
+color = Color(0.45, 0.32, 0.24, 1)
+polygon = PackedVector2Array(-2, -8, 12, -6, 16, 2, 8, 8, -2, 4)
+
+[node name="Morro" type="Polygon2D" parent="Cabeza"]
+position = Vector2(12, 3)
+color = Color(0.60, 0.48, 0.38, 1)
+polygon = PackedVector2Array(0, -3, 6, -1, 5, 4, -1, 3)
+
+[node name="Ojo" type="Polygon2D" parent="Cabeza"]
+position = Vector2(8, -2)
+color = Color(0.12, 0.08, 0.06, 1)
+polygon = PackedVector2Array(-1, -1, 1, -1, 1, 1, -1, 1)
+
+[node name="CuernoIzq" type="Line2D" parent="Cabeza"]
+points = PackedVector2Array(2, -8, 4, -15, 10, -14)
+width = 2.5
+default_color = Color(0.88, 0.84, 0.76, 1)
+
+[node name="CuernoDer" type="Line2D" parent="Cabeza"]
+points = PackedVector2Array(6, -6, 10, -12, 14, -10)
+width = 2.5
+default_color = Color(0.80, 0.76, 0.68, 1)

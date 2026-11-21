@@ -11,6 +11,35 @@
 [ext_resource type="PackedScene" path="res://src/scenes/levels/MinaSubterranea.tscn" id="9_mina_scene"]
 [ext_resource type="PackedScene" path="res://src/scenes/ui/GuiaTutorial.tscn" id="10_tutorial_scene"]
 [ext_resource type="PackedScene" path="res://src/scenes/ui/PantallaResumenDia.tscn" id="11_resumen_scene"]
+[ext_resource type="PackedScene" uid="uid://c_buey_pueblo_01" path="res://src/scenes/objects/BueyPueblo.tscn" id="12_buey_scene"]
+[ext_resource type="PackedScene" uid="uid://c_oveja_pueblo_01" path="res://src/scenes/objects/OvejaPueblo.tscn" id="13_oveja_scene"]
+[ext_resource type="PackedScene" uid="uid://c_mula_pueblo_01" path="res://src/scenes/objects/MulaPueblo.tscn" id="14_mula_scene"]
+[ext_resource type="PackedScene" uid="uid://c_gallina_pueblo_01" path="res://src/scenes/objects/GallinaPueblo.tscn" id="15_gallina_scene"]
+[ext_resource type="PackedScene" uid="uid://c_perro_pueblo_01" path="res://src/scenes/objects/PerroPueblo.tscn" id="16_perro_scene"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cantero_body"]
+size = Vector2(80, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cantero_area"]
+size = Vector2(90, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_granero_body"]
+size = Vector2(100, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_granero_area"]
+size = Vector2(110, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_huerta_area"]
+size = Vector2(90, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_alfareria_body"]
+size = Vector2(60, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_alfareria_area"]
+size = Vector2(75, 55)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cottage_large_body"]
+size = Vector2(90, 55)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ext_south"]
 size = Vector2(1000, 30)
@@ -685,20 +714,56 @@ polygon = PackedVector2Array(-6, -12, 6, -12, 7, 6, -7, 6)
 shape = SubResource("CircleShape2D_kiln_body")
 
 [node name="CercaLaderaMadera" type="StaticBody2D" parent="PuebloExterior/FachadaCasaTio"]
-position = Vector2(0, 90)
+position = Vector2(135, 15)
 
 [node name="RielesMadera" type="Line2D" parent="PuebloExterior/FachadaCasaTio/CercaLaderaMadera"]
-points = PackedVector2Array(-100, -6, 100, -6, -100, 6, 100, 6)
-width = 3.0
+points = PackedVector2Array(0, -25, 45, -10, 90, 15, 0, -20, 45, -5, 90, 20)
+width = 2.5
 default_color = Color(0.44, 0.30, 0.20, 1)
 
 [node name="PostesVerticales" type="Line2D" parent="PuebloExterior/FachadaCasaTio/CercaLaderaMadera"]
-points = PackedVector2Array(-90, -12, -90, 12, -45, -12, -45, 12, 0, -12, 0, 12, 45, -12, 45, 12, 90, -12, 90, 12)
-width = 3.0
+points = PackedVector2Array(0, -30, 0, -15, 45, -15, 45, 0, 90, 10, 90, 25)
+width = 2.5
 default_color = Color(0.36, 0.24, 0.16, 1)
 
 [node name="ColisionCerca" type="CollisionShape2D" parent="PuebloExterior/FachadaCasaTio/CercaLaderaMadera"]
+position = Vector2(45, 0)
 shape = SubResource("RectangleShape2D_fence_body")
+
+[node name="EscalonesPiedra" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
+position = Vector2(0, 62)
+color = Color(0.48, 0.44, 0.40, 1)
+polygon = PackedVector2Array(-48, -4, 48, -4, 52, 6, -52, 6)
+
+[node name="BordeEscalon" type="Line2D" parent="PuebloExterior/FachadaCasaTio/EscalonesPiedra"]
+points = PackedVector2Array(-52, 6, 52, 6)
+width = 2.0
+default_color = Color(0.32, 0.28, 0.24, 1)
+
+[node name="YunqueToconExterior" type="Node2D" parent="PuebloExterior/FachadaCasaTio"]
+position = Vector2(-55, 42)
+
+[node name="ToconMadera" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio/YunqueToconExterior"]
+color = Color(0.38, 0.26, 0.18, 1)
+polygon = PackedVector2Array(-9, -6, 9, -6, 11, 8, -11, 8)
+
+[node name="YunqueMetal" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio/YunqueToconExterior"]
+position = Vector2(0, -7)
+color = Color(0.25, 0.26, 0.28, 1)
+polygon = PackedVector2Array(-8, -4, 8, -4, 12, -2, 6, 0, -6, 0, -10, -2)
+
+[node name="PilaLeniaYCarbon" type="Node2D" parent="PuebloExterior/FachadaCasaTio"]
+position = Vector2(60, 42)
+
+[node name="LeniaApilada" type="Line2D" parent="PuebloExterior/FachadaCasaTio/PilaLeniaYCarbon"]
+points = PackedVector2Array(-8, 6, 8, 6, -6, 2, 6, 2, -4, -2, 4, -2)
+width = 3.0
+default_color = Color(0.45, 0.32, 0.20, 1)
+
+[node name="SacoCarbon" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio/PilaLeniaYCarbon"]
+position = Vector2(12, 2)
+color = Color(0.20, 0.16, 0.14, 1)
+polygon = PackedVector2Array(-4, -6, 4, -6, 6, 4, -6, 4)
 
 [node name="PuertaCasa" type="StaticBody2D" parent="PuebloExterior/FachadaCasaTio"]
 position = Vector2(0, 50)
@@ -794,93 +859,274 @@ polygon = PackedVector2Array(-12, -7, 12, -7, 14, 7, -14, 7)
 z_index = 3
 
 [node name="CasaCampesinaNoroeste" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(480, 500)
+position = Vector2(465, 480)
+
+[node name="SombraSuelo1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-58, 30, 58, 30, 62, 40, -62, 40)
+
+[node name="ZocaloPiedra1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+color = Color(0.42, 0.36, 0.30, 1)
+polygon = PackedVector2Array(-54, 16, 54, 16, 56, 30, -56, 30)
 
 [node name="Muros1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
-color = Color(0.68, 0.60, 0.50, 1)
-polygon = PackedVector2Array(-45, -25, 45, -25, 48, 28, -48, 28)
+color = Color(0.74, 0.68, 0.58, 1)
+polygon = PackedVector2Array(-52, -26, 52, -26, 54, 18, -54, 18)
+
+[node name="VigasMadera1" type="Line2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+points = PackedVector2Array(-50, -24, -50, 16, -20, -24, -20, 16, 20, -24, 20, 16, 50, -24, 50, 16)
+width = 2.5
+default_color = Color(0.32, 0.22, 0.15, 1)
+
+[node name="Puerta1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+position = Vector2(0, 14)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 9, 14, -9, 14)
+
+[node name="HerrajePuerta1" type="Line2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste/Puerta1"]
+points = PackedVector2Array(-7, -12, 7, -12, -7, 0, 7, 0)
+width = 1.5
+default_color = Color(0.12, 0.10, 0.08, 1)
+
+[node name="Ventana1A" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+position = Vector2(-34, -4)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-7, -8, 7, -8, 7, 6, -7, 6)
+
+[node name="Marco1A" type="Line2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste/Ventana1A"]
+points = PackedVector2Array(-7, -8, 7, -8, 7, 6, -7, 6, -7, -8, 0, -8, 0, 6)
+width = 1.5
+default_color = Color(0.26, 0.18, 0.12, 1)
+
+[node name="Ventana1B" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+position = Vector2(34, -4)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-7, -8, 7, -8, 7, 6, -7, 6)
+
+[node name="Marco1B" type="Line2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste/Ventana1B"]
+points = PackedVector2Array(-7, -8, 7, -8, 7, 6, -7, 6, -7, -8, 0, -8, 0, 6)
+width = 1.5
+default_color = Color(0.26, 0.18, 0.12, 1)
 
 [node name="TechoPaja1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
-position = Vector2(0, -30)
-color = Color(0.76, 0.62, 0.38, 1)
-polygon = PackedVector2Array(-52, -14, 52, -14, 55, 12, -55, 12)
+position = Vector2(0, -32)
+color = Color(0.78, 0.65, 0.40, 1)
+polygon = PackedVector2Array(-62, -18, 62, -18, 66, 14, -66, 14)
+
+[node name="SombraTecho1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste/TechoPaja1"]
+color = Color(0.64, 0.52, 0.30, 1)
+polygon = PackedVector2Array(-62, 2, 62, 2, 66, 14, -66, 14)
+
+[node name="Chimenea1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
+position = Vector2(40, -42)
+color = Color(0.44, 0.38, 0.32, 1)
+polygon = PackedVector2Array(-5, -12, 5, -12, 6, 8, -6, 8)
 
 [node name="ColisionCasa1" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoroeste"]
-shape = SubResource("RectangleShape2D_cottage_body")
+shape = SubResource("RectangleShape2D_cottage_large_body")
 
 [node name="CasaCampesinaNoreste" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(800, 500)
+position = Vector2(815, 480)
+
+[node name="SombraSuelo2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-58, 30, 58, 30, 62, 40, -62, 40)
+
+[node name="ZocaloPiedra2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+color = Color(0.42, 0.36, 0.30, 1)
+polygon = PackedVector2Array(-54, 16, 54, 16, 56, 30, -56, 30)
 
 [node name="Muros2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
-color = Color(0.68, 0.60, 0.50, 1)
-polygon = PackedVector2Array(-45, -25, 45, -25, 48, 28, -48, 28)
+color = Color(0.70, 0.62, 0.52, 1)
+polygon = PackedVector2Array(-52, -26, 52, -26, 54, 18, -54, 18)
 
-[node name="TechoPaja2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
-position = Vector2(0, -30)
-color = Color(0.76, 0.62, 0.38, 1)
-polygon = PackedVector2Array(-52, -14, 52, -14, 55, 12, -55, 12)
+[node name="VigasMadera2" type="Line2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+points = PackedVector2Array(-50, -24, 0, 16, 0, -24, 50, 16, 50, -24, -50, 16)
+width = 2.0
+default_color = Color(0.32, 0.22, 0.15, 1)
+
+[node name="Puerta2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+position = Vector2(-20, 14)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-9, -18, 9, -18, 9, 14, -9, 14)
+
+[node name="Ventana2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+position = Vector2(25, -4)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-8, -8, 8, -8, 8, 6, -8, 6)
+
+[node name="TechoTejas2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+position = Vector2(0, -32)
+color = Color(0.66, 0.30, 0.22, 1)
+polygon = PackedVector2Array(-62, -18, 62, -18, 66, 14, -66, 14)
+
+[node name="SombraTecho2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste/TechoTejas2"]
+color = Color(0.50, 0.22, 0.16, 1)
+polygon = PackedVector2Array(-62, 0, 62, 0, 66, 14, -66, 14)
+
+[node name="Chimenea2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
+position = Vector2(-38, -42)
+color = Color(0.44, 0.38, 0.32, 1)
+polygon = PackedVector2Array(-5, -12, 5, -12, 6, 8, -6, 8)
 
 [node name="ColisionCasa2" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaCampesinaNoreste"]
-shape = SubResource("RectangleShape2D_cottage_body")
+shape = SubResource("RectangleShape2D_cottage_large_body")
 
 [node name="CasaCanteroOeste" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(500, 650)
+position = Vector2(480, 630)
+
+[node name="SombraSuelo3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-54, 28, 54, 28, 58, 38, -58, 38)
 
 [node name="Muros3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
-color = Color(0.55, 0.48, 0.42, 1)
-polygon = PackedVector2Array(-42, -24, 42, -24, 45, 26, -45, 26)
+color = Color(0.58, 0.52, 0.46, 1)
+polygon = PackedVector2Array(-48, -24, 48, -24, 50, 26, -50, 26)
 
-[node name="TechoTejas3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
-position = Vector2(0, -28)
-color = Color(0.56, 0.28, 0.22, 1)
-polygon = PackedVector2Array(-48, -14, 48, -14, 52, 10, -52, 10)
+[node name="Puerta3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
+position = Vector2(18, 12)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-8, -16, 8, -16, 8, 14, -8, 14)
+
+[node name="Ventana3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
+position = Vector2(-22, -2)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-7, -7, 7, -7, 7, 5, -7, 5)
+
+[node name="TechoPaja3" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
+position = Vector2(0, -30)
+color = Color(0.78, 0.65, 0.40, 1)
+polygon = PackedVector2Array(-56, -16, 56, -16, 60, 12, -60, 12)
 
 [node name="ColisionCasa3" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaCanteroOeste"]
 shape = SubResource("RectangleShape2D_cottage_body")
 
 [node name="CasaTejasEste" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(780, 650)
+position = Vector2(795, 630)
+
+[node name="SombraSuelo4" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-54, 28, 54, 28, 58, 38, -58, 38)
 
 [node name="Muros4" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
-color = Color(0.55, 0.48, 0.42, 1)
-polygon = PackedVector2Array(-42, -24, 42, -24, 45, 26, -45, 26)
+color = Color(0.60, 0.50, 0.42, 1)
+polygon = PackedVector2Array(-48, -24, 48, -24, 50, 26, -50, 26)
+
+[node name="Puerta4" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
+position = Vector2(-15, 12)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-8, -16, 8, -16, 8, 14, -8, 14)
+
+[node name="Ventana4" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
+position = Vector2(24, -2)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-7, -7, 7, -7, 7, 5, -7, 5)
+
+[node name="TinajasDecorativas" type="Node2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
+position = Vector2(38, 20)
+
+[node name="Tinaja1" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste/TinajasDecorativas"]
+color = Color(0.72, 0.40, 0.28, 1)
+polygon = PackedVector2Array(-3, -6, 3, -6, 4, 3, -4, 3)
+
+[node name="Tinaja2" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste/TinajasDecorativas"]
+position = Vector2(8, 2)
+color = Color(0.65, 0.35, 0.24, 1)
+polygon = PackedVector2Array(-3, -5, 3, -5, 4, 2, -4, 2)
 
 [node name="TechoTejas4" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
-position = Vector2(0, -28)
-color = Color(0.56, 0.28, 0.22, 1)
-polygon = PackedVector2Array(-48, -14, 48, -14, 52, 10, -52, 10)
+position = Vector2(0, -30)
+color = Color(0.66, 0.30, 0.22, 1)
+polygon = PackedVector2Array(-56, -16, 56, -16, 60, 12, -60, 12)
 
 [node name="ColisionCasa4" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaTejasEste"]
 shape = SubResource("RectangleShape2D_cottage_body")
 
 [node name="CasaMolinoSur" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(490, 780)
+position = Vector2(460, 770)
+
+[node name="SombraSuelo5" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-48, 24, 48, 24, 52, 34, -52, 34)
 
 [node name="Muros5" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
-color = Color(0.68, 0.60, 0.50, 1)
-polygon = PackedVector2Array(-38, -22, 38, -22, 40, 24, -40, 24)
+color = Color(0.72, 0.64, 0.54, 1)
+polygon = PackedVector2Array(-42, -22, 42, -22, 44, 24, -44, 24)
+
+[node name="Puerta5" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
+position = Vector2(12, 10)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-7, -14, 7, -14, 7, 14, -7, 14)
+
+[node name="Ventana5" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
+position = Vector2(-18, -2)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-6, -6, 6, -6, 6, 4, -6, 4)
 
 [node name="TechoPaja5" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
-position = Vector2(0, -26)
-color = Color(0.76, 0.62, 0.38, 1)
-polygon = PackedVector2Array(-44, -12, 44, -12, 48, 10, -48, 10)
+position = Vector2(0, -28)
+color = Color(0.78, 0.65, 0.40, 1)
+polygon = PackedVector2Array(-50, -14, 50, -14, 54, 10, -54, 10)
 
 [node name="ColisionCasa5" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaMolinoSur"]
 shape = SubResource("RectangleShape2D_cottage_small_body")
 
 [node name="CasaAlmacenSur" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
-position = Vector2(790, 780)
+position = Vector2(815, 770)
+
+[node name="SombraSuelo6" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-48, 24, 48, 24, 52, 34, -52, 34)
 
 [node name="Muros6" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
-color = Color(0.44, 0.32, 0.22, 1)
-polygon = PackedVector2Array(-38, -22, 38, -22, 40, 24, -40, 24)
+color = Color(0.48, 0.36, 0.26, 1)
+polygon = PackedVector2Array(-42, -22, 42, -22, 44, 24, -44, 24)
+
+[node name="PortonAlmacen" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
+position = Vector2(0, 8)
+color = Color(0.22, 0.15, 0.10, 1)
+polygon = PackedVector2Array(-14, -16, 14, -16, 14, 16, -14, 16)
+
+[node name="RuedaApoyada" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
+position = Vector2(28, 16)
+color = Color(0.34, 0.22, 0.14, 1)
+polygon = PackedVector2Array(-5, -6, 5, -6, 6, 6, -6, 6)
 
 [node name="TechoTejas6" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
-position = Vector2(0, -26)
-color = Color(0.56, 0.28, 0.22, 1)
-polygon = PackedVector2Array(-44, -12, 44, -12, 48, 10, -48, 10)
+position = Vector2(0, -28)
+color = Color(0.66, 0.30, 0.22, 1)
+polygon = PackedVector2Array(-50, -14, 50, -14, 54, 10, -54, 10)
 
 [node name="ColisionCasa6" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaAlmacenSur"]
+shape = SubResource("RectangleShape2D_cottage_small_body")
+
+[node name="CasaLaderaNorte" type="StaticBody2D" parent="PuebloExterior/CasasPueblo"]
+position = Vector2(890, 360)
+
+[node name="SombraSuelo7" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-42, 20, 42, 20, 46, 28, -46, 28)
+
+[node name="Muros7" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
+color = Color(0.56, 0.50, 0.44, 1)
+polygon = PackedVector2Array(-38, -18, 38, -18, 40, 20, -40, 20)
+
+[node name="Puerta7" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
+position = Vector2(-8, 8)
+color = Color(0.24, 0.16, 0.10, 1)
+polygon = PackedVector2Array(-6, -12, 6, -12, 6, 12, -6, 12)
+
+[node name="Ventana7" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
+position = Vector2(16, -2)
+color = Color(0.98, 0.84, 0.44, 1)
+polygon = PackedVector2Array(-5, -5, 5, -5, 5, 4, -5, 4)
+
+[node name="TechoPaja7" type="Polygon2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
+position = Vector2(0, -24)
+color = Color(0.78, 0.65, 0.40, 1)
+polygon = PackedVector2Array(-44, -12, 44, -12, 48, 10, -48, 10)
+
+[node name="ColisionCasa7" type="CollisionShape2D" parent="PuebloExterior/CasasPueblo/CasaLaderaNorte"]
 shape = SubResource("RectangleShape2D_cottage_small_body")
 
 [node name="FarolCentral" type="StaticBody2D" parent="PuebloExterior"]
@@ -952,6 +1198,271 @@ polygon = PackedVector2Array(-18, -6, 18, -6, 20, 6, -20, 6)
 points = PackedVector2Array(-14, 8, -14, -24, 14, 8, 14, -24)
 width = 2.5
 default_color = Color(0.30, 0.20, 0.14, 1)
+[node name="TallerCantero" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 3
+position = Vector2(1060, 710)
+
+[node name="SombraCantero" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-52, 28, 52, 28, 56, 38, -56, 38)
+
+[node name="PastoSeco" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+color = Color(0.68, 0.60, 0.44, 1)
+polygon = PackedVector2Array(-50, -28, 50, -28, 54, 28, -54, 28)
+
+[node name="BloqueSilleria1" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+position = Vector2(-25, 4)
+color = Color(0.72, 0.68, 0.62, 1)
+polygon = PackedVector2Array(-14, -12, 14, -12, 16, 12, -16, 12)
+
+[node name="BloqueSilleria2" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+position = Vector2(20, -6)
+color = Color(0.65, 0.60, 0.54, 1)
+polygon = PackedVector2Array(-12, -10, 12, -10, 14, 10, -14, 10)
+
+[node name="BloqueSilleria3" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+position = Vector2(16, 12)
+color = Color(0.75, 0.70, 0.64, 1)
+polygon = PackedVector2Array(-10, -8, 10, -8, 11, 8, -11, 8)
+
+[node name="TejadilloCobertizo" type="Polygon2D" parent="PuebloExterior/TallerCantero"]
+position = Vector2(0, -20)
+color = Color(0.38, 0.26, 0.18, 1)
+polygon = PackedVector2Array(-46, -10, 46, -10, 48, 8, -48, 8)
+
+[node name="PostesCobertizo" type="Line2D" parent="PuebloExterior/TallerCantero"]
+points = PackedVector2Array(-42, -14, -42, 24, 42, -14, 42, 24)
+width = 3.0
+default_color = Color(0.28, 0.18, 0.12, 1)
+
+[node name="MazaHierro" type="Line2D" parent="PuebloExterior/TallerCantero"]
+points = PackedVector2Array(-8, -4, -4, 6)
+width = 2.0
+default_color = Color(0.22, 0.20, 0.20, 1)
+
+[node name="ColisionCantero" type="CollisionShape2D" parent="PuebloExterior/TallerCantero"]
+shape = SubResource("RectangleShape2D_cantero_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/TallerCantero"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Cantera y Taller del Cantero [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/TallerCantero/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_cantero_area")
+
+[node name="GraneroComunal" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 3
+position = Vector2(320, 460)
+
+[node name="SombraGranero" type="Polygon2D" parent="PuebloExterior/GraneroComunal"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-64, 34, 64, 34, 68, 46, -68, 46)
+
+[node name="ZocaloGranero" type="Polygon2D" parent="PuebloExterior/GraneroComunal"]
+color = Color(0.40, 0.34, 0.28, 1)
+polygon = PackedVector2Array(-60, 20, 60, 20, 62, 34, -62, 34)
+
+[node name="MurosGranero" type="Polygon2D" parent="PuebloExterior/GraneroComunal"]
+color = Color(0.52, 0.38, 0.26, 1)
+polygon = PackedVector2Array(-58, -26, 58, -26, 60, 22, -60, 22)
+
+[node name="PortonDoble" type="Polygon2D" parent="PuebloExterior/GraneroComunal"]
+position = Vector2(0, 10)
+color = Color(0.26, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-18, -20, 18, -20, 18, 18, -18, 18)
+
+[node name="AspasPorton" type="Line2D" parent="PuebloExterior/GraneroComunal/PortonDoble"]
+points = PackedVector2Array(-16, -18, 16, 16, -16, 16, 16, -18)
+width = 2.0
+default_color = Color(0.38, 0.28, 0.18, 1)
+
+[node name="FardosHeno" type="Node2D" parent="PuebloExterior/GraneroComunal"]
+position = Vector2(40, 18)
+
+[node name="Fardo1" type="Polygon2D" parent="PuebloExterior/GraneroComunal/FardosHeno"]
+color = Color(0.85, 0.74, 0.44, 1)
+polygon = PackedVector2Array(-8, -6, 8, -6, 9, 6, -9, 6)
+
+[node name="Fardo2" type="Polygon2D" parent="PuebloExterior/GraneroComunal/FardosHeno"]
+position = Vector2(0, -9)
+color = Color(0.80, 0.70, 0.40, 1)
+polygon = PackedVector2Array(-7, -5, 7, -5, 8, 5, -8, 5)
+
+[node name="TechoGranero" type="Polygon2D" parent="PuebloExterior/GraneroComunal"]
+position = Vector2(0, -32)
+color = Color(0.78, 0.65, 0.40, 1)
+polygon = PackedVector2Array(-68, -18, 68, -18, 72, 14, -72, 14)
+
+[node name="SombraAlero" type="Polygon2D" parent="PuebloExterior/GraneroComunal/TechoGranero"]
+color = Color(0.62, 0.50, 0.30, 1)
+polygon = PackedVector2Array(-68, 4, 68, 4, 72, 14, -72, 14)
+
+[node name="ColisionGranero" type="CollisionShape2D" parent="PuebloExterior/GraneroComunal"]
+shape = SubResource("RectangleShape2D_granero_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/GraneroComunal"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Granero Comunal [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/GraneroComunal/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_granero_area")
+
+[node name="HuertaComunal" type="Node2D" parent="PuebloExterior"]
+z_index = 3
+position = Vector2(240, 730)
+
+[node name="TierraArada" type="Polygon2D" parent="PuebloExterior/HuertaComunal"]
+color = Color(0.38, 0.28, 0.20, 1)
+polygon = PackedVector2Array(-55, -42, 55, -42, 58, 42, -58, 42)
+
+[node name="SurcosCultivo" type="Line2D" parent="PuebloExterior/HuertaComunal"]
+points = PackedVector2Array(-50, -26, 50, -26, -50, -10, 50, -10, -50, 6, 50, 6, -50, 22, 50, 22)
+width = 2.0
+default_color = Color(0.30, 0.22, 0.16, 1)
+
+[node name="Calabazas" type="Node2D" parent="PuebloExterior/HuertaComunal"]
+position = Vector2(-25, 6)
+
+[node name="Calabaza1" type="Polygon2D" parent="PuebloExterior/HuertaComunal/Calabazas"]
+color = Color(0.86, 0.44, 0.18, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 5, 4, -5, 4)
+
+[node name="Calabaza2" type="Polygon2D" parent="PuebloExterior/HuertaComunal/Calabazas"]
+position = Vector2(14, 0)
+color = Color(0.82, 0.40, 0.15, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 5, 4, -5, 4)
+
+[node name="Coles" type="Node2D" parent="PuebloExterior/HuertaComunal"]
+position = Vector2(25, -10)
+
+[node name="Col1" type="Polygon2D" parent="PuebloExterior/HuertaComunal/Coles"]
+color = Color(0.32, 0.52, 0.28, 1)
+polygon = PackedVector2Array(-3, -3, 3, -3, 4, 3, -4, 3)
+
+[node name="Col2" type="Polygon2D" parent="PuebloExterior/HuertaComunal/Coles"]
+position = Vector2(14, 0)
+color = Color(0.35, 0.56, 0.30, 1)
+polygon = PackedVector2Array(-3, -3, 3, -3, 4, 3, -4, 3)
+
+[node name="Espantapajaros" type="Node2D" parent="PuebloExterior/HuertaComunal"]
+position = Vector2(0, -6)
+
+[node name="Poste" type="Line2D" parent="PuebloExterior/HuertaComunal/Espantapajaros"]
+points = PackedVector2Array(0, 12, 0, -14, -10, -6, 10, -6)
+width = 2.0
+default_color = Color(0.38, 0.26, 0.18, 1)
+
+[node name="Sombrero" type="Polygon2D" parent="PuebloExterior/HuertaComunal/Espantapajaros"]
+position = Vector2(0, -14)
+color = Color(0.68, 0.56, 0.36, 1)
+polygon = PackedVector2Array(-6, 0, 6, 0, 3, -5, -3, -5)
+
+[node name="PircaHuerta" type="Line2D" parent="PuebloExterior/HuertaComunal"]
+points = PackedVector2Array(-56, -44, 56, -44, 60, 44, -60, 44, -56, -44)
+width = 3.0
+default_color = Color(0.48, 0.42, 0.36, 1)
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/HuertaComunal"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Huerta Comunal [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/HuertaComunal/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_huerta_area")
+
+[node name="AlfareriaValle" type="StaticBody2D" parent="PuebloExterior"]
+z_index = 3
+position = Vector2(950, 480)
+
+[node name="SombraAlfareria" type="Polygon2D" parent="PuebloExterior/AlfareriaValle"]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-40, 20, 40, 20, 44, 28, -44, 28)
+
+[node name="HornoAlfarero" type="Polygon2D" parent="PuebloExterior/AlfareriaValle"]
+position = Vector2(-18, 0)
+color = Color(0.68, 0.36, 0.24, 1)
+polygon = PackedVector2Array(-14, 14, 14, 14, 12, -8, 0, -16, -12, -8)
+
+[node name="BocaHorno" type="Polygon2D" parent="PuebloExterior/AlfareriaValle/HornoAlfarero"]
+position = Vector2(0, 4)
+color = Color(0.20, 0.12, 0.08, 1)
+polygon = PackedVector2Array(-6, -6, 6, -6, 6, 8, -6, 8)
+
+[node name="TinajasSecado" type="Node2D" parent="PuebloExterior/AlfareriaValle"]
+position = Vector2(20, 4)
+
+[node name="Jarra1" type="Polygon2D" parent="PuebloExterior/AlfareriaValle/TinajasSecado"]
+color = Color(0.78, 0.44, 0.28, 1)
+polygon = PackedVector2Array(-4, -6, 4, -6, 5, 4, -5, 4)
+
+[node name="Jarra2" type="Polygon2D" parent="PuebloExterior/AlfareriaValle/TinajasSecado"]
+position = Vector2(10, 0)
+color = Color(0.72, 0.38, 0.24, 1)
+polygon = PackedVector2Array(-4, -5, 4, -5, 5, 3, -5, 3)
+
+[node name="TejasApiladas" type="Line2D" parent="PuebloExterior/AlfareriaValle/TinajasSecado"]
+points = PackedVector2Array(-6, 9, 14, 9, -5, 12, 15, 12)
+width = 2.0
+default_color = Color(0.65, 0.32, 0.20, 1)
+
+[node name="ColisionAlfareria" type="CollisionShape2D" parent="PuebloExterior/AlfareriaValle"]
+shape = SubResource("RectangleShape2D_alfareria_body")
+
+[node name="AreaInteractiva" type="Area2D" parent="PuebloExterior/AlfareriaValle"]
+script = ExtResource("6_interact_script")
+prompt_text = "Inspeccionar Alfarería del Valle [E]"
+
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="PuebloExterior/AlfareriaValle/AreaInteractiva"]
+shape = SubResource("RectangleShape2D_alfareria_area")
+
+[node name="AbrevaderoSur" type="Node2D" parent="PuebloExterior"]
+z_index = 3
+position = Vector2(680, 1180)
+
+[node name="PilaPiedra" type="Polygon2D" parent="PuebloExterior/AbrevaderoSur"]
+color = Color(0.48, 0.44, 0.40, 1)
+polygon = PackedVector2Array(-24, -8, 24, -8, 26, 10, -26, 10)
+
+[node name="AguaLimpia" type="Polygon2D" parent="PuebloExterior/AbrevaderoSur"]
+color = Color(0.22, 0.48, 0.58, 1)
+polygon = PackedVector2Array(-20, -5, 20, -5, 22, 7, -22, 7)
+
+[node name="PosteAmarre" type="Line2D" parent="PuebloExterior/AbrevaderoSur"]
+points = PackedVector2Array(-32, 10, -32, -12, 32, 10, 32, -12)
+width = 2.5
+default_color = Color(0.35, 0.24, 0.16, 1)
+
+[node name="FaunaPueblo" type="Node2D" parent="PuebloExterior"]
+z_index = 4
+
+[node name="BueyDeTiro" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("12_buey_scene")]
+position = Vector2(330, 1045)
+
+[node name="Oveja1" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("13_oveja_scene")]
+position = Vector2(385, 1055)
+
+[node name="Oveja2" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("13_oveja_scene")]
+position = Vector2(350, 1080)
+scale = Vector2(-0.9, 0.9)
+
+[node name="MulaDeCarga" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("14_mula_scene")]
+position = Vector2(880, 1135)
+
+[node name="Mula2" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("14_mula_scene")]
+position = Vector2(925, 1150)
+scale = Vector2(-0.95, 0.95)
+
+[node name="GallinaPlaza" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("15_gallina_scene")]
+position = Vector2(575, 925)
+
+[node name="GallinaCalle" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("15_gallina_scene")]
+position = Vector2(685, 680)
+
+[node name="GallinaGranero" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("15_gallina_scene")]
+position = Vector2(380, 500)
+
+[node name="PerroGreta" parent="PuebloExterior/FaunaPueblo" instance=ExtResource("16_perro_scene")]
+position = Vector2(420, 840)
+
 [node name="InteriorCasa" type="Node2D" parent="." unique_id=264943651]
 
 [node name="AccesoMina" type="Node2D" parent="InteriorCasa" unique_id=2141684025]
@@ -1732,3 +2243,5 @@ color = Color(0.02, 0.015, 0.01, 1)
 [node name="CartaPrologo" parent="." unique_id=607814212 instance=ExtResource("5_prologue_scene")]
 
 [node name="PantallaResumenDia" parent="." instance=ExtResource("11_resumen_scene")]
+
+

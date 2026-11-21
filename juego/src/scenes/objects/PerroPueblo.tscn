@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://c_perro_pueblo_01"]
+
+[ext_resource type="Script" path="res://src/scenes/objects/AnimalPueblo.gd" id="1_animal_script"]
+
+[node name="PerroPueblo" type="Node2D"]
+script = ExtResource("1_animal_script")
+tipo_animal = 6
+velocidad_respiracion = 2.8
+amplitud_respiracion = 0.04
+
+[node name="SombraSuelo" type="Polygon2D" parent="."]
+color = Color(0.18, 0.14, 0.11, 0.35)
+polygon = PackedVector2Array(-16, 3, -6, 8, 14, 8, 18, 3, 10, -2, -6, -2)
+
+[node name="Patas" type="Line2D" parent="."]
+points = PackedVector2Array(-8, 0, -8, 6, -2, 0, -2, 6, 6, 0, 6, 6, 12, 0, 12, 6)
+width = 2.5
+default_color = Color(0.38, 0.28, 0.18, 1)
+
+[node name="Cuerpo" type="Polygon2D" parent="."]
+color = Color(0.68, 0.48, 0.30, 1)
+polygon = PackedVector2Array(-12, -8, 8, -8, 14, -3, 12, 4, -10, 4, -13, -2)
+
+[node name="Collar" type="Line2D" parent="Cuerpo"]
+points = PackedVector2Array(8, -8, 11, -3, 9, 3)
+width = 2.0
+default_color = Color(0.68, 0.18, 0.15, 1)
+
+[node name="Cola" type="Node2D" parent="."]
+position = Vector2(-12, -4)
+
+[node name="Line2D" type="Line2D" parent="Cola"]
+points = PackedVector2Array(0, 0, -4, -6, -2, -12)
+width = 2.5
+default_color = Color(0.62, 0.44, 0.26, 1)
+
+[node name="Cabeza" type="Node2D" parent="."]
+position = Vector2(13, -5)
+
+[node name="Polygon2D" type="Polygon2D" parent="Cabeza"]
+color = Color(0.70, 0.50, 0.32, 1)
+polygon = PackedVector2Array(-2, -5, 6, -3, 8, 1, 4, 4, -2, 3)
+
+[node name="Trufa" type="Polygon2D" parent="Cabeza"]
+position = Vector2(7, 0)
+color = Color(0.12, 0.08, 0.06, 1)
+polygon = PackedVector2Array(0, -1, 2, 0, 0, 1)
+
+[node name="Oreja" type="Polygon2D" parent="Cabeza"]
+position = Vector2(0, -4)
+color = Color(0.50, 0.34, 0.20, 1)
+polygon = PackedVector2Array(0, 0, 4, 0, 2, 5, -1, 4)

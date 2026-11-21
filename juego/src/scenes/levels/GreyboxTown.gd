@@ -65,6 +65,10 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var area_fermin_muebles: Area2D = $PuebloExterior/FerminMuebles/AreaInteractiva
 @onready var area_corral_ganado: Area2D = $PuebloExterior/CorralesGanado/CorralOeste/AreaInteractiva
 @onready var area_camino_gobierno: Area2D = $PuebloExterior/CaminoCasaGobierno/PortonFeudal/AreaInteractiva
+@onready var area_cantero: Area2D = $PuebloExterior/TallerCantero/AreaInteractiva
+@onready var area_granero: Area2D = $PuebloExterior/GraneroComunal/AreaInteractiva
+@onready var area_huerta: Area2D = $PuebloExterior/HuertaComunal/AreaInteractiva
+@onready var area_alfareria: Area2D = $PuebloExterior/AlfareriaValle/AreaInteractiva
 
 # Alias de compatibilidad hacia atrás para QA y tests existentes
 var exterior_town: Node2D:
@@ -233,6 +237,22 @@ func _ready() -> void:
 		area_corral_ganado.interacted.connect(_on_corral_ganado_interacted)
 	if is_instance_valid(area_camino_gobierno):
 		area_camino_gobierno.interacted.connect(_on_camino_gobierno_interacted)
+	if is_instance_valid(area_cantero):
+		area_cantero.interacted.connect(func() -> void:
+			GameManager.post_notification("Taller del Cantero: Bloques de arenisca y granito tallados con cinceles para las defensas del feudo.")
+		)
+	if is_instance_valid(area_granero):
+		area_granero.interacted.connect(func() -> void:
+			GameManager.post_notification("Granero Comunal: Graneros repletos de trigo, avena y paja seca para abastecer el valle.")
+		)
+	if is_instance_valid(area_huerta):
+		area_huerta.interacted.connect(func() -> void:
+			GameManager.post_notification("Huerta Comunal: Hortalizas frescas, coles y calabazas protegidas por el espantapájaros.")
+		)
+	if is_instance_valid(area_alfareria):
+		area_alfareria.interacted.connect(func() -> void:
+			GameManager.post_notification("Alfarería del Valle: Tinajas de barro cocido y tejas rojizas secándose al sol del desierto.")
+		)
 
 	_construir_capa_inventario_barril_mina()
 
