@@ -1,4 +1,4 @@
-# GuiaTutorial.gd
+﻿# GuiaTutorial.gd
 # Sistema de Tutorial Interactivo, Contextual y Diegético en 2 Partes para 'Yunque & Sombra'
 # Especialidades combinadas: /programador_godot + /disenador_grafico + /sonidista + /game_feel
 # Nomenclatura de nodos 100% en español, cero emojis y tipado estricto (:=) conforme a docs/idea.txt §8.2
@@ -27,74 +27,74 @@ const PASOS_TUTORIAL: Array[Dictionary] = [
 	# Parte 1 (Pasos 1 a 9 — Los 3 Encargos del Día 1)
 	{
 		"numero": 1,
-		"subtitulo": "El Legado del Tío",
-		"descripcion": "Lee la carta de tu madre y sigue las flechas hacia el norte hasta la Herrería de Rodrik."
+		"subtitulo": "Llegada a Decroveil",
+		"descripcion": "Bajas del carruaje en la Plaza Central. Observa la fuente, la taberna y el comercio móvil; sigue las flechas doradas al norte hacia la ladera."
 	},
 	{
 		"numero": 2,
-		"subtitulo": "El Taller y el Ciudadano",
-		"descripcion": "Entra al Taller por la puerta oeste. El ciudadano tocará la campana al llegar a la ventanilla."
+		"subtitulo": "La Herrería en la Ladera",
+		"descripcion": "Sube el sendero norte junto al Horno Abovedado exterior y cruza la puerta principal del taller [E]."
 	},
 	{
 		"numero": 3,
-		"subtitulo": "El Encargo Artesanal",
-		"descripcion": "Escucha al vecino, espera a que se escriba la receta del pedido y pulsa 'Aceptar Encargo y Forjar'."
+		"subtitulo": "El Mostrador y la Campana",
+		"descripcion": "Pasa al mostrador comercial en el pasillo. El cliente tocará la campana para encargar su primera pieza."
 	},
 	{
 		"numero": 4,
 		"subtitulo": "La Fragua y los Metales",
-		"descripcion": "Toma un lingote del barril (stock 3/3) y caliéntalo según la temperatura propia de ese metal."
+		"descripcion": "Toma un lingote del barril de stock (3/3) y caliéntalo según la temperatura propia de ese metal."
 	},
 	{
 		"numero": 5,
 		"subtitulo": "El Yunque Cenital",
-		"descripcion": "Martilla el metal según su maleabilidad hasta ajustarlo a la silueta guía (95%+)."
+		"descripcion": "Martilla el metal según su maleabilidad hasta ajustarlo a la silueta guía (95%+ de precisión)."
 	},
 	{
 		"numero": 6,
 		"subtitulo": "Corte con Cizalla",
-		"descripcion": "Dibuja la línea de corte sobre las 3 guías respetando el largo máximo de la cizalla."
+		"descripcion": "Dibuja la línea de corte sobre las 3 guías respetando el largo máximo de la herramienta."
 	},
 	{
 		"numero": 7,
 		"subtitulo": "Templado en Agua",
-		"descripcion": "Toma cualquier parte de la pinza, sumerge la pieza en el agua y retírala al sonar el aviso óptimo."
+		"descripcion": "Toma la pinza, sumerge la pieza al rojo en la tina y retírala al sonar el aviso de temple martensítico óptimo."
 	},
 	{
 		"numero": 8,
 		"subtitulo": "Pulido en Arenisca",
-		"descripcion": "Frota la piedra de afilar con calma sobre el metal hasta alcanzar el 95% de brillo."
+		"descripcion": "Frota la piedra de afilar con calma sobre el metal hasta alcanzar el 95% de brillo artesanal."
 	},
 	{
 		"numero": 9,
-		"subtitulo": "Los Tres Encargos del Día",
-		"descripcion": "Entrega la pieza al cliente y completa los 3 pedidos del primer día (Encargos: %d/3)."
+		"subtitulo": "Los Encargos de Decroveil",
+		"descripcion": "Entrega la pieza forjada al cliente y completa los 3 encargos del primer día (Progreso: %d/3)."
 	},
 	# Parte 2 (Pasos 10 a 14 — Dormir, Mina, Barril de Entrada, Carga Pesada y Fundición)
 	{
 		"numero": 10,
-		"subtitulo": "Fin de Jornada: A Dormir",
-		"descripcion": "Completaste los 3 pedidos del día. Ve al Dormitorio (ala este) y descansa en la cama [E]."
+		"subtitulo": "Fin de Jornada: A Descansar",
+		"descripcion": "Completaste los 3 pedidos del día. Ve al Dormitorio (ala este) y descansa en la cama [E] para reponer tu estamina."
 	},
 	{
 		"numero": 11,
 		"subtitulo": "Extracción en la Mina",
-		"descripcion": "Entra a la Mina Subterránea por el norte, enciende antorchas y pica vetas para extraer mena en bruto."
+		"descripcion": "Entra a la Mina Subterránea por el túnel norte, enciende antorchas y pica vetas para extraer mena en bruto."
 	},
 	{
 		"numero": 12,
-		"subtitulo": "Barriles de la Entrada",
-		"descripcion": "Inspecciona los barriles a la entrada de la mina [E] y selecciona hasta 3 menas iguales."
+		"subtitulo": "Barriles de Acopio Minero",
+		"descripcion": "Inspecciona los barriles a la entrada de la mina [E] y selecciona hasta 3 menas iguales para cargar en tus manos."
 	},
 	{
 		"numero": 13,
 		"subtitulo": "Carga Pesada al Taller",
-		"descripcion": "Camina lento con el mineral en las manos de regreso hacia el Taller de Forja."
+		"descripcion": "Camina lento con el mineral en las manos de regreso hacia la Fragua del taller."
 	},
 	{
 		"numero": 14,
-		"subtitulo": "Fundición a Temperatura Máxima",
-		"descripcion": "Coloca las menas en la Fragua y atiza el fuelle hasta su punto de fusión máximo para recargar los barriles."
+		"subtitulo": "Fundición en la Fragua",
+		"descripcion": "Coloca las menas en la Fragua y atiza el fuelle hasta su punto de fusión máximo para recargar los barriles de lingotes."
 	}
 ]
 

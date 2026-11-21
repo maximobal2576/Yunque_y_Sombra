@@ -1,4 +1,4 @@
-# GreyboxTown.gd
+﻿# GreyboxTown.gd
 # Logica de nivel greybox, orquestacion espacial y oclusion estanca (/disenador_de_niveles)
 # Arquitectura topologica: Centro del Pueblo (Sur) <-> Pasillo Distribuidor <-> Taller (Oeste) / Mina (Norte) / Dormitorio (Este)
 # Nomenclatura de nodos 100% en español conforme a docs/idea.txt §8.2
@@ -24,6 +24,9 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var mina_subterranea: Node2D = $MinaSubterranea
 @onready var guia_tutorial: CanvasLayer = $GuiaTutorial
 @onready var pantalla_resumen_dia: CanvasLayer = $PantallaResumenDia
+@onready var telon_negro_inicial: CanvasLayer = $TelonNegroInicial
+@onready var carruaje_llegada: Node2D = $PuebloExterior/CarruajeLlegada
+@onready var flechas_guia_taller: Node2D = $PuebloExterior/FlechasGuiaTaller
 
 # Triggers de puertas y umbrales en Español
 @onready var trigger_puerta_taller: Area2D = $InteriorCasa/Pasillo/TriggerPuertaTaller
@@ -83,6 +86,8 @@ var underground_mine: Node2D:
 	get: return mina_subterranea
 var tutorial_guide: CanvasLayer:
 	get: return guia_tutorial
+var telon_negro: CanvasLayer:
+	get: return telon_negro_inicial
 var workshop_door_trigger: Area2D:
 	get: return trigger_puerta_taller
 var house_exit_trigger: Area2D:
@@ -236,10 +241,39 @@ func _ready() -> void:
 	if TimeManager.has_signal("day_started"):
 		TimeManager.day_started.connect(_on_day_started)
 
-	# Mensaje de bienvenida inicial si ya no estamos en prologo
-	if GameManager.current_state != GameManager.State.PROLOGUE:
-		GameManager.post_notification("Centro del Pueblo: Sigue el camino hacia la casa de tu tío al norte.")
+	# Superposiciones y z-index estrictos
+	if flechas_guia_taller:
+		flechas_guia_taller.z_index = 4
+	if carruaje_llegada:
+		carruaje_llegada.z_index = 4
+	jugador.z_index = 6
 
+	# Gestión del Prólogo y Cinemática de Llegada en Carruaje
+	if GameManager.current_state == GameManager.State.PROLOGUE:
+		if is_instance_valid(telon_negro_inicial):
+			telon_negro_inicial.visible = true
+			var fondo: ColorRect = telon_negro_inicial.get_node_or_null("FondoNegro")
+			if is_instance_valid(fondo):
+				fondo.color = Color(0.02, 0.015, 0.01, 1.0)
+				fondo.modulate.a = 1.0
+		if is_instance_valid(jugador):
+			jugador.visible = false
+			jugador.set_physics_process(false)
+		if is_instance_valid(carruaje_llegada):
+			carruaje_llegada.position = Vector2(640, 1080)
+			carruaje_llegada.visible = true
+			carruaje_llegada.modulate.a = 1.0
+		if is_instance_valid(carta_prologo):
+			carta_prologo.letter_closed.connect(_on_prologue_letter_closed)
+	else:
+		if is_instance_valid(telon_negro_inicial):
+			telon_negro_inicial.visible = false
+		if is_instance_valid(carruaje_llegada):
+			carruaje_llegada.visible = false
+		if is_instance_valid(jugador):
+			jugador.visible = true
+			jugador.set_physics_process(true)
+		GameManager.post_notification("Plaza Central: Sigue las flechas doradas al norte hacia la Herrería en la ladera.")
 func _notificar_tutorial(evento_id: String) -> void:
 	if is_instance_valid(guia_tutorial) and guia_tutorial.has_method("notificar_evento"):
 		guia_tutorial.notificar_evento(evento_id)
@@ -651,3 +685,89 @@ func _on_corral_ganado_interacted() -> void:
 
 func _on_camino_gobierno_interacted() -> void:
 	GameManager.post_notification("Guardia Feudal: «¡Alto, herrero! El paso a la Casa de Gobierno está cerrado a los campesinos.»")
+
+func _on_prologue_letter_closed() -> void:
+	var es_test: bool = (DisplayServer.get_name() == "headless" or OS.get_environment("GODOT_PLAYTEST") == "1")
+	if es_test:
+		if is_instance_valid(telon_negro_inicial):
+			telon_negro_inicial.visible = false
+		if is_instance_valid(carruaje_llegada):
+			carruaje_llegada.position = Vector2(640, 915)
+			carruaje_llegada.visible = false
+		if is_instance_valid(jugador):
+			jugador.visible = true
+			jugador.global_position = SPAWN_EXTERIOR_TOWN
+			jugador.set_physics_process(true)
+		return
+
+	_reproducir_cinematica_llegada()
+
+func _reproducir_cinematica_llegada() -> void:
+	if not is_instance_valid(carruaje_llegada) or not is_instance_valid(jugador):
+		if is_instance_valid(telon_negro_inicial):
+			telon_negro_inicial.visible = false
+		if is_instance_valid(jugador):
+			jugador.visible = true
+			jugador.global_position = SPAWN_EXTERIOR_TOWN
+			jugador.set_physics_process(true)
+		return
+
+	carruaje_llegada.position = Vector2(640, 1080)
+	carruaje_llegada.visible = true
+	carruaje_llegada.modulate.a = 1.0
+
+	# 1. Desvanecer el telón negro inicial (0.8s) para desvelar el mapa
+	if is_instance_valid(telon_negro_inicial):
+		var fondo: ColorRect = telon_negro_inicial.get_node_or_null("FondoNegro")
+		if is_instance_valid(fondo):
+			var tw_telon := create_tween()
+			tw_telon.tween_property(fondo, "modulate:a", 0.0, 0.8).set_trans(Tween.TRANS_SINE)
+			tw_telon.finished.connect(func() -> void: telon_negro_inicial.visible = false)
+		else:
+			telon_negro_inicial.visible = false
+
+	# 2. Rodar carruaje por el sendero sur hacia la plaza central (Vector2(640, 915))
+	var tw_carruaje := create_tween()
+	tw_carruaje.tween_property(carruaje_llegada, "position", Vector2(640, 915), 1.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	# Bamboleo artesanal de la caja del carruaje durante el trayecto
+	var tw_bamboleo := create_tween()
+	tw_bamboleo.set_loops(4)
+	tw_bamboleo.tween_property(carruaje_llegada, "rotation_degrees", 1.8, 0.18).set_trans(Tween.TRANS_SINE)
+	tw_bamboleo.tween_property(carruaje_llegada, "rotation_degrees", -1.8, 0.18).set_trans(Tween.TRANS_SINE)
+	tw_bamboleo.finished.connect(func() -> void: carruaje_llegada.rotation_degrees = 0.0)
+
+	AudioManager.play_sfx("place_item", 0.0, 0.08)
+
+	await tw_carruaje.finished
+
+	# 3. Frenada y resoplido del animal
+	AudioManager.play_sfx("bellows_air", -6.0, 0.1)
+	await get_tree().create_timer(0.3).timeout
+
+	# 4. El jugador desciende del carruaje en la plaza central
+	jugador.global_position = Vector2(620, 915)
+	jugador.visible = true
+	jugador.modulate.a = 0.0
+
+	var tw_bajada := create_tween().set_parallel(true)
+	tw_bajada.tween_property(jugador, "modulate:a", 1.0, 0.3)
+	tw_bajada.tween_property(jugador, "global_position", SPAWN_EXTERIOR_TOWN, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+	AudioManager.play_sfx("place_item", 0.4, 0.05)
+	await tw_bajada.finished
+
+	jugador.set_physics_process(true)
+
+	# 5. Despedida del cochero y partida del carruaje
+	GameManager.post_notification("Cochero: «Hemos llegado a Decroveil. ¡Buena suerte levantando la herrería de tu tío!»")
+
+	await get_tree().create_timer(0.5).timeout
+
+	var tw_partida := create_tween().set_parallel(true)
+	tw_partida.tween_property(carruaje_llegada, "position:y", 1080.0, 1.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw_partida.tween_property(carruaje_llegada, "modulate:a", 0.0, 1.8)
+	tw_partida.finished.connect(func() -> void:
+		carruaje_llegada.visible = false
+		GameManager.post_notification("Plaza Central: Sigue las flechas doradas al norte hacia la Herrería en la ladera.")
+	)

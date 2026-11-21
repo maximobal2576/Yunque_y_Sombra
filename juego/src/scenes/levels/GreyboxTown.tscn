@@ -231,7 +231,7 @@ offset_bottom = 705.0
 color = Color(0.196078, 0.14902, 0.121569, 1)
 
 [node name="FlechasGuiaTaller" type="Node2D" parent="PuebloExterior" unique_id=965311279]
-z_index = 2
+z_index = 4
 
 [node name="Flecha1" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller" unique_id=1440495354]
 position = Vector2(640, 865)
@@ -247,6 +247,80 @@ polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
 position = Vector2(640, 715)
 color = Color(1, 0.88, 0.46, 1)
 polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
+
+[node name="CarruajeLlegada" type="Node2D" parent="PuebloExterior"]
+z_index = 4
+position = Vector2(640, 915)
+
+[node name="SombraCarruaje" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(4, 6)
+color = Color(0.06, 0.04, 0.03, 0.5)
+polygon = PackedVector2Array(-32, -18, 32, -18, 38, 20, -38, 20)
+
+[node name="CaballoTiro" type="Node2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(0, -38)
+
+[node name="SombraCaballo" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada/CaballoTiro"]
+position = Vector2(2, 4)
+color = Color(0.06, 0.04, 0.03, 0.45)
+polygon = PackedVector2Array(-14, -12, 14, -12, 16, 14, -16, 14)
+
+[node name="CuerpoCaballo" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada/CaballoTiro"]
+color = Color(0.32, 0.22, 0.16, 1)
+polygon = PackedVector2Array(-12, -14, 12, -14, 14, 12, -14, 12)
+
+[node name="CabezaCaballo" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada/CaballoTiro"]
+position = Vector2(0, -16)
+color = Color(0.24, 0.16, 0.12, 1)
+polygon = PackedVector2Array(-6, -10, 6, -10, 7, 2, -7, 2)
+
+[node name="ArreosCuero" type="Line2D" parent="PuebloExterior/CarruajeLlegada/CaballoTiro"]
+points = PackedVector2Array(-8, -4, -12, 22, 12, 22, 8, -4)
+width = 2.0
+default_color = Color(0.55, 0.42, 0.25, 0.9)
+
+[node name="CajaCarruaje" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+color = Color(0.28, 0.18, 0.12, 1)
+polygon = PackedVector2Array(-28, -20, 28, -20, 30, 22, -30, 22)
+
+[node name="CapotaLona" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+color = Color(0.72, 0.65, 0.52, 1)
+polygon = PackedVector2Array(-26, -16, 26, -16, 28, 16, -28, 16)
+
+[node name="RuedaDelanteraIzq" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(-30, -12)
+color = Color(0.18, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -8, 4, -8, 4, 8, -4, 8)
+
+[node name="RuedaDelanteraDer" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(30, -12)
+color = Color(0.18, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -8, 4, -8, 4, 8, -4, 8)
+
+[node name="RuedaTraseraIzq" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(-30, 14)
+color = Color(0.18, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -9, 4, -9, 4, 9, -4, 9)
+
+[node name="RuedaTraseraDer" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(30, 14)
+color = Color(0.18, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-4, -9, 4, -9, 4, 9, -4, 9)
+
+[node name="CocheroAsiento" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(0, -22)
+color = Color(0.2, 0.14, 0.1, 1)
+polygon = PackedVector2Array(-10, -6, 10, -6, 10, 2, -10, 2)
+
+[node name="SombreroCochero" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(0, -28)
+color = Color(0.15, 0.1, 0.08, 1)
+polygon = PackedVector2Array(-7, -4, 7, -4, 9, 2, -9, 2)
+
+[node name="FarolitoCarruaje" type="Polygon2D" parent="PuebloExterior/CarruajeLlegada"]
+position = Vector2(-28, -22)
+color = Color(0.96, 0.78, 0.28, 1)
+polygon = PackedVector2Array(-3, -4, 3, -4, 3, 4, -3, 4)
 
 [node name="PozoAntiguo" type="Node2D" parent="PuebloExterior" unique_id=477908237]
 z_index = 2
@@ -1672,6 +1746,18 @@ position = Vector2(640, 900)
 [node name="MinaSubterranea" parent="." unique_id=1458291044 instance=ExtResource("9_mina_scene")]
 
 [node name="GuiaTutorial" parent="." unique_id=1892045123 instance=ExtResource("10_tutorial_scene")]
+
+[node name="TelonNegroInicial" type="CanvasLayer" parent="."]
+layer = 14
+
+[node name="FondoNegro" type="ColorRect" parent="TelonNegroInicial"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.015, 0.01, 1)
 
 [node name="CartaPrologo" parent="." unique_id=607814212 instance=ExtResource("5_prologue_scene")]
 
