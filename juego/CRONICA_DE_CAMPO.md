@@ -821,3 +821,43 @@ Sección reservada para las corroboraciones oculares ejecutadas bajo la directiv
      - Optimización de `_process` en todas las estaciones del taller y ampliación del pool de audio a 12 canales con limpieza en `_exit_tree()` (`orphan nodes = 0`).
 - **Certificación QA (`/playtester`):**
   - Ejecución headless en Godot v4.7.2 de `tests/playtest_gameplay_loop.gd`: **133 / 133 aserciones superadas (100.0% PASS), código de salida 0, 0 errores, 0 warnings y 0 fugas de memoria**.
+
+---
+
+### 📌 Acta N° 023 — Bucle de Progresión Multidía Continuo (Días 1 a 5+), Consecuencias de Medianoche y Pantalla de Resumen Diario
+- **Sello Temporal:** `2026-11-20 21:00:00`
+- **Especialistas Involucrados:** Administrador Jefe (`/administrador`), Diseñador de Juego (`/disenador_de_juego`), Programador Godot (`/programador_godot`), Playtester QA (`/playtester`) y Secretario Imperial (`/secretario`).
+- **Contexto y Problema:**
+  El usuario solicitó que la jugabilidad sea constante y continua, permitiendo avanzar día tras día más allá del Día 1, mientras prepara un boceto para rediseñar el estilo de entrada del taller como un portal (con la restricción explícita de no modificar las estructuras físicas del nivel por el momento).
+- **Decisión Adoptada e Implementación:**
+  1. **Catálogo Progresivo de Clientes y Bucle Multidía (`CounterShopView.gd`):**
+     - Se refactorizó la lógica del mostrador desacoplando el límite hardcodeado de Día 1 mediante `max_pedidos_hoy` y `ROSTER_POR_DIA`.
+     - **Día 1:** Clavo de Mazmorra (Sargento Godofredo), Perno de Molino (Eustaquio), Pasador de Bronce (Doña Valeria).
+     - **Día 2:** Reja de Arado Reforzada (Mateo el Granjero), Herradura de Tiro Pesado (Anselmo el Herrero Viejo), Trípode de Brasa (Greta la Tabernera).
+     - **Día 3:** Hacha de Talar de Filo Tenaz (Baldomero el Leñador), Pico de Barreno Profundo (Gorki el Minero), Zuncho de Barril (Teo el Tonelero).
+     - **Día 4:** Daga Corta de Inspección (Sargento Godofredo), Bisagras de Portón Pesado (Don Claudio el Albañil), Cascabel Sonoro de Niebla (Niña Lira).
+     - **Día 5 (Punto de Inflexión Feudal - GDD §6):** Cadenas Pesadas de Contención (Capitán de la Guarnición Feudal), Cerrojo Oculto de Doble Traba (Aldeano Asustado), Refuerzo de Carromato para Fuga (Doña Valeria).
+     - **Día 6+:** Generación procedural dinámica a partir de un pool balanceado de vecinos, artesanos, mercaderes y guardias.
+     - Conexión a señales horarias de `TimeManager` (`day_started`, `shop_opened`, `shop_closed`), gestionando la apertura de ventanilla a las 06:00 y su cierre a las 17:00.
+  2. **Mecánica de Sueño y Penalizaciones de Medianoche (GDD §3.3):**
+     - En `TimeManager.gd` y `GameManager.gd`:
+       * **Sueño Voluntario en Cama:** 100% de estamina restaurada a las 06:00, 0 monedas perdidas.
+       * **Colapso a Medianoche en Taller (00:00):** Desmayo por fatiga dentro de casa; despierta con 50% de estamina, sin robo.
+       * **Asalto a Medianoche en Exterior o Mina (00:00):** Colapso a la intemperie; asalto nocturno con robo del ~18% de monedas de oro, despojo de menas en mano y fatiga severa (40% de estamina).
+     - En `GreyboxTown.gd`:
+       * Rastreo de `GameManager.zona_actual` (`"interior"`, `"exterior"`, `"mina"`).
+       * Reposicionamiento del jugador en su lecho (`SPAWN_BEDROOM` en `Vector2(1010, 380)`) con oclusión del dormitorio activada.
+  3. **Pantalla de Resumen Diario (`PantallaResumenDia.tscn` / `.gd`):**
+     - Interfaz `CanvasLayer` (layer 28) con estética de pergamino medieval (#120e0c, bordes #b59a6a, tipografía AAA #f2e6cc).
+     - Registra condición de descanso, libro de cuentas del taller (pedidos de ayer, ingresos por forja, pérdidas por robo, saldo total) y "El Murmullo del Poblado" con rumores evolutivos sobre la creciente tensión feudal.
+     - Cierre accesible mediante botón o pulsación de `[ESPACIO]` / `[ENTER]`.
+  4. **Preservación Física Absoluta:**
+     - Geometría de muros, colisiones y entradas intactas según directiva del usuario.
+  5. **Suite de Pruebas Multidía (`tests/test_ciclo_multidia.gd`):**
+     - Cobertura exhaustiva de 51 aserciones para progresión de clientes Días 1-5+, rotación procedural, consecuencias de descanso y medianoche, UI de resumen y control horario.
+- **Certificación QA (`/playtester`):**
+  - `tests/test_ciclo_multidia.gd`: **51/51 PASS (100%)**
+  - `tests/test_forja_y_mina_fase2.gd`: **40/40 PASS (100%)**
+  - `tests/playtest_gameplay_loop.gd`: **133/133 PASS (100%)**
+  - **Gran Total: 224 / 224 aserciones superadas con éxito (0 fallos, 0 errores).**
+

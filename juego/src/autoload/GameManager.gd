@@ -78,6 +78,12 @@ var menas_en_mano_cantidad: int = 0
 var pedidos_completados_hoy: int = 0
 var ha_dormido_tras_jornada: bool = false
 var mision_fundicion_mena_completada: bool = false
+var zona_actual: String = "exterior"
+var ganancias_oro_hoy: int = 0
+var perdidas_oro_hoy: int = 0
+var pedidos_ayer: int = 0
+var ganancias_ayer: int = 0
+var perdidas_ayer: int = 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -203,11 +209,28 @@ func registrar_sueno_completado() -> void:
 	ha_dormido_tras_jornada = true
 	sueno_completado.emit()
 
+func reiniciar_jornada_diaria(nuevo_dia: int) -> void:
+	pedidos_ayer = pedidos_completados_hoy
+	ganancias_ayer = ganancias_oro_hoy
+	perdidas_ayer = perdidas_oro_hoy
+	pedidos_completados_hoy = 0
+	ganancias_oro_hoy = 0
+	perdidas_oro_hoy = 0
+	ha_dormido_tras_jornada = false
+	
+	# Asegurar stock mínimo en fragua para que el jugador nunca quede bloqueado
+	for tipo_metal: String in ["hierro_dulce", "acero_carbono", "bronce_cobre"]:
+		var stock: int = int(stock_barriles_fragua.get(tipo_metal, 0))
+		if stock < 2:
+			stock_barriles_fragua[tipo_metal] = 3
+	stock_barriles_cambiado.emit()
+
 func record_crafted_item(item_name: String, quality: float, reward_coins: int) -> void:
 	if inventory.has(item_name):
 		inventory[item_name] = int(inventory[item_name]) + 1
 	else:
 		inventory[item_name] = 1
+	ganancias_oro_hoy += reward_coins
 	add_coins(reward_coins)
 	item_crafted.emit(item_name, quality)
 	post_notification("Forjaste %s (Calidad: %.0f%%) | +%d monedas" % [item_name, quality * 100.0, reward_coins])

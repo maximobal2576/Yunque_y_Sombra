@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bx2uv4rlir374" path="res://assets/sprites/environment/stone_floor.png" id="8_stone_floor"]
 [ext_resource type="PackedScene" path="res://src/scenes/levels/MinaSubterranea.tscn" id="9_mina_scene"]
 [ext_resource type="PackedScene" path="res://src/scenes/ui/GuiaTutorial.tscn" id="10_tutorial_scene"]
+[ext_resource type="PackedScene" path="res://src/scenes/ui/PantallaResumenDia.tscn" id="11_resumen_scene"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ext_south"]
 size = Vector2(1000, 30)
@@ -119,10 +120,9 @@ size = Vector2(350, 230)
 script = ExtResource("1_town_script")
 
 [node name="FondoVacio" type="ColorRect" parent="." unique_id=165466763]
-offset_left = -138.0
-offset_top = -67.0
-offset_right = 2850.0
-offset_bottom = 1433.0
+offset_top = -3.0
+offset_right = 2988.0
+offset_bottom = 1497.0
 color = Color(0.04, 0.03, 0.03, 1)
 
 [node name="PuebloExterior" type="Node2D" parent="." unique_id=1598440992]
@@ -135,16 +135,16 @@ offset_bottom = 1160.0
 texture = ExtResource("8_stone_floor")
 stretch_mode = 1
 
-[node name="BordeTierra" type="Polygon2D" parent="PuebloExterior"]
+[node name="BordeTierra" type="Polygon2D" parent="PuebloExterior" unique_id=385169310]
 color = Color(0.18, 0.14, 0.11, 0.55)
 polygon = PackedVector2Array(280, 660, 1000, 660, 1020, 1080, 260, 1080)
 
-[node name="PlazaEmpedrada" type="Polygon2D" parent="PuebloExterior"]
+[node name="PlazaEmpedrada" type="Polygon2D" parent="PuebloExterior" unique_id=720390405]
 position = Vector2(640, 885)
 color = Color(0.24, 0.2, 0.17, 0.85)
 polygon = PackedVector2Array(-150, -70, -70, -115, 70, -115, 150, -70, 165, 20, 115, 95, -115, 95, -165, 20)
 
-[node name="AnilloPlaza" type="Line2D" parent="PuebloExterior/PlazaEmpedrada"]
+[node name="AnilloPlaza" type="Line2D" parent="PuebloExterior/PlazaEmpedrada" unique_id=201155965]
 points = PackedVector2Array(-150, -70, -70, -115, 70, -115, 150, -70, 165, 20, 115, 95, -115, 95, -165, 20, -150, -70)
 width = 4.0
 default_color = Color(0.42, 0.35, 0.27, 0.75)
@@ -194,78 +194,78 @@ offset_right = 668.0
 offset_bottom = 705.0
 color = Color(0.196078, 0.14902, 0.121569, 1)
 
-[node name="FlechasGuiaTaller" type="Node2D" parent="PuebloExterior"]
+[node name="FlechasGuiaTaller" type="Node2D" parent="PuebloExterior" unique_id=965311279]
 z_index = 2
 
-[node name="Flecha1" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+[node name="Flecha1" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller" unique_id=1440495354]
 position = Vector2(640, 865)
 color = Color(0.95, 0.79, 0.36, 0.92)
 polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
 
-[node name="Flecha2" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+[node name="Flecha2" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller" unique_id=1655967436]
 position = Vector2(640, 790)
 color = Color(0.98, 0.83, 0.4, 0.96)
 polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
 
-[node name="Flecha3" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller"]
+[node name="Flecha3" type="Polygon2D" parent="PuebloExterior/FlechasGuiaTaller" unique_id=933886570]
 position = Vector2(640, 715)
 color = Color(1, 0.88, 0.46, 1)
 polygon = PackedVector2Array(0, -14, 14, 4, 6, 4, 6, 12, -6, 12, -6, 4, -14, 4)
 
-[node name="PozoAntiguo" type="Node2D" parent="PuebloExterior"]
+[node name="PozoAntiguo" type="Node2D" parent="PuebloExterior" unique_id=477908237]
 z_index = 2
 position = Vector2(495, 905)
 
-[node name="SombraPozo" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+[node name="SombraPozo" type="Polygon2D" parent="PuebloExterior/PozoAntiguo" unique_id=1432439618]
 position = Vector2(4, 6)
 color = Color(0.06, 0.04, 0.03, 0.55)
 polygon = PackedVector2Array(-32, -16, 0, -28, 32, -16, 36, 12, 0, 26, -36, 12)
 
-[node name="BrocalPiedra" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+[node name="BrocalPiedra" type="Polygon2D" parent="PuebloExterior/PozoAntiguo" unique_id=393165657]
 color = Color(0.36, 0.33, 0.3, 1)
 polygon = PackedVector2Array(-30, -15, 0, -26, 30, -15, 34, 10, 0, 24, -34, 10)
 
-[node name="AguaOscura" type="Polygon2D" parent="PuebloExterior/PozoAntiguo"]
+[node name="AguaOscura" type="Polygon2D" parent="PuebloExterior/PozoAntiguo" unique_id=516641750]
 color = Color(0.09, 0.16, 0.22, 1)
 polygon = PackedVector2Array(-20, -10, 0, -17, 20, -10, 22, 6, 0, 15, -22, 6)
 
-[node name="VigaTechoPozo" type="ColorRect" parent="PuebloExterior/PozoAntiguo"]
+[node name="VigaTechoPozo" type="ColorRect" parent="PuebloExterior/PozoAntiguo" unique_id=1500438551]
 offset_left = -32.0
 offset_top = -34.0
 offset_right = 32.0
 offset_bottom = -24.0
 color = Color(0.32, 0.21, 0.13, 1)
 
-[node name="ArbolesSecos" type="Node2D" parent="PuebloExterior"]
+[node name="ArbolesSecos" type="Node2D" parent="PuebloExterior" unique_id=853724556]
 z_index = 2
 
-[node name="ArbolOeste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
+[node name="ArbolOeste" type="Node2D" parent="PuebloExterior/ArbolesSecos" unique_id=1737198632]
 position = Vector2(360, 770)
 
-[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste" unique_id=1910989110]
 color = Color(0.05, 0.04, 0.03, 0.45)
 polygon = PackedVector2Array(-34, 8, 0, -6, 36, 8, 24, 24, -24, 24)
 
-[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste" unique_id=1119321298]
 color = Color(0.25, 0.17, 0.12, 1)
 polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
 
-[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste"]
+[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolOeste" unique_id=1754175081]
 color = Color(0.46, 0.22, 0.14, 0.92)
 polygon = PackedVector2Array(-36, -18, -18, -44, 18, -46, 38, -20, 22, 2, -22, 4)
 
-[node name="ArbolEste" type="Node2D" parent="PuebloExterior/ArbolesSecos"]
+[node name="ArbolEste" type="Node2D" parent="PuebloExterior/ArbolesSecos" unique_id=1290005494]
 position = Vector2(905, 795)
 
-[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+[node name="SombraArbol" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste" unique_id=1490964142]
 color = Color(0.05, 0.04, 0.03, 0.45)
 polygon = PackedVector2Array(-34, 8, 0, -6, 36, 8, 24, 24, -24, 24)
 
-[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+[node name="Tronco" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste" unique_id=1825857659]
 color = Color(0.25, 0.17, 0.12, 1)
 polygon = PackedVector2Array(-8, 16, -6, -24, 6, -24, 9, 16)
 
-[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste"]
+[node name="FollajeOtonal" type="Polygon2D" parent="PuebloExterior/ArbolesSecos/ArbolEste" unique_id=1602971454]
 color = Color(0.55, 0.34, 0.16, 0.92)
 polygon = PackedVector2Array(-34, -16, -14, -42, 20, -42, 36, -16, 18, 4, -20, 4)
 
@@ -516,25 +516,25 @@ offset_right = 190.0
 offset_bottom = -30.0
 color = Color(0.16, 0.09, 0.08, 1)
 
-[node name="TejadoInclinado" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
+[node name="TejadoInclinado" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio" unique_id=336276783]
 color = Color(0.38, 0.14, 0.16, 1)
 polygon = PackedVector2Array(-198, -32, -165, -68, 165, -68, 198, -32)
 
-[node name="VentanaIzquierda" type="ColorRect" parent="PuebloExterior/FachadaCasaTio"]
+[node name="VentanaIzquierda" type="ColorRect" parent="PuebloExterior/FachadaCasaTio" unique_id=382681069]
 offset_left = -135.0
 offset_top = -12.0
 offset_right = -85.0
 offset_bottom = 22.0
 color = Color(0.92, 0.64, 0.24, 0.85)
 
-[node name="VentanaDerecha" type="ColorRect" parent="PuebloExterior/FachadaCasaTio"]
+[node name="VentanaDerecha" type="ColorRect" parent="PuebloExterior/FachadaCasaTio" unique_id=1027526753]
 offset_left = 85.0
 offset_top = -12.0
 offset_right = 135.0
 offset_bottom = 22.0
 color = Color(0.92, 0.64, 0.24, 0.85)
 
-[node name="HaloEntradaCalida" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio"]
+[node name="HaloEntradaCalida" type="Polygon2D" parent="PuebloExterior/FachadaCasaTio" unique_id=160477843]
 visible = false
 position = Vector2(0, 52)
 color = Color(0.95, 0.68, 0.25, 0.22)
@@ -756,63 +756,63 @@ prompt_text = "Picos mellados y herramientas mineras antiguas"
 [node name="ColisionInteraccion" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/EstanteriaHerramientas/AreaInteractiva" unique_id=1713972352]
 shape = SubResource("RectangleShape2D_shelf_area")
 
-[node name="BarrilesAcopioMina" type="StaticBody2D" parent="InteriorCasa/AccesoMina"]
+[node name="BarrilesAcopioMina" type="StaticBody2D" parent="InteriorCasa/AccesoMina" unique_id=248184417]
 z_index = 1
 position = Vector2(745, 232)
 collision_mask = 0
 
-[node name="SombraBarriles" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="SombraBarriles" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=689290649]
 position = Vector2(0, 4)
 color = Color(0.04, 0.03, 0.03, 0.55)
 polygon = PackedVector2Array(-30, -10, 30, -10, 32, 14, -32, 14)
 
-[node name="BarrilIzquierdoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="BarrilIzquierdoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=403280524]
 position = Vector2(-14, 0)
 color = Color(0.28, 0.18, 0.12, 1)
 polygon = PackedVector2Array(-12, -13, 12, -13, 13, 13, -13, 13)
 
-[node name="AroHierroIzqSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+[node name="AroHierroIzqSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera" unique_id=822877983]
 offset_left = -13.0
 offset_top = -8.0
 offset_right = 13.0
 offset_bottom = -5.0
 color = Color(0.31, 0.33, 0.36, 1)
 
-[node name="AroHierroIzqInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+[node name="AroHierroIzqInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera" unique_id=1391018771]
 offset_left = -13.0
 offset_top = 5.0
 offset_right = 13.0
 offset_bottom = 8.0
 color = Color(0.31, 0.33, 0.36, 1)
 
-[node name="MenaBrutaIzquierda" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera"]
+[node name="MenaBrutaIzquierda" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilIzquierdoMadera" unique_id=327186040]
 color = Color(0.68, 0.72, 0.78, 1)
 polygon = PackedVector2Array(-9, -11, -3, -16, 5, -15, 9, -10, 3, -8, -6, -8)
 
-[node name="BarrilDerechoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="BarrilDerechoMadera" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=994399957]
 position = Vector2(14, 2)
 color = Color(0.25, 0.16, 0.11, 1)
 polygon = PackedVector2Array(-12, -13, 12, -13, 13, 13, -13, 13)
 
-[node name="AroHierroDerSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+[node name="AroHierroDerSuperior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera" unique_id=354633525]
 offset_left = -13.0
 offset_top = -8.0
 offset_right = 13.0
 offset_bottom = -5.0
 color = Color(0.31, 0.33, 0.36, 1)
 
-[node name="AroHierroDerInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+[node name="AroHierroDerInferior" type="ColorRect" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera" unique_id=1915546712]
 offset_left = -13.0
 offset_top = 5.0
 offset_right = 13.0
 offset_bottom = 8.0
 color = Color(0.31, 0.33, 0.36, 1)
 
-[node name="MenaBrutaDerecha" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera"]
+[node name="MenaBrutaDerecha" type="Polygon2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/BarrilDerechoMadera" unique_id=1661415916]
 color = Color(0.78, 0.48, 0.28, 1)
 polygon = PackedVector2Array(-8, -11, -2, -15, 6, -15, 9, -10, 2, -8, -5, -8)
 
-[node name="EtiquetaBarriles" type="Label" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="EtiquetaBarriles" type="Label" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=874624241]
 offset_left = -52.0
 offset_top = 15.0
 offset_right = 52.0
@@ -822,14 +822,14 @@ theme_override_font_sizes/font_size = 8
 text = "Barriles de Menas"
 horizontal_alignment = 1
 
-[node name="ColisionBarrilesAcopio" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="ColisionBarrilesAcopio" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=1606070473]
 shape = SubResource("RectangleShape2D_barriles_acopio_body")
 
-[node name="AreaInteractiva" type="Area2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina"]
+[node name="AreaInteractiva" type="Area2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina" unique_id=1345884053]
 script = ExtResource("6_interact_script")
 prompt_text = "Inspeccionar Barril de Menas en Bruto"
 
-[node name="ColisionInteraccion" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/AreaInteractiva"]
+[node name="ColisionInteraccion" type="CollisionShape2D" parent="InteriorCasa/AccesoMina/BarrilesAcopioMina/AreaInteractiva" unique_id=1424296466]
 shape = SubResource("RectangleShape2D_barriles_acopio_area")
 
 [node name="Pasillo" type="Node2D" parent="InteriorCasa" unique_id=481261187]
@@ -1369,3 +1369,5 @@ position = Vector2(640, 900)
 [node name="GuiaTutorial" parent="." unique_id=1892045123 instance=ExtResource("10_tutorial_scene")]
 
 [node name="CartaPrologo" parent="." unique_id=607814212 instance=ExtResource("5_prologue_scene")]
+
+[node name="PantallaResumenDia" parent="." instance=ExtResource("11_resumen_scene")]

@@ -23,6 +23,7 @@ var current_zone: Zone = Zone.EXTERIOR
 @onready var carta_prologo: CanvasLayer = $CartaPrologo
 @onready var mina_subterranea: Node2D = $MinaSubterranea
 @onready var guia_tutorial: CanvasLayer = $GuiaTutorial
+@onready var pantalla_resumen_dia: CanvasLayer = $PantallaResumenDia
 
 # Triggers de puertas y umbrales en Español
 @onready var trigger_puerta_taller: Area2D = $InteriorCasa/Pasillo/TriggerPuertaTaller
@@ -121,6 +122,7 @@ const SPAWN_HOUSE_HALLWAY: Vector2 = Vector2(640, 480)
 const SPAWN_FRONT_OF_HOUSE: Vector2 = Vector2(640, 740)
 const SPAWN_WORKSHOP_THRESHOLD: Vector2 = Vector2(510, 410)
 const SPAWN_MINE_ACCESS_RETURN: Vector2 = Vector2(640, 210)
+const SPAWN_BEDROOM: Vector2 = Vector2(1010, 380)
 
 var _is_transitioning: bool = false
 var _active_tween: Tween = null
@@ -210,6 +212,12 @@ func _ready() -> void:
 
 	_construir_capa_inventario_barril_mina()
 
+	# Conectar eventos de medianoche y amanecer multidia
+	if TimeManager.has_signal("player_passed_out"):
+		TimeManager.player_passed_out.connect(_on_player_passed_out)
+	if TimeManager.has_signal("day_started"):
+		TimeManager.day_started.connect(_on_day_started)
+
 	# Mensaje de bienvenida inicial si ya no estamos en prologo
 	if GameManager.current_state != GameManager.State.PROLOGUE:
 		GameManager.post_notification("Centro del Pueblo: Sigue el camino hacia la casa de tu tío al norte.")
@@ -262,17 +270,36 @@ func set_active_zone(new_zone: Zone, immediate: bool = false) -> void:
 	if jugador and jugador.has_method("set_camera_bounds"):
 		match new_zone:
 			Zone.EXTERIOR:
+				if "zona_actual" in GameManager:
+					GameManager.zona_actual = "exterior"
 				jugador.set_camera_bounds(120, 590, 1160, 1150)
 			Zone.PASILLO:
+				if "zona_actual" in GameManager:
+					GameManager.zona_actual = "interior"
 				jugador.set_camera_bounds(440, 280, 830, 550)
 				_notificar_tutorial("pasillo_entrado")
 			Zone.DORMITORIO:
+				if "zona_actual" in GameManager:
+					GameManager.zona_actual = "interior"
 				jugador.set_camera_bounds(790, 270, 1180, 550)
 			Zone.MINA:
+				if "zona_actual" in GameManager:
+					GameManager.zona_actual = "mina"
 				jugador.set_camera_bounds(440, 50, 830, 320)
 			Zone.CAVERNAS_MINA:
+				if "zona_actual" in GameManager:
+					GameManager.zona_actual = "mina"
 				jugador.set_camera_bounds(1780, 280, 2620, 920)
 				_notificar_tutorial("mina_explorada")
+
+func _on_player_passed_out() -> void:
+	_teleport_player(SPAWN_BEDROOM)
+	set_active_zone(Zone.DORMITORIO, true)
+
+func _on_day_started(_nuevo_dia: int) -> void:
+	if current_zone != Zone.DORMITORIO:
+		_teleport_player(SPAWN_BEDROOM)
+		set_active_zone(Zone.DORMITORIO, true)
 
 func _reset_camera() -> void:
 	if jugador.has_node("CamaraJugador"):

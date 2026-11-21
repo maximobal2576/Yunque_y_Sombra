@@ -94,51 +94,232 @@ var btn_to_forge: Button:
 const POSICION_PIEZA_EN_BANDEJA: Vector2 = Vector2(190.0, 92.0)
 const VELOCIDAD_REVELADO_RECETA: float = 0.42
 const MAX_PEDIDOS_DIA_1: int = 3
+var max_pedidos_hoy: int = 3
 
-var customers: Array[Dictionary] = [
-	{
-		"name": "Sargento Godofredo (Guardia Feudal)",
-		"faction": "Patrulla del Feudo",
-		"visual_id": "sargento",
-		"portrait": PORTRAIT_SERGEANT,
-		"dialogue_intro": "Tú debes ser el sobrino del viejo herrero... No hagas preguntas indiscretas. Necesito un clavo de Hierro Dulce reforzado para la compuerta de la mazmorra. Que tenga buena cabeza y punta firme.",
-		"dialogue_good": "Mmh... cabeza bien recalcada y templado parejo. Tu tío tenía buena técnica y veo que la heredas. Toma tus monedas y no hables de esto.",
-		"dialogue_bad": "¡Esto es una porquería quebradiza! Si la compuerta cede, te colgaré de las vigas del taller. No esperes buena paga por esta basura.",
-		"item_name": "Clavo Forjado de Compuerta",
-		"required_metal": "hierro_dulce",
-		"description": "Clavo de hierro dulce con cabeza ancha y espiga cónica para roble pesado.",
-		"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Cabeza ancha + espiga\n• Corte: Cizallar 3 rebabas\n• Temple y Pulido: Acero limpio",
-		"base_reward": 25
-	},
-	{
-		"name": "Eustaquio el Molinero",
-		"faction": "Aldeano del Bajo Pueblo",
-		"visual_id": "molinero",
-		"portrait": PORTRAIT_PEASANT,
-		"dialogue_intro": "¡Muchacho, qué alivio ver humo saliendo de la chimenea! El eje de la noria de mi molino se soltó. Necesito un perno de Acero al Carbono resistente antes de perder la molienda.",
-		"dialogue_good": "¡Qué bendición de pieza! Brillante y sólida como piedra. Te pagaré hasta la última moneda, ¡salvaste mi molienda!",
-		"dialogue_bad": "Ay... el metal tiene grietas y está todo disparejo. No aguantará ni tres giros de la rueda. Te daré solo una limosna.",
-		"item_name": "Perno Rústico de Molino",
-		"required_metal": "acero_carbono",
-		"description": "Perno de acero al carbono capaz de resistir la vibración de la rueda hidráulica.",
-		"specs": "• Barril: Acero al Carbono\n• Fragua: 900°C - 1030°C (Fusión 1130°C)\n• Yunque: Expansión firme (Duro)\n• Corte: Sin rebabas\n• Temple y Pulido: Acero tenaz",
-		"base_reward": 20
-	},
-	{
-		"name": "Doña Valeria (Mercader de Caravanas)",
-		"faction": "Gremio Mercantil de la Comarca",
-		"visual_id": "mercader",
-		"portrait": PORTRAIT_PEASANT,
-		"dialogue_intro": "Buenas tardes, joven maestro. Mi carromato de especias sufrió un percance en el puente viejo y requiero un pasador de Bronce de Forja que no se oxide con la humedad del camino.",
-		"dialogue_good": "¡Exquisito acabado y proporciones impecables! Se nota la mano de un verdadero artesano. Aquí tienes tu bolsa de oro bien ganada.",
-		"dialogue_bad": "Qué pieza tan tosca y mal batida... Supongo que servirá para salir del paso, pero no puedo pagarte el precio completo.",
-		"item_name": "Perno de Bronce de Caravana",
-		"required_metal": "bronce_cobre",
-		"description": "Pasador de bronce forjado resistente a la intemperie para el eje del carromato.",
-		"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Alta maleabilidad\n• Corte: Sin rebabas\n• Temple y Pulido: Brillo dorado",
-		"base_reward": 30
-	}
-]
+const ROSTER_POR_DIA: Dictionary = {
+	1: [
+		{
+			"name": "Sargento Godofredo (Guardia Feudal)",
+			"faction": "Patrulla del Feudo",
+			"visual_id": "sargento",
+			"portrait": PORTRAIT_SERGEANT,
+			"dialogue_intro": "Tú debes ser el sobrino del viejo herrero... No hagas preguntas indiscretas. Necesito un clavo de Hierro Dulce reforzado para la compuerta de la mazmorra. Que tenga buena cabeza y punta firme.",
+			"dialogue_good": "Mmh... cabeza bien recalcada y templado parejo. Tu tío tenía buena técnica y veo que la heredas. Toma tus monedas y no hables de esto.",
+			"dialogue_bad": "¡Esto es una porquería quebradiza! Si la compuerta cede, te colgaré de las vigas del taller. No esperes buena paga por esta basura.",
+			"item_name": "Clavo Forjado de Compuerta",
+			"required_metal": "hierro_dulce",
+			"description": "Clavo de hierro dulce con cabeza ancha y espiga cónica para roble pesado.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Cabeza ancha + espiga\n• Corte: Cizallar 3 rebabas\n• Temple y Pulido: Acero limpio",
+			"base_reward": 25
+		},
+		{
+			"name": "Eustaquio el Molinero",
+			"faction": "Aldeano del Bajo Pueblo",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Muchacho, qué alivio ver humo saliendo de la chimenea! El eje de la noria de mi molino se soltó. Necesito un perno de Acero al Carbono resistente antes de perder la molienda.",
+			"dialogue_good": "¡Qué bendición de pieza! Brillante y sólida como piedra. Te pagaré hasta la última moneda, ¡salvaste mi molienda!",
+			"dialogue_bad": "Ay... el metal tiene grietas y está todo disparejo. No aguantará ni tres giros de la rueda. Te daré solo una limosna.",
+			"item_name": "Perno Rústico de Molino",
+			"required_metal": "acero_carbono",
+			"description": "Perno de acero al carbono capaz de resistir la vibración de la rueda hidráulica.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Expansión firme (Duro)\n• Corte: Sin rebabas\n• Temple y Pulido: Acero tenaz",
+			"base_reward": 20
+		},
+		{
+			"name": "Doña Valeria (Mercader de Caravanas)",
+			"faction": "Gremio Mercantil de la Comarca",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "Buenas tardes, joven maestro. Mi carromato de especias sufrió un percance en el puente viejo y requiero un pasador de Bronce de Forja que no se oxide con la humedad del camino.",
+			"dialogue_good": "¡Exquisito acabado y proporciones impecables! Se nota la mano de un verdadero artesano. Aquí tienes tu bolsa de oro bien ganada.",
+			"dialogue_bad": "Qué pieza tan tosca y mal batida... Supongo que servirá para salir del paso, pero no puedo pagarte el precio completo.",
+			"item_name": "Perno de Bronce de Caravana",
+			"required_metal": "bronce_cobre",
+			"description": "Pasador de bronce forjado resistente a la intemperie para el eje del carromato.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Alta maleabilidad\n• Corte: Sin rebabas\n• Temple y Pulido: Brillo dorado",
+			"base_reward": 30
+		}
+	],
+	2: [
+		{
+			"name": "Mateo el Granjero",
+			"faction": "Agricultores del Valle Norte",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Buen día, muchacho! La reja de mi arado chocó contra una roca y se partió en dos. La siembra de cebada no espera. Necesito una reja reforzada de Hierro Dulce que abra surcos firmes.",
+			"dialogue_good": "¡Qué fortaleza de hierro! Se nota que tiene buen templado y perfil limpio. Podré arar hasta el ocaso sin temor. ¡Toma tu paga bien merecida!",
+			"dialogue_bad": "Mmh... la hoja quedó torcida y el filo disparejo. Al primer pedrusco se doblará. Te pagaré una suma módica.",
+			"item_name": "Reja de Arado Reforzada",
+			"required_metal": "hierro_dulce",
+			"description": "Reja de hierro dulce para arado de tiro, con ángulo penetrante y espiga de sujeción.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Pala triangular ancha\n• Corte: Sin rebabas\n• Temple y Pulido: Resistencia dúctil",
+			"base_reward": 28
+		},
+		{
+			"name": "Anselmo el Herrero Viejo",
+			"faction": "Veteranos del Yunque",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "Hrmpf... Veo que reviviste el fuego de mi compadre Rodrik. Ya mis manos tiemblan con las tenazas. Necesito una herradura de tiro en Hierro Dulce para el tiro comunal de bueyes.",
+			"dialogue_good": "Mmh, nada mal, jovenzuelo... Tienes buen pulso en el yunque y claveras limpias. Rodrik estaría orgulloso. Toma tu dinero.",
+			"dialogue_bad": "¡La clavera está descentrada y el talón muy fino! Tienes que aprender a escuchar el metal antes de golpearlo. Te pagaré lo justo.",
+			"item_name": "Herradura de Tiro Pesado",
+			"required_metal": "hierro_dulce",
+			"description": "Herradura ancha de hierro dulce para buey de tiro comunal.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Curvatura simétrica\n• Corte: Desbaste de rebabas\n• Temple y Pulido: Enfriado parejo",
+			"base_reward": 25
+		},
+		{
+			"name": "Greta la Tabernera",
+			"faction": "Taberna El Callejón Hundido",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Hola artesano! Con este frío los leñadores exigen su guisado hirviendo y mi trípode de hierro viejo se desfondó. Necesito uno nuevo de Bronce de Forja con patas firmes que aguante las brasas.",
+			"dialogue_good": "¡Qué hermosura de acabado, brilla como oro viejo! Esta noche en la taberna brindaremos por el nuevo herrero. ¡Aquí tienes tu buena recompensa!",
+			"dialogue_bad": "Una de las patas quedó más corta que las otras... Tendré que calzarlo con piedras en el fogón. Te daré lo que vale.",
+			"item_name": "Trípode de Brasa para Caldero",
+			"required_metal": "bronce_cobre",
+			"description": "Trípode de bronce forjado de tres patas estables para fuego directo.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Patas triples simétricas\n• Corte: 3 cortes limpios\n• Temple y Pulido: Brillo cobrizo",
+			"base_reward": 30
+		}
+	],
+	3: [
+		{
+			"name": "Baldomero el Leñador",
+			"faction": "Gremio de Madereros de la Quebrada",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Saludos, herrero! El roble centenario del linde me melló el hacha de talar. Necesito una hoja de Acero al Carbono con ojo ancho y temple firme que muerda madera dura sin quebrarse.",
+			"dialogue_good": "¡Por las barbas del bosque, qué filo y qué balance! Esta hoja cantará al rozar la madera. ¡Monedas de oro bien ganadas, amigo!",
+			"dialogue_bad": "El filo está desdentado y el metal tiene fisuras. Tendré que pasarle la piedra arenisca horas enteras. Te daré una paga corta.",
+			"item_name": "Hacha de Talar de Filo Tenaz",
+			"required_metal": "acero_carbono",
+			"description": "Hoja pesada de hacha en acero al carbono templado para corte de leña dura.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Hoja cuneiforme y ojo centrado\n• Corte: Cizallar rebabas\n• Temple y Pulido: Filo brillante",
+			"base_reward": 32
+		},
+		{
+			"name": "Gorki el Minero",
+			"faction": "Piconeros de la Galería Sur",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Hola, compañero de martillo! En la galería profunda de la mina encontramos una veta de hierro en roca viva. Necesitamos un pico de barreno de Acero al Carbono con punta templada.",
+			"dialogue_good": "¡Macizo como la entraña de la montaña! Con este pico quebraremos cualquier roca sin miedo a romper la punta. ¡Aquí tienes tu bolsa de monedas!",
+			"dialogue_bad": "La punta quedó roma y blanda... Al tercer golpe se achatará contra el pedernal. No mereces más que una paga mínima.",
+			"item_name": "Pico de Barreno Profundo",
+			"required_metal": "acero_carbono",
+			"description": "Pico de minería en acero al carbono de alta penetración para vetas duras.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Puntas cónicas opuestas\n• Corte: Cizallado parejo\n• Temple y Pulido: Acero endurecido",
+			"base_reward": 35
+		},
+		{
+			"name": "Teo el Tonelero",
+			"faction": "Bodegueros del Valle Bajo",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Buenas tardes, artesano! El mosto fermentado de la vendimia carcome el hierro común. Necesito un zuncho resistente en Bronce de Forja para apretar la gran barrica de roble.",
+			"dialogue_good": "¡Curvatura perfecta y flexibilidad justa! Mis barricas de vino estarán a salvo de filtraciones. ¡Toma tu oro y gracias!",
+			"dialogue_bad": "La banda tiene espesores disparejos. Va a aflojarse con la presión de la fermentación. Te pagaré lo que considero justo.",
+			"item_name": "Zuncho de Barril de Mosto",
+			"required_metal": "bronce_cobre",
+			"description": "Aro de unión en bronce forjado anticorrosivo para toneles y cubas.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Banda maleable alargada\n• Corte: Retirar rebabas de borde\n• Temple y Pulido: Sin cascarilla",
+			"base_reward": 28
+		}
+	],
+	4: [
+		{
+			"name": "Sargento Godofredo (Guardia Feudal)",
+			"faction": "Patrulla de Inspección Feudal",
+			"visual_id": "sargento",
+			"portrait": PORTRAIT_SERGEANT,
+			"dialogue_intro": "Herrero... La guarnición del feudo está realizando rondas nocturnas extraordinarias. Necesito una daga corta de inspección en Acero al Carbono. Y recuerda: el Señor Feudal vigila a quienes forjan a deshoras.",
+			"dialogue_good": "Hoja recta, filo templado y espiga sólida. Sabes hacer tu oficio sin hacer demasiadas preguntas. Toma tus monedas y mantén el perfil bajo.",
+			"dialogue_bad": "¡Una hoja mellada e indigna de un soldado feudal! Da gracias de que no te decomise los fuelles por desacato. Te daré unas pocas monedas.",
+			"item_name": "Daga Corta de Inspección",
+			"required_metal": "acero_carbono",
+			"description": "Daga militar corta forjada en acero al carbono con filo de punzada.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Hoja corta y espiga firme\n• Corte: Cizalla precisa\n• Temple y Pulido: Acero reluciente",
+			"base_reward": 35
+		},
+		{
+			"name": "Don Claudio el Albañil",
+			"faction": "Constructores del Concejo Aldeano",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "Saludos, muchacho. Los guardias del feudo cerraron el camino comunal y tuvimos que asegurar el portón de piedra del granero viejo. Necesito bisagras pesadas de Hierro Dulce con buenos anclajes.",
+			"dialogue_good": "¡Qué robustez de goznes! Ni los carromatos de la guardia podrán forzar ese portón. Muchas gracias, el pueblo te lo agradece.",
+			"dialogue_bad": "Los agujeros están desnivelados. El portón va a chirriar y descolgarse en dos semanas. Te daré lo poco que tengo.",
+			"item_name": "Bisagras de Portón Pesado",
+			"required_metal": "hierro_dulce",
+			"description": "Par de goznes anchos de hierro dulce para compuertas de piedra comunales.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Placas planas con cilindro de perno\n• Corte: Desbaste de rebabas\n• Temple y Pulido: Acero limpio",
+			"base_reward": 30
+		},
+		{
+			"name": "Niña Lira",
+			"faction": "Vecindario del Caserío Sur",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Hola señor herrero! En las mañanas hay mucha niebla en los pantanos y los soldados cabalgan sin mirar. ¿Me forjas un cascabel sonoro de Bronce para colgarle a la cabra de mi abuela?",
+			"dialogue_good": "¡Suena hermoso y clarito como una campana de fiesta! Mi abuela me dio sus ahorros en monedas para pagarte. ¡Muchas gracias señor!",
+			"dialogue_bad": "Casi no suena... suena sordo como una lata abollada. Pero te dejo mis pocas moneditas igual.",
+			"item_name": "Cascabel Sonoro de Niebla",
+			"required_metal": "bronce_cobre",
+			"description": "Cascabel hueco en bronce de forja de alta resonancia acústica.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Cúpula esférica hueca con badajo\n• Corte: Rebaba pulida\n• Temple y Pulido: Resonancia limpia",
+			"base_reward": 24
+		}
+	],
+	5: [
+		{
+			"name": "Capitán de la Guarnición Feudal",
+			"faction": "Fuerzas del Señor Feudal",
+			"visual_id": "sargento",
+			"portrait": PORTRAIT_SERGEANT,
+			"dialogue_intro": "Atención, herrero. El Señor Feudal ha notado murmullos y reuniones sospechosas en la plaza tras el anochecer. Se acabó la paciencia. Forjarás de inmediato un juego de Cadenas Pesadas de Contención en Hierro Dulce reforzado. Y un consejo gratis: ocúpate de tu fuelle y olvida lo que viste.",
+			"dialogue_good": "Eslabones sólidos y sin fisuras. Estas cadenas silenciarán cualquier conato de rebeldía campesina. Toma esta generosa bolsa de la corte feudal... y sé prudente.",
+			"dialogue_bad": "¡Eslabones frágiles! ¿Acaso simpatizas con los rebeldes de la taberna? Si un prisionero rompe esto, tú ocuparás su lugar. Toma estas miserables monedas.",
+			"item_name": "Cadenas Pesadas de Contención",
+			"required_metal": "hierro_dulce",
+			"description": "Eslabones de contención carcelaria forjados en hierro dulce grueso soldados a martillo.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Eslabones gruesos soldados a fuego\n• Corte: Cizallado limpio\n• Temple y Pulido: Acero negro endurecido",
+			"base_reward": 50
+		},
+		{
+			"name": "Aldeano Asustado",
+			"faction": "Vecinos en Resistencia Silenciosa",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "(Mira aterrado a ambos lados de la calle antes de susurrar)... Muchacho, por favor... La guardia requisó la harina de mi compadre Eustaquio. Vienen por las casas de noche. Necesito un cerrojo oculto de Acero al Carbono para la trampilla del sótano. Si los soldados lo descubren, no me conoces.",
+			"dialogue_good": "¡Gracias a los cielos, encaja perfecto y corre sin hacer ruido! Mis hijos tendrán comida segura. Toma todas mis monedas, te las debo con el alma.",
+			"dialogue_bad": "Se traba al empujarlo y rechina... si los guardias lo escuchan nos atraparán. Te doy lo que me queda en el bolsillo...",
+			"item_name": "Cerrojo Oculto de Doble Traba",
+			"required_metal": "acero_carbono",
+			"description": "Mecanismo discreto de cerrojo y pasador en acero al carbono para trampillas ocultas.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Pasador templado y traba elástica\n• Corte: Sin esquinas delatoras\n• Temple y Pulido: Acero disimulado",
+			"base_reward": 35
+		},
+		{
+			"name": "Doña Valeria (Mercader de Caravanas)",
+			"faction": "Gremio Mercantil de la Comarca",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "Joven artesano... La guarnición impuso un arancel confiscatorio y bloqueó el puente de piedra. Si nos quedamos, nos dejarán en la miseria. Necesito placas de refuerzo en Bronce de Forja para desviar las carretas por el viejo sendero del acantilado antes del alba.",
+			"dialogue_good": "¡Bendita sea tu destreza! Con estos refuerzos atravesaremos el desfiladero sin romper los ejes. ¡Toma esta bolsa de oro y que los caminos te protejan!",
+			"dialogue_bad": "Las placas son delgadas... espero que aguanten el peso del cargamento. Te daré tu recompensa aunque no sea el trabajo más fino.",
+			"item_name": "Refuerzo de Carromato para Fuga",
+			"required_metal": "bronce_cobre",
+			"description": "Placas angulares en bronce de forja resistente a impactos y fatiga de caminos agrestes.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Placas de unión en ángulo reforzado\n• Corte: Sin rebabas filosas\n• Temple y Pulido: Brillo bronceado",
+			"base_reward": 40
+		}
+	]
+}
+
+var customers: Array[Dictionary] = []
 
 var current_customer_index: int = 0
 var pedidos_entregados_hoy: int = 0
@@ -183,9 +364,26 @@ func _ready() -> void:
 	if indicador_entrega_cliente:
 		indicador_entrega_cliente.visible = false
 
-	bell_label.text = "Aguardando llegada de ciudadano..."
-	_actualizar_busto_cliente("sargento")
-	call_deferred("_verificar_llegada_si_visible")
+	if TimeManager.has_signal("day_started"):
+		TimeManager.day_started.connect(func(d: int) -> void: reiniciar_jornada_mostrador(d))
+	if TimeManager.has_signal("shop_closed"):
+		TimeManager.shop_closed.connect(_on_shop_closed)
+	if TimeManager.has_signal("shop_opened"):
+		TimeManager.shop_opened.connect(_on_shop_opened)
+
+	reiniciar_jornada_mostrador(TimeManager.day if "day" in TimeManager else 1)
+
+func _on_shop_closed() -> void:
+	if pedidos_entregados_hoy < max_pedidos_hoy:
+		bell_button.disabled = true
+		bell_label.text = "17:00 PM — Portón comercial cerrado por hoy. Ve a descansar o a la mina."
+
+func _on_shop_opened() -> void:
+	if pedidos_entregados_hoy < max_pedidos_hoy:
+		bell_button.disabled = false
+		bell_label.text = "Aguardando llegada de ciudadano..."
+		if is_inside_tree() and is_visible_in_tree():
+			call_deferred("_verificar_llegada_automatica_ciudadano")
 
 func _on_visibility_changed() -> void:
 	if is_inside_tree() and is_visible_in_tree():
@@ -195,7 +393,10 @@ func _verificar_llegada_si_visible() -> void:
 	if is_inside_tree() and is_visible_in_tree():
 		_verificar_llegada_automatica_ciudadano()
 
-func reiniciar_jornada_mostrador() -> void:
+func reiniciar_jornada_mostrador(dia_actual: int = -1) -> void:
+	var dia: int = dia_actual if dia_actual > 0 else (TimeManager.day if "day" in TimeManager else 1)
+	customers = _obtener_clientes_para_dia(dia)
+	max_pedidos_hoy = customers.size()
 	pedidos_entregados_hoy = 0
 	clientes_atendidos_indices.clear()
 	_cliente_presente_en_ventanilla = false
@@ -208,15 +409,87 @@ func reiniciar_jornada_mostrador() -> void:
 	btn_to_forge.visible = false
 	dialogue_box.visible = false
 	customer_container.modulate.a = 0.0
-	bell_button.disabled = false
-	bell_label.text = "Aguardando llegada de ciudadano..."
+
+	var es_hora_comercial: bool = true
+	if "hour" in TimeManager:
+		es_hora_comercial = (TimeManager.hour >= 6 and TimeManager.hour < 17)
+
+	if es_hora_comercial:
+		bell_button.disabled = false
+		bell_label.text = "Aguardando llegada de ciudadano..."
+		_actualizar_busto_cliente("sargento")
+		if is_inside_tree() and is_visible_in_tree():
+			call_deferred("_verificar_llegada_automatica_ciudadano")
+	else:
+		bell_button.disabled = true
+		bell_label.text = "Portón comercial cerrado por la noche. Abre a las 06:00 AM."
+
+func _obtener_clientes_para_dia(num_dia: int) -> Array[Dictionary]:
+	if ROSTER_POR_DIA.has(num_dia):
+		var base: Array = ROSTER_POR_DIA[num_dia] as Array
+		var resultado: Array[Dictionary] = []
+		for elem in base:
+			if elem is Dictionary:
+				resultado.append((elem as Dictionary).duplicate(true))
+		return resultado
+	return _generar_clientes_procedurales(num_dia)
+
+func _generar_clientes_procedurales(num_dia: int) -> Array[Dictionary]:
+	var resultado: Array[Dictionary] = []
+	var pool: Array[Dictionary] = [
+		{
+			"name": "Patrulla de Vigilancia Feudal",
+			"faction": "Guarnición del Castillo",
+			"visual_id": "sargento",
+			"portrait": PORTRAIT_SERGEANT,
+			"dialogue_intro": "Herrero. Inspección de rutina del Día %d. Requerimos clavazón y herrajes de compuerta en Hierro Dulce para el cuartel. Trabaja rápido." % num_dia,
+			"dialogue_good": "Metal resistente y templado reglamentario. Buen servicio.",
+			"dialogue_bad": "Pieza torpe. Esperaba más de un herrero registrado en la comarca.",
+			"item_name": "Herraje de Compuerta Feudal",
+			"required_metal": "hierro_dulce",
+			"description": "Herraje de hierro dulce para compuertas de la guarnición.",
+			"specs": "• Barril: Hierro Dulce\n• Fragua: 1000°C - 1160°C (Fusión 1200°C)\n• Yunque: Formado simétrico\n• Corte: Sin rebabas\n• Temple y Pulido: Acero limpio",
+			"base_reward": 30 + (num_dia % 5) * 2
+		},
+		{
+			"name": "Gorki el Minero",
+			"faction": "Piconeros de la Galería Sur",
+			"visual_id": "molinero",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "¡Hola camarada! La roca profunda del nivel %d está desgastando nuestras herramientas. Necesitamos un pico de Acero al Carbono bien templado." % num_dia,
+			"dialogue_good": "¡Qué filo tenaz! Esta noche extraeremos buenas menas gracias a ti.",
+			"dialogue_bad": "Mmh, la punta tiene fisuras... tendré que usarlo con cuidado.",
+			"item_name": "Pico de Galería Profunda",
+			"required_metal": "acero_carbono",
+			"description": "Pico de minería en acero al carbono para roca viva.",
+			"specs": "• Barril: Acero al Carbono\n• Fragua: 920°C - 1040°C (Fusión 1140°C)\n• Yunque: Puntas opuestas\n• Corte: Cizallado limpio\n• Temple y Pulido: Acero oscuro tenaz",
+			"base_reward": 34 + (num_dia % 4) * 2
+		},
+		{
+			"name": "Doña Valeria (Mercader)",
+			"faction": "Caravanas de la Comarca",
+			"visual_id": "mercader",
+			"portrait": PORTRAIT_PEASANT,
+			"dialogue_intro": "Saludos, artesano. En el Día %d partimos hacia las tierras altas y requerimos un perno de Bronce de Forja que soporte las lluvias del paso de montaña." % num_dia,
+			"dialogue_good": "¡Pieza formidable! El bronce brilla perfecto y no se oxidará jamás.",
+			"dialogue_bad": "Un poco áspero, pero servirá para no quedarnos varados en el lodo.",
+			"item_name": "Perno de Bronce de Travesía",
+			"required_metal": "bronce_cobre",
+			"description": "Perno de bronce forjado inoxidable para carromatos de viaje.",
+			"specs": "• Barril: Bronce de Forja\n• Fragua: 740°C - 870°C (Fusión 1010°C)\n• Yunque: Cilindro maleable\n• Corte: Sin rebabas\n• Temple y Pulido: Brillo cobrizo",
+			"base_reward": 32 + (num_dia % 3) * 3
+		}
+	]
+	for p: Dictionary in pool:
+		resultado.append(p.duplicate(true))
+	return resultado
 
 func reset_if_stuck() -> void:
 	if _convocando_cliente:
 		return
-	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+	if pedidos_entregados_hoy >= max_pedidos_hoy:
 		bell_button.disabled = true
-		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		bell_label.text = "Jornada del día %d completada (%d de %d encargos). Ve a descansar o a la mina." % [TimeManager.day if "day" in TimeManager else 1, max_pedidos_hoy, max_pedidos_hoy]
 		return
 	if _cliente_presente_en_ventanilla:
 		bell_button.disabled = true
@@ -422,18 +695,18 @@ func _hacer_sonar_campana_por_ciudadano() -> void:
 func _verificar_llegada_automatica_ciudadano() -> void:
 	if not is_inside_tree():
 		return
-	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+	if pedidos_entregados_hoy >= max_pedidos_hoy:
 		bell_button.disabled = true
-		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		bell_label.text = "Jornada del día %d completada (%d de %d encargos). Ve a descansar o a la mina." % [TimeManager.day if "day" in TimeManager else 1, max_pedidos_hoy, max_pedidos_hoy]
 		return
 	if _cliente_presente_en_ventanilla or has_active_order or has_finished_piece or _convocando_cliente:
 		return
 
 	var siguiente_idx: int = _seleccionar_siguiente_cliente_no_atendido()
 	if siguiente_idx == -1:
-		pedidos_entregados_hoy = MAX_PEDIDOS_DIA_1
+		pedidos_entregados_hoy = max_pedidos_hoy
 		bell_button.disabled = true
-		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		bell_label.text = "Jornada del día %d completada (%d de %d encargos). Ve a descansar o a la mina." % [TimeManager.day if "day" in TimeManager else 1, max_pedidos_hoy, max_pedidos_hoy]
 		return
 
 	current_customer_index = siguiente_idx
@@ -444,9 +717,9 @@ func _verificar_llegada_automatica_ciudadano() -> void:
 	_summon_customer()
 
 func _on_bell_clicked() -> void:
-	if pedidos_entregados_hoy >= MAX_PEDIDOS_DIA_1:
+	if pedidos_entregados_hoy >= max_pedidos_hoy:
 		bell_button.disabled = true
-		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		bell_label.text = "Jornada del día %d completada (%d de %d encargos). Ve a descansar o a la mina." % [TimeManager.day if "day" in TimeManager else 1, max_pedidos_hoy, max_pedidos_hoy]
 		return
 	if _cliente_presente_en_ventanilla or has_active_order or has_finished_piece or _convocando_cliente:
 		bell_button.disabled = true
@@ -751,10 +1024,10 @@ func _on_deliver_item_pressed() -> void:
 	_cliente_presente_en_ventanilla = false
 
 	var siguiente_idx: int = _seleccionar_siguiente_cliente_no_atendido()
-	if pedidos_entregados_hoy < MAX_PEDIDOS_DIA_1 and siguiente_idx != -1:
+	if pedidos_entregados_hoy < max_pedidos_hoy and siguiente_idx != -1:
 		current_customer_index = siguiente_idx
 		bell_button.disabled = true
-		bell_label.text = "Aguardando llegada del siguiente ciudadano (%d de %d)..." % [pedidos_entregados_hoy + 1, MAX_PEDIDOS_DIA_1]
+		bell_label.text = "Aguardando llegada del siguiente ciudadano (%d de %d)..." % [pedidos_entregados_hoy + 1, max_pedidos_hoy]
 		var espera_siguiente: float = 0.05 if es_headless else 1.2
 		await get_tree().create_timer(espera_siguiente).timeout
 		if not is_inside_tree():
@@ -762,9 +1035,9 @@ func _on_deliver_item_pressed() -> void:
 		if is_visible_in_tree():
 			_verificar_llegada_automatica_ciudadano()
 	else:
-		pedidos_entregados_hoy = MAX_PEDIDOS_DIA_1
+		pedidos_entregados_hoy = max_pedidos_hoy
 		bell_button.disabled = true
-		bell_label.text = "Jornada del día completada (3 de 3 encargos). Ve a descansar."
+		bell_label.text = "Jornada del día %d completada (%d de %d encargos). Ve a descansar o a la mina." % [TimeManager.day if "day" in TimeManager else 1, max_pedidos_hoy, max_pedidos_hoy]
 		dialogue_box.visible = true
-		dialogue_text.text = "Has completado los 3 encargos del día. El taller cierra la ventanilla por hoy."
+		dialogue_text.text = "Has completado los %d encargos del Día %d. El taller baja el portón comercial por hoy." % [max_pedidos_hoy, TimeManager.day if "day" in TimeManager else 1]
 		dialogue_text.visible_characters = -1

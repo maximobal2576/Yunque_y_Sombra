@@ -9,6 +9,7 @@ signal shop_opened()
 signal shop_closed()
 signal midnight_approaching()
 signal player_passed_out()
+signal daily_summary_requested(resumen_info: Dictionary)
 
 var day: int = 1
 var hour: int = 6
@@ -56,35 +57,115 @@ func advance_hour() -> void:
 		trigger_midnight_passout()
 
 func trigger_midnight_passout() -> void:
+	if not is_time_running and GameManager.current_state == GameManager.State.SLEEPING:
+		return
 	is_time_running = false
 	GameManager.change_state(GameManager.State.SLEEPING)
 	GameManager.consume_stamina(GameManager.stamina) # Vaciado total de estamina por colapso
 	emit_signal("player_passed_out")
-	GameManager.post_notification("¡Colapsaste de fatiga a medianoche! Un vecino te arrastró a tu cama...")
 	
-	# Transicion al dia siguiente con solo 50% de energia
-	await get_tree().create_timer(3.0).timeout
-	start_new_day(0.5)
+	var es_en_interior: bool = ("zona_actual" in GameManager and GameManager.zona_actual == "interior")
+	var stamina_pct: float = 0.5 if es_en_interior else 0.4
+	var monedas_robadas: int = 0
+	var tipo_descanso: String = "desmayo_taller" if es_en_interior else "desmayo_exterior"
+	var titulo_descanso: String = ""
+	var desc_descanso: String = ""
+	
+	if es_en_interior:
+		titulo_descanso = "Colapso por Agotamiento en el Taller"
+		desc_descanso = "La medianoche te sorprendió sin descansar. Despiertas en tu cama con fatiga acumulada (50% de vigor)."
+		GameManager.post_notification("¡Colapsaste de agotamiento a las 00:00 dentro de casa!")
+	else:
+		titulo_descanso = "Asalto Nocturno a la Intemperie"
+		if GameManager.coins > 0:
+			monedas_robadas = clampi(int(float(GameManager.coins) * 0.18), 5, GameManager.coins)
+			GameManager.add_coins(-monedas_robadas)
+			if "perdidas_oro_hoy" in GameManager:
+				GameManager.perdidas_oro_hoy += monedas_robadas
+		if "menas_en_mano_cantidad" in GameManager and GameManager.menas_en_mano_cantidad > 0:
+			GameManager.menas_en_mano_cantidad = 0
+			GameManager.menas_en_mano_tipo = ""
+			if GameManager.has_signal("menas_en_mano_cambiado"):
+				GameManager.menas_en_mano_cambiado.emit("", 0)
+		desc_descanso = "Colapsaste a las 00:00 a la intemperie. Maleantes te robaron %d monedas de oro y te arrastraron a tu cama (40%% de vigor)." % monedas_robadas
+		GameManager.post_notification("¡Colapso a medianoche! Fuiste asaltado y perdiste %d monedas..." % monedas_robadas)
+	
+	var info_resumen: Dictionary = {
+		"tipo_descanso": tipo_descanso,
+		"titulo_descanso": titulo_descanso,
+		"desc_descanso": desc_descanso,
+		"stamina_pct": stamina_pct,
+		"monedas_robadas": monedas_robadas,
+		"pedidos_ayer": GameManager.pedidos_completados_hoy if "pedidos_completados_hoy" in GameManager else 0,
+		"ganancias_ayer": GameManager.ganancias_oro_hoy if "ganancias_oro_hoy" in GameManager else 0,
+		"saldo_actual": GameManager.coins,
+		"nuevo_dia": day + 1
+	}
+	
+	var es_headless: bool = DisplayServer.get_name() == "headless"
+	var dur_espera: float = 0.08 if es_headless else 1.5
+	await get_tree().create_timer(dur_espera).timeout
+	start_new_day(stamina_pct, info_resumen)
 
 func sleep_voluntarily() -> void:
+	if not is_time_running and GameManager.current_state == GameManager.State.SLEEPING:
+		return
 	is_time_running = false
 	GameManager.change_state(GameManager.State.SLEEPING)
 	GameManager.post_notification("Te recuestas en tu cama y descansas profundamente...")
 	
-	# Transicion al dia siguiente con 100% de energia
-	await get_tree().create_timer(2.0).timeout
-	start_new_day(1.0)
+	var info_resumen: Dictionary = {
+		"tipo_descanso": "voluntario",
+		"titulo_descanso": "Descanso Pleno en Cama",
+		"desc_descanso": "Descansaste plácidamente antes de medianoche. Despiertas a las 06:00 AM con el 100% de tu vigor restaurado.",
+		"stamina_pct": 1.0,
+		"monedas_robadas": 0,
+		"pedidos_ayer": GameManager.pedidos_completados_hoy if "pedidos_completados_hoy" in GameManager else 0,
+		"ganancias_ayer": GameManager.ganancias_oro_hoy if "ganancias_oro_hoy" in GameManager else 0,
+		"saldo_actual": GameManager.coins,
+		"nuevo_dia": day + 1
+	}
+	
+	var es_headless: bool = DisplayServer.get_name() == "headless"
+	var dur_espera: float = 0.08 if es_headless else 1.2
+	await get_tree().create_timer(dur_espera).timeout
+	start_new_day(1.0, info_resumen)
 
-func start_new_day(stamina_percentage: float = 1.0) -> void:
+func start_new_day(stamina_percentage: float = 1.0, info_resumen: Dictionary = {}) -> void:
 	day += 1
 	hour = 6
 	minute = 0
-	is_time_running = true
 	GameManager.restore_stamina(stamina_percentage)
-	GameManager.change_state(GameManager.State.OVERWORLD)
+	if GameManager.has_method("reiniciar_jornada_diaria"):
+		GameManager.reiniciar_jornada_diaria(day)
+	
+	if info_resumen.is_empty():
+		info_resumen = {
+			"tipo_descanso": "voluntario",
+			"titulo_descanso": "Descanso en Cama",
+			"desc_descanso": "Amanece un nuevo día de forja.",
+			"stamina_pct": stamina_percentage,
+			"monedas_robadas": 0,
+			"pedidos_ayer": GameManager.pedidos_ayer if "pedidos_ayer" in GameManager else 0,
+			"ganancias_ayer": GameManager.ganancias_ayer if "ganancias_ayer" in GameManager else 0,
+			"saldo_actual": GameManager.coins,
+			"nuevo_dia": day
+		}
+	info_resumen["nuevo_dia"] = day
+	
 	emit_signal("day_started", day)
 	emit_current_time()
+	emit_signal("shop_opened")
+	emit_signal("daily_summary_requested", info_resumen)
 	GameManager.post_notification("Amanecer del Día %d (06:00 AM) — Tu energía ha sido restaurada." % day)
+	
+	var es_headless: bool = DisplayServer.get_name() == "headless"
+	if es_headless:
+		confirmar_inicio_jornada()
+
+func confirmar_inicio_jornada() -> void:
+	is_time_running = true
+	GameManager.change_state(GameManager.State.OVERWORLD)
 
 func get_phase_name() -> String:
 	if hour >= 6 and hour < 17:

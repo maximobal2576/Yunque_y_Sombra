@@ -1,0 +1,239 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/scenes/ui/PantallaResumenDia.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pergamino"]
+bg_color = Color(0.12, 0.09, 0.08, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.71, 0.6, 0.42, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_caja_seccion"]
+bg_color = Color(0.08, 0.06, 0.05, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.35, 0.26, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boton_normal"]
+bg_color = Color(0.22, 0.16, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.71, 0.6, 0.42, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boton_hover"]
+bg_color = Color(0.32, 0.24, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.85, 0.55, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PantallaResumenDia" type="CanvasLayer"]
+layer = 28
+script = ExtResource("1_script")
+
+[node name="FondoAtenuado" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.04, 0.03, 0.85)
+
+[node name="ContenedorCentrado" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelPergamino" type="PanelContainer" parent="ContenedorCentrado"]
+custom_minimum_size = Vector2(680, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pergamino")
+
+[node name="MargenInterno" type="MarginContainer" parent="ContenedorCentrado/PanelPergamino"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="ColumnaPrincipal" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EtiquetaTituloAmanecer" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.84, 0.48, 1)
+theme_override_font_sizes/font_size = 20
+text = "☀️ AMANECER DEL DÍA 2"
+horizontal_alignment = 1
+
+[node name="EtiquetaSubtitulo" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.82, 0.72, 1)
+theme_override_font_sizes/font_size = 12
+text = "06:00 AM — Despiertas en tus aposentos del taller"
+horizontal_alignment = 1
+
+[node name="Separador1" type="HSeparator" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+
+[node name="PanelEstadoDescanso" type="PanelContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_caja_seccion")
+
+[node name="MargenDescanso" type="MarginContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelEstadoDescanso"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="ColumnaDescanso" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelEstadoDescanso/MargenDescanso"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EtiquetaTituloDescanso" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelEstadoDescanso/MargenDescanso/ColumnaDescanso"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+text = "🛌 Descanso Pleno en Cama"
+
+[node name="EtiquetaDescDescanso" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelEstadoDescanso/MargenDescanso/ColumnaDescanso"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "Descansaste plácidamente antes de medianoche. Tu vigor ha sido restaurado al 100%."
+autowrap_mode = 3
+
+[node name="Separador2" type="HSeparator" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+
+[node name="PanelLibroCuentas" type="PanelContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_caja_seccion")
+
+[node name="MargenCuentas" type="MarginContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="ColumnaCuentas" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EtiquetaTituloCuentas" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.7, 0.44, 1)
+theme_override_font_sizes/font_size = 13
+text = "LIBRO DE CUENTAS DEL TALLER"
+
+[node name="FilaMetricas" type="HBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ColumnaIzq" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EtiquetaPedidosAyer" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas/ColumnaIzq"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "Encargos ayer: 3 completados"
+
+[node name="EtiquetaGananciasAyer" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas/ColumnaIzq"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.56, 0.89, 0.53, 1)
+theme_override_font_sizes/font_size = 12
+text = "Ganancias por forja: +75 monedas de oro"
+
+[node name="ColumnaDer" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EtiquetaPerdidasAyer" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas/ColumnaDer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.48, 0.48, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pérdidas nocturnas: 0 monedas"
+
+[node name="EtiquetaSaldoActual" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelLibroCuentas/MargenCuentas/ColumnaCuentas/FilaMetricas/ColumnaDer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.84, 0.48, 1)
+theme_override_font_sizes/font_size = 12
+text = "Saldo total en bolsa: 125 monedas de oro"
+
+[node name="Separador3" type="HSeparator" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+
+[node name="PanelRumoresPueblo" type="PanelContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_caja_seccion")
+
+[node name="MargenRumores" type="MarginContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelRumoresPueblo"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="ColumnaRumores" type="VBoxContainer" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelRumoresPueblo/MargenRumores"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EtiquetaTituloRumores" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelRumoresPueblo/MargenRumores/ColumnaRumores"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.7, 0.44, 1)
+theme_override_font_sizes/font_size = 13
+text = "EL MURMULLO DEL POBLADO"
+
+[node name="EtiquetaTextoRumor" type="Label" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal/PanelRumoresPueblo/MargenRumores/ColumnaRumores"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "Los campesinos comentan con alivio en la plaza: el taller de Rodrik vuelve a martillar."
+autowrap_mode = 3
+
+[node name="Separador4" type="HSeparator" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+layout_mode = 2
+
+[node name="BotonComenzarJornada" type="Button" parent="ContenedorCentrado/PanelPergamino/MargenInterno/ColumnaPrincipal"]
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.96, 0.88, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_boton_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_boton_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_boton_normal")
+text = "Comenzar Jornada [ ESPACIO / ENTER ]"
